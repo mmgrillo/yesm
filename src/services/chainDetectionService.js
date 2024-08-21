@@ -2,6 +2,7 @@ const Moralis = require('moralis').default;
 const { EvmChain } = require('@moralisweb3/common-evm-utils');
 const axios = require('axios');
 const Web3 = require('web3');
+const config = require('../utils/config');
 
 class ChainDetectionService {
   constructor() {

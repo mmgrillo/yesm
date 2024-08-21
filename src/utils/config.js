@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+result = dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 module.exports = {
   port: process.env.PORT || 5001,
@@ -12,3 +12,4 @@ module.exports = {
   rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
   rateLimitMax: 100, // limit each IP to 100 requests per windowMs
 };
+
