@@ -1,148 +1,59 @@
-const Moralis = require('moralis').default;
-const { EvmChain } = require('@moralisweb3/common-evm-utils');
-const axios = require('axios');
-const Web3 = require('web3');
-const config = require('../utils/config');
+const evmService = require('./evmService');
+const bitcoinService = require('./bitcoinService');
+const solanaService = require('./solanaService');
+const logger = require('../utils/logger');
 
 class ChainDetectionService {
-  constructor() {
-    this.initializeMoralis();
-    this.initializeInfura();
-  }
-
-  async initializeMoralis() {
-    await Moralis.start({
-      apiKey: process.env.MORALIS_API_KEY,
-    });
-  }
-
-  initializeInfura() {
-    this.infuraEndpoints = {
-      ethereum: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      polygon: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      optimism: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      arbitrum: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-    };
-  }
-
   async detectChain(txHash) {
-    // Check EVM chains first using Moralis
-    const evmChain = await this.checkEVMChains(txHash);
-    if (evmChain) {
-      return evmChain;
-    }
-
-    // If Moralis fails, try Infura
-    const infuraChain = await this.checkInfuraChains(txHash);
-    if (infuraChain) {
-      return infuraChain;
-    }
-
-    // Check Bitcoin
-    if (await this.checkBitcoin(txHash)) {
-      return 'bitcoin';
-    }
-
-    // Check Solana
-    if (await this.checkSolana(txHash)) {
-      return 'solana';
-    }
-
-    return 'unknown';
-  }
-
-  async checkEVMChains(txHash) {
     try {
-      const chains = [
-        EvmChain.ETHEREUM,
-        EvmChain.POLYGON,
-        EvmChain.ARBITRUM,
-        EvmChain.OPTIMISM,
-        EvmChain.BASE
-      ];
-
-      for (const chain of chains) {
-        try {
-          const response = await Moralis.EvmApi.transaction.getTransaction({
-            transactionHash: txHash,
-            chain
-          });
-
-          if (response && response.result) {
-            return chain.name;
-          }
-        } catch (error) {
-          // If transaction is not found on this chain, continue to the next
-          if (error.message.includes('Transaction not found')) {
-            continue;
-          }
-          throw error;
-        }
+      logger.debug(`Detecting chain for transaction hash: ${txHash}`);
+      
+      // Check EVM chains first
+      const evmChain = await evmService.checkEVMChains(txHash);
+      if (evmChain) {
+        logger.info(`Transaction hash ${txHash} detected on EVM chain: ${evmChain}`);
+        return evmChain;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Error checking EVM chains with Moralis:', error.message);
-      return null;
-    }
-  }
-
-  async checkInfuraChains(txHash) {
-    for (const [chain, endpoint] of Object.entries(this.infuraEndpoints)) {
-      try {
-        const web3 = new Web3(new Web3.providers.HttpProvider(endpoint));
-        const transaction = await web3.eth.getTransaction(txHash);
-        
-        if (transaction) {
-          return chain;
-        }
-      } catch (error) {
-        console.error(`Error checking ${chain} with Infura:`, error.message);
+      // Check Bitcoin
+      if (await bitcoinService.checkBitcoin(txHash)) {
+        logger.info(`Transaction hash ${txHash} detected on Bitcoin`);
+        return 'bitcoin';
       }
-    }
-    return null;
-  }
 
-  async checkBitcoin(txHash) {
-    try {
-      const query = `
-        query {
-          bitcoin {
-            transactions(txHash: {is: "${txHash}"}) {
-              txHash
-            }
-          }
-        }
-      `;
+      // Check Solana
+      if (await solanaService.checkSolana(txHash)) {
+        logger.info(`Transaction hash ${txHash} detected on Solana`);
+        return 'solana';
+      }
 
-      const response = await axios.post('https://graphql.bitquery.io', 
-        { query },
-        { headers: { 'X-API-KEY': process.env.BITQUERY_API_KEY } }
-      );
-
-      return response.data.data.bitcoin.transactions.length > 0;
+      logger.warn(`Transaction hash ${txHash} does not match any known chain`);
+      return 'unknown';
     } catch (error) {
-      console.error('Error checking Bitcoin:', error.message);
-      return false;
-    }
-  }
-
-  async checkSolana(txHash) {
-    try {
-      const response = await axios.post('https://api.mainnet-beta.solana.com', {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getTransaction',
-        params: [
-          txHash,
-          'json'
-        ]
+      logger.error(`Error detecting chain for transaction hash ${txHash}: ${error.message}`, {
+        stack: error.stack,
+        txHash,
+        errorDetails: error,
       });
+      throw error;
+    }
+  }
 
-      return response.data.result !== null;
-    } catch (error) {
-      console.error('Error checking Solana:', error.message);
-      return false;
+  async fetchTransactionDetails(txHash, chain) {
+    switch (chain.toLowerCase()) {
+      case 'ethereum':
+      case 'polygon':
+      case 'arbitrum':
+      case 'optimism':
+        return evmService.fetchTransactionDetails(txHash, chain);
+      case 'bitcoin':
+        // Implement the logic if you want to fetch Bitcoin details similarly
+        return { message: 'Fetching Bitcoin transaction details not yet implemented' };
+      case 'solana':
+        // Implement the logic if you want to fetch Solana details similarly
+        return { message: 'Fetching Solana transaction details not yet implemented' };
+      default:
+        throw new Error(`Chain ${chain} is not supported for fetching transaction details.`);
     }
   }
 }
