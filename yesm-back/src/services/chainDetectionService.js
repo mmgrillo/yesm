@@ -1,3 +1,4 @@
+const { Moralis, EvmChain } = require('../utils/moralisInit');
 const evmService = require('./evmService');
 const bitcoinService = require('./bitcoinService');
 const solanaService = require('./solanaService');
@@ -7,12 +8,33 @@ class ChainDetectionService {
   async detectChain(txHash) {
     try {
       logger.debug(`Detecting chain for transaction hash: ${txHash}`);
-      
-      // Check EVM chains first
-      const evmChain = await evmService.checkEVMChains(txHash);
-      if (evmChain) {
-        logger.info(`Transaction hash ${txHash} detected on EVM chain: ${evmChain}`);
-        return evmChain;
+
+      // Check EVM chains first using Moralis
+      const evmChains = [
+        EvmChain.ETHEREUM,
+        EvmChain.POLYGON,
+        EvmChain.ARBITRUM,
+        EvmChain.OPTIMISM,
+        EvmChain.BSC,
+      ];
+
+      for (const chain of evmChains) {
+        try {
+          const response = await Moralis.EvmApi.transaction.getTransaction({
+            transactionHash: txHash,
+            chain: chain,
+          });
+
+          if (response && response.result) {
+            logger.info(`Transaction hash ${txHash} detected on EVM chain: ${chain.name}`);
+            return chain.name.split(' ')[0].toLowerCase(); // This will return 'ethereum' for 'Ethereum Mainnet'
+          }
+        } catch (error) {
+          if (error.message.includes('Transaction not found')) {
+            continue; // Try the next chain
+          }
+          throw error;
+        }
       }
 
       // Check Bitcoin
@@ -40,18 +62,26 @@ class ChainDetectionService {
   }
 
   async fetchTransactionDetails(txHash, chain) {
-    switch (chain.toLowerCase()) {
+    const normalizedChain = chain.toLowerCase().trim();
+    switch (normalizedChain) {
       case 'ethereum':
+      case 'ethereum mainnet':
+        return evmService.fetchTransactionDetails(txHash, 'ethereum');
       case 'polygon':
+        return evmService.fetchTransactionDetails(txHash, 'polygon');
       case 'arbitrum':
+        return evmService.fetchTransactionDetails(txHash, 'arbitrum');
       case 'optimism':
-        return evmService.fetchTransactionDetails(txHash, chain);
+        return evmService.fetchTransactionDetails(txHash, 'optimism');
+      case 'bsc':
+      case 'binance smart chain':
+        return evmService.fetchTransactionDetails(txHash, 'bsc');
+      case 'base':
+        return evmService.fetchTransactionDetails(txHash, 'base');
       case 'bitcoin':
-        // Implement the logic if you want to fetch Bitcoin details similarly
-        return { message: 'Fetching Bitcoin transaction details not yet implemented' };
+        return bitcoinService.fetchTransactionDetails(txHash);
       case 'solana':
-        // Implement the logic if you want to fetch Solana details similarly
-        return { message: 'Fetching Solana transaction details not yet implemented' };
+        return solanaService.fetchTransactionDetails(txHash);
       default:
         throw new Error(`Chain ${chain} is not supported for fetching transaction details.`);
     }

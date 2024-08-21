@@ -10,6 +10,13 @@ class BitcoinService {
           bitcoin {
             transactions(txHash: {is: "${txHash}"}) {
               txHash
+              blockNumber
+              sender
+              recipient
+              value
+              fee
+              confirmations
+              status
             }
           }
         }
@@ -34,6 +41,57 @@ class BitcoinService {
         errorDetails: error,
       });
       return false;
+    }
+  }
+
+  async fetchTransactionDetails(txHash) {
+    try {
+      const query = `
+        query {
+          bitcoin {
+            transactions(txHash: {is: "${txHash}"}) {
+              txHash
+              blockNumber
+              sender
+              recipient
+              value
+              fee
+              confirmations
+              status
+            }
+          }
+        }
+      `;
+
+      const response = await axios.post(
+        'https://graphql.bitquery.io',
+        { query },
+        { headers: { 'X-API-KEY': config.bitqueryApiKey } }
+      );
+
+      const transaction = response.data.data.bitcoin.transactions[0];
+
+      if (transaction) {
+        return {
+          blockchain: 'bitcoin',
+          status: transaction.status || 'Pending',
+          amount: transaction.value,
+          fee: transaction.fee,
+          from: transaction.sender,
+          to: transaction.recipient,
+          confirmations: transaction.confirmations,
+          blockNumber: transaction.blockNumber,
+        };
+      } else {
+        throw new Error('Transaction not found on Bitcoin');
+      }
+    } catch (error) {
+      logger.error(`Error fetching Bitcoin transaction details: ${error.message}`, {
+        stack: error.stack,
+        txHash,
+        errorDetails: error,
+      });
+      return null;
     }
   }
 }
