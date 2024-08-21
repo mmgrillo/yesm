@@ -265,3 +265,8 @@
 {"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-21T16:03:16.756Z"}
 {"level":"debug","message":"Detecting chain for transaction hash: 0x860b7c88690dc39a56eabeb278ac27325edfba2bbb0840306f83162c974fa10c","timestamp":"2024-08-21T16:03:23.845Z"}
 {"level":"info","message":"Transaction hash 0x860b7c88690dc39a56eabeb278ac27325edfba2bbb0840306f83162c974fa10c detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-21T16:03:24.723Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-21T16:27:32.721Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-21T16:27:32.724Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-21T16:27:32.903Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x860b7c88690dc39a56eabeb278ac27325edfba2bbb0840306f83162c974fa10c","timestamp":"2024-08-21T16:27:44.972Z"}
+{"level":"info","message":"Transaction hash 0x860b7c88690dc39a56eabeb278ac27325edfba2bbb0840306f83162c974fa10c detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-21T16:27:47.891Z"}
