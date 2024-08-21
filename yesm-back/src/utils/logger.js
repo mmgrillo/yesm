@@ -2,7 +2,7 @@ const winston = require('winston');
 const config = require('./config');
 
 const logger = winston.createLogger({
-  level: config.nodeEnv === 'production' ? 'info' : 'debug',
+  level: config.nodeEnv === 'production' ? 'info' : 'debug', // Use 'debug' level for more detailed logs
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
