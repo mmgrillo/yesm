@@ -44,8 +44,10 @@ const TransactionDetails = ({ txInfo }) => {
         </div>
         <div>
           <p><strong>Confirmations:</strong> {txInfo.confirmations}</p>
-          <p><strong>Sender:</strong> {txInfo.sender}</p>
-          <p><strong>Receiver:</strong> {txInfo.receiver}</p>
+          <p><strong>Sender:</strong> {txInfo.from}</p>
+          <p><strong>Receiver:</strong> {txInfo.to}</p>
+          <p><strong>Block Number:</strong> {txInfo.blockNumber}</p>
+          <p><strong>Timestamp:</strong> {txInfo.timestamp ? new Date(txInfo.timestamp).toLocaleString() : 'N/A'}</p>
         </div>
       </div>
       <div className="mt-4 bg-[#FFE4B5] p-2 rounded">

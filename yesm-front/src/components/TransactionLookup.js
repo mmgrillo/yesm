@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import axios from 'axios';
+import TransactionDetails from './TransactionDetails';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
   const [txHash, setTxHash] = useState('');
@@ -12,7 +15,8 @@ const TransactionLookup = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:5001/api/transactions/${txHash}`);
+      const response = await axios.get(`${API_URL}/api/transactions/${txHash}`);
+      console.log('Fetched Transaction Details:', response.data); // Log the response
       setTxInfo(response.data);
     } catch (err) {
       setError('Failed to fetch transaction details. Please try again.');
@@ -42,25 +46,7 @@ const TransactionLookup = () => {
         </button>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {txInfo && (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl mb-4 text-[#4A0E4E] font-semibold">Transaction Details</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p><strong>Blockchain:</strong> {txInfo.blockchain}</p>
-              <p><strong>Status:</strong> {txInfo.status}</p>
-              <p><strong>Amount:</strong> {txInfo.amount} {txInfo.currency}</p>
-              <p><strong>Fee:</strong> {txInfo.fee} {txInfo.currency}</p>
-            </div>
-            <div>
-              <p><strong>From:</strong> {txInfo.from}</p>
-              <p><strong>To:</strong> {txInfo.to}</p>
-              <p><strong>Confirmations:</strong> {txInfo.confirmations}</p>
-              <p><strong>Block Number:</strong> {txInfo.blockNumber}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {txInfo && <TransactionDetails txInfo={txInfo} />}
     </div>
   );
 };
