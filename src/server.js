@@ -1,11 +1,13 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
 const config = require('./utils/config');
 const logger = require('./utils/logger');
 const { handleError } = require('./utils/errorHandler');
+const { initializeMoralis } = require('./utils/moralisInit');
 
 const app = express();
 
@@ -26,17 +28,19 @@ app.use(limiter);
 app.use(express.json());
 
 // API routes
+app.use(cors());
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/transactions', transactionRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  handleError(err, res);
+  handleError(err, req, res);
 });
 
 // Start server
 const startServer = async () => {
   try {
+    await initializeMoralis();
     app.listen(config.port, () => {
       logger.info(`Server is running on port ${config.port}`);
     });

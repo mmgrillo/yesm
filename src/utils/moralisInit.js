@@ -1,4 +1,5 @@
 const Moralis = require('moralis').default;
+const { EvmChain } = require('@moralisweb3/common-evm-utils');
 const config = require('./config');
 const logger = require('./logger');
 
@@ -20,4 +21,4 @@ const initializeMoralis = async () => {
   return Moralis;
 };
 
-module.exports = initializeMoralis;
+module.exports = { initializeMoralis, Moralis, EvmChain };
