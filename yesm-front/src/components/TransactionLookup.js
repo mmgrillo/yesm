@@ -16,7 +16,7 @@ const TransactionLookup = () => {
     setError(null);
     try {
       const response = await axios.get(`${API_URL}/api/transactions/${txHash}`);
-      console.log('Fetched Transaction Details:', response.data); // Log the response
+      console.log('Fetched Transaction Details:', response.data);
       setTxInfo(response.data);
     } catch (err) {
       setError('Failed to fetch transaction details. Please try again.');
@@ -34,7 +34,7 @@ const TransactionLookup = () => {
           value={txHash} 
           onChange={(e) => setTxHash(e.target.value)}
           placeholder="Paste your transaction hash here"
-          className="flex-grow p-3 border-2 rounded-l-lg border-[#4A0E4E] focus:outline-none focus:ring-2 focus:ring-[#4A0E4E]"
+          className="flex-grow p-3 rounded-l-lg bg-[#FFEBCC] border-none focus:outline-none focus:ring-2 focus:ring-[#4A0E4E] text-[#4A0E4E] placeholder-[#4A0E4E]"
         />
         <button 
           onClick={handleCheck}
