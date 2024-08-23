@@ -1,3 +1,4 @@
+const Web3 = require('web3').default;
 const axios = require('axios');
 const config = require('../utils/config');
 const logger = require('../utils/logger');
@@ -8,18 +9,21 @@ class EVMService {
     this.initWeb3();
   }
 
-  async initWeb3() {
+  initWeb3() {
     try {
-      const Web3 = await import('web3');
-      if (config.infuraProjectId) {
-        this.web3 = new Web3.default(`https://mainnet.infura.io/v3/${config.infuraProjectId}`);
-      } else {
-        // Fallback to a public Ethereum node if Infura ID is not available
-        this.web3 = new Web3.default('https://eth-mainnet.public.blastapi.io');
+      // Ensure that Web3 is indeed a constructor function
+      if (typeof Web3 !== 'function') {
+        throw new Error('Web3 is not a constructor function');
       }
+  
+      // Initialize Web3
+      this.web3 = new Web3(config.infuraProjectId 
+        ? `https://mainnet.infura.io/v3/${config.infuraProjectId}`
+        : 'https://eth-mainnet.public.blastapi.io');
       logger.info('Web3 initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize Web3:', error);
+      throw error; // Throw error to prevent further execution if Web3 fails to initialize
     }
   }
 
