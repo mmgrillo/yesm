@@ -71,8 +71,10 @@ const TransactionDetails = ({ txInfo }) => {
           <div className="space-y-4 text-left">
             <DetailRow label="Blockchain" value={txInfo.blockchain} />
             <DetailRow label="Status" value={txInfo.status} />
-            <DetailRow label="Amount" value={`${txInfo.amount} (${txInfo.amountUSD ? `$${txInfo.amountUSD}` : '$N/A'})`} />
-            <DetailRow label="Fee" value={`${txInfo.fee} (${txInfo.feeUSD ? `$${txInfo.feeUSD}` : '$N/A'})`} />
+            <DetailRow label="Amount" value={txInfo.amount} /> {/* Removed USD value */}
+            <DetailRow label="Value USD when transacted" value={`$${txInfo.valueWhenTransacted || 'N/A'}`} />
+            <DetailRow label="Value USD today" value={`$${txInfo.valueToday || 'N/A'}`} />
+            <DetailRow label="Fee" value={`${txInfo.fee} ($${txInfo.feeUSD || 'N/A'})`} /> {/* Updated to use feeUSD */}
             <DetailRow label="Confirmations" value={txInfo.confirmations} />
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
             <DetailRow label="Receiver" value={txInfo.to} isAddress={true} />

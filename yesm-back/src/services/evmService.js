@@ -39,27 +39,25 @@ class EVMService {
   async getEthPriceAtTimestamp(timestamp) {
     try {
       const date = new Date(timestamp * 1000).toISOString().split('T')[0];
-      const formattedDate = date.split('-').reverse().join('-'); // Format to DD-MM-YYYY
+      const formattedDate = date.split('-').reverse().join('-');
       const response = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/history`, {
         params: {
           date: formattedDate,
           localization: 'false'
         }
       });
-  
-      // Check if the response contains the historical price
+
       const price = response.data.market_data?.current_price?.usd || null;
       if (!price) {
         logger.error(`No price data available for ETH on date ${formattedDate}`);
       }
-  
+
       return price;
     } catch (error) {
       logger.error(`Error fetching historical ETH price: ${error.message}`);
       return null;
     }
   }
-  
 
   async getCurrentEthPrice() {
     try {
@@ -166,13 +164,16 @@ class EVMService {
       const valueWhenTransacted = ethPriceAtTransaction ? (parseFloat(amountInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
       const valueToday = currentEthPrice ? (parseFloat(amountInEther) * currentEthPrice).toFixed(2) : 'N/A';
 
+      // Calculate fee in USD at the time of transaction
+      const feeInUsdAtTransaction = ethPriceAtTransaction ? (parseFloat(feeInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
+
       return {
         blockchain: chain,
         status: status === '1' ? 'Success' : 'Failed',
         amount: amountInEther,
         amountUSD: valueWhenTransacted,
         fee: feeInEther,
-        feeUSD: 'N/A',
+        feeUSD: feeInUsdAtTransaction, // Include the fee in USD
         from: transaction.from,
         to: transaction.to,
         confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A',
