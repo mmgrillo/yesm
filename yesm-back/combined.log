@@ -376,3 +376,120 @@
 {"level":"info","message":"Transaction hash 0x31915e391b3bb55dd2c37db80fda02441d23e661b349c356e97bc092e5f3798f detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-24T08:53:41.803Z"}
 {"level":"debug","message":"Detecting chain for transaction hash: 0x5d4a81c6ec462b787447196752e5819bf13d1672825d7544af032ae71b7145ba","timestamp":"2024-08-24T08:53:53.987Z"}
 {"level":"info","message":"Transaction hash 0x5d4a81c6ec462b787447196752e5819bf13d1672825d7544af032ae71b7145ba detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-24T08:53:54.557Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:31:40.355Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:31:40.359Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:31:40.360Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:32:25.446Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:32:26.811Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:39:35.348Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:39:35.356Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:39:35.357Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:39:46.823Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:39:46.827Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:39:46.828Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:39:48.096Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:39:48.100Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:39:48.100Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:41:44.585Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:41:44.592Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:41:44.594Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:41:49.072Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:41:50.455Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: this.web3.utils.toBN is not a function","stack":"TypeError: this.web3.utils.toBN is not a function\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:99:35)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T10:41:51.143Z","txHash":"0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:42:25.096Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:42:25.102Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:42:25.103Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:42:26.089Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:42:27.199Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:43:22.317Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:43:22.323Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:43:22.324Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:43:23.895Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:43:24.868Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: this.web3.utils.toBN is not a function","stack":"TypeError: this.web3.utils.toBN is not a function\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:99:35)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T10:43:25.601Z","txHash":"0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:43:46.287Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:43:46.291Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:43:46.292Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:43:48.681Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:43:49.286Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:43:49.290Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:43:49.291Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T10:43:50.832Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:43:51.285Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T10:44:02.864Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T10:44:03.771Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T10:44:22.002Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T10:44:22.006Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T10:44:22.007Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:05:24.915Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:05:24.922Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:05:24.923Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:05:27.040Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:05:28.095Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: fee is not defined","stack":"ReferenceError: fee is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:109:22)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:05:28.758Z","txHash":"0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:05:47.705Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:05:48.155Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: fee is not defined","stack":"ReferenceError: fee is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:109:22)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:05:48.814Z","txHash":"0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:05:56.795Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:05:56.798Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:05:56.799Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:05:58.561Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:05:58.908Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:06:25.969Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:06:25.974Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:06:25.975Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:06:28.652Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:06:29.432Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: fee is not defined","stack":"ReferenceError: fee is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:109:22)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:06:30.198Z","txHash":"0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:09:35.056Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:09:35.059Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:09:35.060Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:09:41.103Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:09:41.107Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:09:41.107Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:09:44.994Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:09:46.448Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: fee is not defined","stack":"ReferenceError: fee is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:122:22)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:09:47.532Z","txHash":"0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:10:31.907Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:10:31.911Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:10:31.911Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90","timestamp":"2024-08-25T11:10:34.031Z"}
+{"level":"info","message":"Transaction hash 0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:10:34.409Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: fee is not defined","stack":"ReferenceError: fee is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:122:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:10:35.066Z","txHash":"0x0be8b05c42785cd54c6d93cd869da7bee51ce086723bc1558a2723e4df5dad90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:10:47.157Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:10:47.162Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:10:47.163Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:18:30.983Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:18:30.987Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:18:30.988Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T11:18:34.021Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:18:34.995Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot mix BigInt and other types, use explicit conversions","stack":"TypeError: Cannot mix BigInt and other types, use explicit conversions\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:106:48)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:18:36.560Z","txHash":"0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:30:25.339Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:30:25.345Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:30:25.346Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T11:30:28.469Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:30:29.326Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot mix BigInt and other types, use explicit conversions","stack":"TypeError: Cannot mix BigInt and other types, use explicit conversions\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:107:48)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-25T11:30:30.481Z","txHash":"0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:30:52.662Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:30:52.667Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:30:52.668Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:32:14.650Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:32:14.654Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:32:14.655Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T11:32:17.067Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:32:17.766Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T11:32:37.238Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:32:37.629Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x5f7112aeeb6bc4881b4a99624b88bd4664733ca4206a7e829602a7c0bc6ddee1","timestamp":"2024-08-25T11:32:46.840Z"}
+{"level":"info","message":"Transaction hash 0x5f7112aeeb6bc4881b4a99624b88bd4664733ca4206a7e829602a7c0bc6ddee1 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:32:47.208Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:34:02.829Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:34:02.833Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:34:02.834Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x5f7112aeeb6bc4881b4a99624b88bd4664733ca4206a7e829602a7c0bc6ddee1","timestamp":"2024-08-25T11:34:04.388Z"}
+{"level":"info","message":"Transaction hash 0x5f7112aeeb6bc4881b4a99624b88bd4664733ca4206a7e829602a7c0bc6ddee1 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:34:05.233Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0","timestamp":"2024-08-25T11:34:31.849Z"}
+{"level":"info","message":"Transaction hash 0x032d207e6893d1a8ecbb3f15fc0ee373625dec940ff1638231d1918ae65390c0 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-25T11:34:32.318Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-25T11:34:42.112Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-25T11:34:42.117Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-25T11:34:42.118Z"}

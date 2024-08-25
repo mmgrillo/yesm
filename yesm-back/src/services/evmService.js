@@ -1,4 +1,4 @@
-const Web3 = require('web3').default;
+const Web3 = require('web3').default; // Ensure we use the correct import
 const axios = require('axios');
 const config = require('../utils/config');
 const logger = require('../utils/logger');
@@ -11,21 +11,32 @@ class EVMService {
 
   initWeb3() {
     try {
-      // Ensure that Web3 is indeed a constructor function
-      if (typeof Web3 !== 'function') {
-        throw new Error('Web3 is not a constructor function');
-      }
-  
-      // Initialize Web3
-      this.web3 = new Web3(config.infuraProjectId 
-        ? `https://mainnet.infura.io/v3/${config.infuraProjectId}`
-        : 'https://eth-mainnet.public.blastapi.io');
+      // Initialize Web3 directly with the provider URL
+      this.web3 = new Web3(
+        config.infuraProjectId 
+          ? `https://mainnet.infura.io/v3/${config.infuraProjectId}`
+          : 'https://eth-mainnet.public.blastapi.io'
+      );
       logger.info('Web3 initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize Web3:', error);
       throw error; // Throw error to prevent further execution if Web3 fails to initialize
     }
   }
+
+  fromWei(value, unit = 'ether') {
+    const units = {
+        'wei': BigInt('1'),
+        'kwei': BigInt('1000'),
+        'mwei': BigInt('1000000'),
+        'gwei': BigInt('1000000000'),
+        'ether': BigInt('1000000000000000000')
+    };
+    const divisor = units[unit];
+    const result = BigInt(value) * 100000n / divisor; // Multiply by 100000 to retain precision
+    return (result / 100000n).toString() + '.' + (result % 100000n).toString().padStart(5, '0');
+}
+
 
   async fetchTransactionDetails(txHash, chain) {
     try {
@@ -87,31 +98,27 @@ class EVMService {
 
       const status = statusResponse.data.result.status;
 
-      const fromWei = (value) => {
-        try {
-          return this.web3.utils.fromWei(value, 'ether');
-        } catch (error) {
-          logger.error('Error converting value to ether:', error);
-          return value;
-        }
-      };
+      const gas = BigInt(transaction.gas);
+      const gasPrice = BigInt(transaction.gasPrice);
 
-      /*
-      const gas = this.web3.utils.toBN(transaction.gas);
-      const gasPrice = this.web3.utils.toBN(transaction.gasPrice);
-      const fee = gas.mul(gasPrice);
-      */
+      const fee = gas * gasPrice;  // Calculate fee as gas * gasPrice
+
+      const feeInEther = this.fromWei(fee.toString()); // Convert fee to Ether
+
+      const currentBlockNumber = BigInt(await this.web3.eth.getBlockNumber());
+      const transactionBlockNumber = BigInt(parseInt(transaction.blockNumber, 16));
+      const confirmations = currentBlockNumber - transactionBlockNumber;
 
       return {
         blockchain: chain,
         status: status === '1' ? 'Success' : 'Failed',
-        amount: fromWei(transaction.value),
+        amount: this.fromWei(transaction.value), // Using the custom fromWei method
         amountUSD: 'N/A', // You'll need to implement price conversion
-        //fee: fromWei(fee),
+        fee: feeInEther, // Using the custom fromWei method for fee
         feeUSD: 'N/A', // You'll need to implement price conversion
         from: transaction.from,
         to: transaction.to,
-        confirmations: 'N/A', // This information might not be available from the API
+        confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A', // Ensure confirmations are included
         blockNumber: parseInt(transaction.blockNumber, 16),
         timestamp: transaction.timeStamp ? new Date(parseInt(transaction.timeStamp) * 1000).toISOString() : 'N/A'
       };
@@ -127,5 +134,3 @@ class EVMService {
 }
 
 module.exports = new EVMService();
-
-
