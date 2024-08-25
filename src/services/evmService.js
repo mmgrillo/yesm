@@ -167,20 +167,32 @@ class EVMService {
       // Calculate fee in USD at the time of transaction
       const feeInUsdAtTransaction = ethPriceAtTransaction ? (parseFloat(feeInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
 
+      // Calculate the difference between the past value and current value
+      const valueDifference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A' 
+        ? (parseFloat(valueToday) - parseFloat(valueWhenTransacted)).toFixed(2)
+        : 'N/A';
+      const gainOrLoss = valueDifference !== 'N/A' 
+        ? valueDifference > 0 
+          ? `🙂 +$${valueDifference}` 
+          : `☹️ -$${Math.abs(valueDifference)}`
+        : 'N/A';
+
       return {
         blockchain: chain,
         status: status === '1' ? 'Success' : 'Failed',
         amount: amountInEther,
         amountUSD: valueWhenTransacted,
         fee: feeInEther,
-        feeUSD: feeInUsdAtTransaction, // Include the fee in USD
+        feeUSD: feeInUsdAtTransaction,
         from: transaction.from,
         to: transaction.to,
         confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A',
         blockNumber: parseInt(transaction.blockNumber, 16),
         timestamp: timestamp ? new Date(timestamp * 1000).toISOString() : 'N/A',
         valueWhenTransacted: valueWhenTransacted,
-        valueToday: valueToday
+        valueToday: valueToday,
+        gainOrLoss: gainOrLoss, 
+        hash: txHash
       };
     } catch (error) {
       logger.error(`Error fetching transaction details from ${chain}: ${error.message}`, {
