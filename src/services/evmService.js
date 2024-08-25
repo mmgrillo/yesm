@@ -1,4 +1,4 @@
-const Web3 = require('web3').default; // Ensure we use the correct import
+const Web3 = require('web3').default;
 const axios = require('axios');
 const config = require('../utils/config');
 const logger = require('../utils/logger');
@@ -11,7 +11,6 @@ class EVMService {
 
   initWeb3() {
     try {
-      // Initialize Web3 directly with the provider URL
       this.web3 = new Web3(
         config.infuraProjectId 
           ? `https://mainnet.infura.io/v3/${config.infuraProjectId}`
@@ -20,7 +19,7 @@ class EVMService {
       logger.info('Web3 initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize Web3:', error);
-      throw error; // Throw error to prevent further execution if Web3 fails to initialize
+      throw error;
     }
   }
 
@@ -33,10 +32,49 @@ class EVMService {
         'ether': BigInt('1000000000000000000')
     };
     const divisor = units[unit];
-    const result = BigInt(value) * 100000n / divisor; // Multiply by 100000 to retain precision
+    const result = BigInt(value) * 100000n / divisor;
     return (result / 100000n).toString() + '.' + (result % 100000n).toString().padStart(5, '0');
-}
+  }
 
+  async getEthPriceAtTimestamp(timestamp) {
+    try {
+      const date = new Date(timestamp * 1000).toISOString().split('T')[0];
+      const formattedDate = date.split('-').reverse().join('-'); // Format to DD-MM-YYYY
+      const response = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/history`, {
+        params: {
+          date: formattedDate,
+          localization: 'false'
+        }
+      });
+  
+      // Check if the response contains the historical price
+      const price = response.data.market_data?.current_price?.usd || null;
+      if (!price) {
+        logger.error(`No price data available for ETH on date ${formattedDate}`);
+      }
+  
+      return price;
+    } catch (error) {
+      logger.error(`Error fetching historical ETH price: ${error.message}`);
+      return null;
+    }
+  }
+  
+
+  async getCurrentEthPrice() {
+    try {
+      const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+        params: {
+          ids: 'ethereum',
+          vs_currencies: 'usd'
+        }
+      });
+      return response.data.ethereum?.usd || null;
+    } catch (error) {
+      logger.error(`Error fetching current ETH price: ${error.message}`);
+      return null;
+    }
+  }
 
   async fetchTransactionDetails(txHash, chain) {
     try {
@@ -101,26 +139,47 @@ class EVMService {
       const gas = BigInt(transaction.gas);
       const gasPrice = BigInt(transaction.gasPrice);
 
-      const fee = gas * gasPrice;  // Calculate fee as gas * gasPrice
-
-      const feeInEther = this.fromWei(fee.toString()); // Convert fee to Ether
+      const fee = gas * gasPrice;
+      const feeInEther = this.fromWei(fee.toString());
 
       const currentBlockNumber = BigInt(await this.web3.eth.getBlockNumber());
       const transactionBlockNumber = BigInt(parseInt(transaction.blockNumber, 16));
       const confirmations = currentBlockNumber - transactionBlockNumber;
 
+      const blockResponse = await axios.get(apiUrl, {
+        params: {
+          module: 'proxy',
+          action: 'eth_getBlockByNumber',
+          tag: transaction.blockNumber,
+          boolean: 'false',
+          apikey: apiKey
+        }
+      });
+
+      const block = blockResponse.data.result;
+      const timestamp = block ? parseInt(block.timestamp, 16) : null;
+
+      const ethPriceAtTransaction = timestamp ? await this.getEthPriceAtTimestamp(timestamp) : null;
+      const currentEthPrice = await this.getCurrentEthPrice();
+
+      const amountInEther = this.fromWei(transaction.value);
+      const valueWhenTransacted = ethPriceAtTransaction ? (parseFloat(amountInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
+      const valueToday = currentEthPrice ? (parseFloat(amountInEther) * currentEthPrice).toFixed(2) : 'N/A';
+
       return {
         blockchain: chain,
         status: status === '1' ? 'Success' : 'Failed',
-        amount: this.fromWei(transaction.value), // Using the custom fromWei method
-        amountUSD: 'N/A', // You'll need to implement price conversion
-        fee: feeInEther, // Using the custom fromWei method for fee
-        feeUSD: 'N/A', // You'll need to implement price conversion
+        amount: amountInEther,
+        amountUSD: valueWhenTransacted,
+        fee: feeInEther,
+        feeUSD: 'N/A',
         from: transaction.from,
         to: transaction.to,
-        confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A', // Ensure confirmations are included
+        confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A',
         blockNumber: parseInt(transaction.blockNumber, 16),
-        timestamp: transaction.timeStamp ? new Date(parseInt(transaction.timeStamp) * 1000).toISOString() : 'N/A'
+        timestamp: timestamp ? new Date(timestamp * 1000).toISOString() : 'N/A',
+        valueWhenTransacted: valueWhenTransacted,
+        valueToday: valueToday
       };
     } catch (error) {
       logger.error(`Error fetching transaction details from ${chain}: ${error.message}`, {
