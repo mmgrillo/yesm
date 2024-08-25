@@ -66,15 +66,16 @@ const TransactionDetails = ({ txInfo }) => {
   return (
     <div className="p-8 min-h-screen flex flex-col items-center shadow-2xl" style={{ backgroundColor: '#FFEBCC' }}>
       <div className="w-full max-w-4xl mb-8 text-center">
-        <div className="p-8 rounded-lg shadow-md" style={{ backgroundColor: '#FFF7E6', borderColor: '#FFD700', borderWidth: '2px' }}>
-          <h2 className="text-4xl mb-6 text-[#4A0E4E] font-bold tracking-wide">Last Transaction</h2>
+        <div className="p-8 rounded-lg shadow-md bg-yellow-100 border-2" style={{ backgroundColor: '#FFF7E6', borderColor: '#FFD700', borderWidth: '2px' }}>
+        <h2 className="text-4xl mb-6 text-[#4A0E4E] font-bold tracking-wide">Last Transaction</h2>
           <div className="space-y-4 text-left">
             <DetailRow label="Blockchain" value={txInfo.blockchain} />
             <DetailRow label="Status" value={txInfo.status} />
-            <DetailRow label="Amount" value={txInfo.amount} /> {/* Removed USD value */}
+            <DetailRow label="Amount" value={txInfo.amount} />
             <DetailRow label="Value USD when transacted" value={`$${txInfo.valueWhenTransacted || 'N/A'}`} />
             <DetailRow label="Value USD today" value={`$${txInfo.valueToday || 'N/A'}`} />
-            <DetailRow label="Fee" value={`${txInfo.fee} ($${txInfo.feeUSD || 'N/A'})`} /> {/* Updated to use feeUSD */}
+            <DetailRow label="Difference" value={txInfo.gainOrLoss} />
+            <DetailRow label="Fee" value={`${txInfo.fee} ($${txInfo.feeUSD || 'N/A'})`} />
             <DetailRow label="Confirmations" value={txInfo.confirmations} />
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
             <DetailRow label="Receiver" value={txInfo.to} isAddress={true} />
@@ -92,16 +93,11 @@ const TransactionDetails = ({ txInfo }) => {
         {recentTransactions.map((transaction, index) => (
           <div
             key={index}
-            className="relative p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
-            style={{
-              backgroundColor: '#FFF7E6',
-              border: '2px solid #FFD700',
-              borderRadius: '16px',
-            }}
+            className="relative p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-yellow-300 to-yellow-500 border-2 border-yellow-600"
           >
             <div className="absolute inset-0 bg-white opacity-10 rounded-xl"></div>
             <div className="relative z-10">
-              <div className="mb-3 text-xl font-bold text-[#4A0E4E] uppercase tracking-wide">
+              <div className="mb-3 text-xl font-bold text-purple-800 uppercase tracking-wide">
                 {transaction.blockchain}
               </div>
               <a
@@ -113,11 +109,12 @@ const TransactionDetails = ({ txInfo }) => {
                 <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash || transaction.txHash)}</p>
               </a>
               <p className="text-sm text-gray-700 mb-2">
-                <strong>Amount:</strong>
+                <strong>Amount (ETH):</strong>
                 <br />
-                {truncateAmount(transaction.amount)} (${transaction.amountUSD})
+                {truncateAmount(transaction.amount)}
               </p>
-              <p className="text-sm text-gray-700"><strong>Block Number:</strong> {transaction.blockNumber}</p>
+              <p className="text-sm text-gray-700 mb-2"><strong>Balance:</strong> {transaction.gainOrLoss}</p>
+              <p className="text-sm text-gray-700 mb-2"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
             </div>
           </div>
         ))}
