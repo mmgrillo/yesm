@@ -111,44 +111,93 @@ class EVMService {
       const response = await axios.get(apiUrl, {
         params: {
           module: 'proxy',
-          action: 'eth_getTransactionByHash',
+          action: 'eth_getTransactionReceipt',
           txhash: txHash,
           apikey: apiKey
         }
       });
 
-      const transaction = response.data.result;
+      const transactionReceipt = response.data.result;
 
-      if (!transaction) {
+      if (!transactionReceipt) {
         throw new Error(`Transaction not found on ${chain}`);
       }
 
-      const statusResponse = await axios.get(apiUrl, {
-        params: {
-          module: 'transaction',
-          action: 'gettxreceiptstatus',
-          txhash: txHash,
-          apikey: apiKey
+      const status = transactionReceipt.status;
+      const isSuccessful = status === '0x1';
+
+      const logs = transactionReceipt.logs || [];
+      let amountInEther = '0';
+      let tokenSymbol = 'ETH';
+
+      // Handle ERC-20 token transactions
+      for (const log of logs) {
+        if (log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
+          // This is an ERC-20 transfer
+          const tokenAddress = log.address;
+          const tokenValue = log.data;
+
+          try {
+            // Fetch token decimals
+            let tokenDecimalsResponse = await axios.get(apiUrl, {
+              params: {
+                module: 'proxy',
+                action: 'eth_call',
+                to: tokenAddress,
+                data: '0x313ce567', // Function selector for decimals()
+                tag: 'latest',
+                apikey: apiKey
+              }
+            });
+
+            let tokenDecimals = parseInt(tokenDecimalsResponse.data.result, 16);
+
+            if (isNaN(tokenDecimals) || tokenDecimals === 0) {
+              logger.warn(`Invalid token decimals for token address: ${tokenAddress}. Defaulting to 18.`);
+              tokenDecimals = 18; // Defaulting to standard 18 decimals for ERC-20 tokens
+            }
+
+            // Safely convert tokenValue and calculate amountInEther
+            const tokenValueBigInt = BigInt(tokenValue);
+            const divisorBigInt = BigInt(10 ** tokenDecimals);
+            amountInEther = (tokenValueBigInt / divisorBigInt).toString();
+          } catch (err) {
+            logger.error(`Error fetching token decimals for token address: ${tokenAddress}, defaulting decimals to 18`, err);
+            amountInEther = '0'; // Fallback if something goes wrong
+          }
+
+          try {
+            // Fetch token symbol
+            const tokenSymbolResponse = await axios.get(apiUrl, {
+              params: {
+                module: 'proxy',
+                action: 'eth_call',
+                to: tokenAddress,
+                data: '0x95d89b41', // Function selector for symbol()
+                tag: 'latest',
+                apikey: apiKey
+              }
+            });
+
+            tokenSymbol = tokenSymbolResponse.data.result ? Web3.utils.hexToUtf8(tokenSymbolResponse.data.result) : 'ERC20';
+          } catch (err) {
+            logger.error(`Error fetching token symbol for token address: ${tokenAddress}, defaulting to 'ERC20'`, err);
+            tokenSymbol = 'ERC20'; // Default fallback
+          }
+
+          break;
         }
-      });
-
-      const status = statusResponse.data.result.status;
-
-      const gas = BigInt(transaction.gas);
-      const gasPrice = BigInt(transaction.gasPrice);
-
-      const fee = gas * gasPrice;
-      const feeInEther = this.fromWei(fee.toString());
+      }
 
       const currentBlockNumber = BigInt(await this.web3.eth.getBlockNumber());
-      const transactionBlockNumber = BigInt(parseInt(transaction.blockNumber, 16));
+      const transactionBlockNumber = BigInt(parseInt(transactionReceipt.blockNumber, 16));
       const confirmations = currentBlockNumber - transactionBlockNumber;
 
       const blockResponse = await axios.get(apiUrl, {
         params: {
           module: 'proxy',
           action: 'eth_getBlockByNumber',
-          tag: transaction.blockNumber,
+          tag: transactionReceipt.blockNumber,
           boolean: 'false',
           apikey: apiKey
         }
@@ -157,42 +206,36 @@ class EVMService {
       const block = blockResponse.data.result;
       const timestamp = block ? parseInt(block.timestamp, 16) : null;
 
+      if (!timestamp || timestamp === 0) {
+        logger.error('Invalid timestamp received from block data.');
+        return null;
+      }
+
       const ethPriceAtTransaction = timestamp ? await this.getEthPriceAtTimestamp(timestamp) : null;
       const currentEthPrice = await this.getCurrentEthPrice();
 
-      const amountInEther = this.fromWei(transaction.value);
       const valueWhenTransacted = ethPriceAtTransaction ? (parseFloat(amountInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
       const valueToday = currentEthPrice ? (parseFloat(amountInEther) * currentEthPrice).toFixed(2) : 'N/A';
 
-      // Calculate fee in USD at the time of transaction
-      const feeInUsdAtTransaction = ethPriceAtTransaction ? (parseFloat(feeInEther) * ethPriceAtTransaction).toFixed(2) : 'N/A';
-
-      // Calculate the difference between the past value and current value
-      const valueDifference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A' 
-        ? (parseFloat(valueToday) - parseFloat(valueWhenTransacted)).toFixed(2)
-        : 'N/A';
-      const gainOrLoss = valueDifference !== 'N/A' 
-        ? valueDifference > 0 
-          ? `🙂 +$${valueDifference}` 
-          : `☹️ -$${Math.abs(valueDifference)}`
-        : 'N/A';
+      // Convert fee from hexadecimal to decimal
+      const feeInDecimal = parseInt(transactionReceipt.gasUsed, 16).toString();
 
       return {
         blockchain: chain,
-        status: status === '1' ? 'Success' : 'Failed',
-        amount: amountInEther,
+        status: isSuccessful ? 'Success' : 'Failed',
+        amount: `${amountInEther} ${tokenSymbol}`,
         amountUSD: valueWhenTransacted,
-        fee: feeInEther,
-        feeUSD: feeInUsdAtTransaction,
-        from: transaction.from,
-        to: transaction.to,
+        fee: feeInDecimal,
+        feeUSD: 'N/A', // Adjust fee logic as needed
+        from: transactionReceipt.from,
+        to: transactionReceipt.to,
         confirmations: confirmations >= 0 ? confirmations.toString() : 'N/A',
-        blockNumber: parseInt(transaction.blockNumber, 16),
+        blockNumber: parseInt(transactionReceipt.blockNumber, 16),
         timestamp: timestamp ? new Date(timestamp * 1000).toISOString() : 'N/A',
         valueWhenTransacted: valueWhenTransacted,
         valueToday: valueToday,
-        gainOrLoss: gainOrLoss, 
-        hash: txHash
+        gainOrLoss: 'N/A', // Adjust gain/loss calculation as needed
+        hash: txHash // Include the transaction hash
       };
     } catch (error) {
       logger.error(`Error fetching transaction details from ${chain}: ${error.message}`, {
