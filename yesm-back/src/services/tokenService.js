@@ -1,7 +1,9 @@
-// src/services/tokenService.js
+const Web3 = require('web3').default;
 const axios = require('axios');
 const logger = require('../utils/logger');
-const CustomError = require('../utils/customError');  // Correct casing for the custom error utility
+const CustomError = require('../utils/customError');
+
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
 
 const getTokenDetails = async (tokenAddress, apiUrl, apiKey) => {
   try {
@@ -15,28 +17,20 @@ const getTokenDetails = async (tokenAddress, apiUrl, apiKey) => {
     ]);
 
     const tokenDecimals = parseInt(decimalsResponse.data.result, 16);
-    const tokenSymbol = Web3.utils.hexToUtf8(symbolResponse.data.result).trim();
+    const tokenSymbol = web3.utils.hexToUtf8(symbolResponse.data.result).trim().replace(/\0/g, '');
 
     return { tokenDecimals, tokenSymbol };
   } catch (error) {
     logger.error(`Error fetching token details for token address: ${tokenAddress}`, error);
-    return { tokenDecimals: null, tokenSymbol: null }; // Return nulls instead of throwing an error to allow processing to continue
+    return { tokenDecimals: 18, tokenSymbol: 'UNKNOWN' };
   }
 };
 
-const fromWei = (value, unit = 'ether') => {
-  const units = {
-    'wei': BigInt('1'),
-    'kwei': BigInt('1000'),
-    'mwei': BigInt('1000000'),
-    'gwei': BigInt('1000000000'),
-    'ether': BigInt('1000000000000000000')
-  };
-  const divisor = units[unit];
-  const result = BigInt(value) * 100000n / divisor;
-  return (result / 100000n).toString() + '.' + (result % 100000n).toString().padStart(5, '0');
+const fromWei = (value, decimals = 18) => {
+  const divisor = BigInt(10) ** BigInt(decimals);
+  const result = (BigInt(value) * BigInt(100000)) / divisor;
+  return (Number(result) / 100000).toFixed(5);
 };
-
 
 const getEthPrice = async (timestamp = null) => {
   try {

@@ -18,10 +18,6 @@ const TransactionDetails = ({ txInfo }) => {
     return hash && hash.length > 15 ? hash.substring(0, 12) + '...' : hash;
   };
 
-  const truncateAmount = (amount) => {
-    return amount && amount.length > 10 ? amount.substring(0, 7) + '...' : amount;
-  };
-
   useEffect(() => {
     if (txInfo) {
       setRecentTransactions((prevTransactions) => {
@@ -33,20 +29,20 @@ const TransactionDetails = ({ txInfo }) => {
 
   const renderDifference = (difference) => {
     if (difference === 'N/A') return { label: 'Difference', value: 'N/A' };
-    const numDifference = parseFloat(difference.replace('$', ''));
-    if (numDifference > 0) {
-      return { label: 'You are a King 👑', value: `+$${numDifference.toFixed(2)}` };
-    } else if (numDifference < 0) {
-      return { label: 'You are a Fool 😂', value: `-$${Math.abs(numDifference).toFixed(2)}` };
+    const diff = parseFloat(difference);
+    if (diff > 0) {
+      return { label: 'You are a King 👑', value: `$${diff.toFixed(2)}` };
+    } else if (diff < 0) {
+      return { label: 'You are a Fool 😂', value: `-$${Math.abs(diff).toFixed(2)}` };
     } else {
-      return { label: 'No change', value: `$${numDifference.toFixed(2)}` };
+      return { label: 'No change', value: '$0.00' };
     }
   };
 
   const DetailRow = ({ label, value, isAddress }) => (
-    <div className="flex justify-between items-center py-2 border-b border-gray-300">
-      <span className="font-semibold text-gray-700">{label}:</span>
-      <span className="text-right">
+    <div className="py-3 border-b border-gray-300">
+      <div className="font-semibold text-gray-700 mb-1">{label}</div>
+      <div className="text-right break-words">
         {isAddress ? (
           <a
             href={`https://etherscan.io/address/${value}`}
@@ -54,26 +50,16 @@ const TransactionDetails = ({ txInfo }) => {
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
           >
-            <span className="group relative">
-              {truncateHash(value)}
-              <span className="invisible group-hover:visible absolute -top-8 right-0 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {value}
-              </span>
-            </span>
+            {value}
           </a>
         ) : (
-          <span className="group relative">
-            {typeof value === 'string' && value.length > 15 ? truncateHash(value) : value}
-            {typeof value === 'string' && value.length > 15 && (
-              <span className="invisible group-hover:visible absolute -top-8 right-0 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {value}
-              </span>
-            )}
-          </span>
+          value
         )}
-      </span>
+      </div>
     </div>
   );
+
+  const { label: differenceLabel, value: differenceValue } = renderDifference(txInfo.difference);
 
   return (
     <div className="p-8 min-h-screen flex flex-col items-center shadow-2xl" style={{ backgroundColor: '#FFEBCC' }}>
@@ -86,8 +72,8 @@ const TransactionDetails = ({ txInfo }) => {
             <DetailRow label="Amount" value={txInfo.amount} />
             <DetailRow label="Value USD when transacted" value={txInfo.valueWhenTransacted} />
             <DetailRow label="Value USD today" value={txInfo.valueToday} />
-            <DetailRow {...renderDifference(txInfo.difference)} />
-            <DetailRow label="Fee" value={`${txInfo.fee} ($${txInfo.feeUSD || 'N/A'})`} />
+            <DetailRow label={differenceLabel} value={differenceValue} />
+            <DetailRow label="Fee" value={txInfo.fee} />
             <DetailRow label="Confirmations" value={txInfo.confirmations} />
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
             <DetailRow label="Receiver" value={txInfo.to} isAddress={true} />
@@ -103,7 +89,7 @@ const TransactionDetails = ({ txInfo }) => {
       {/* Recent Transactions - Collectible Card Style */}
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
         {recentTransactions.map((transaction, index) => {
-          const { label, value } = renderDifference(transaction.difference);
+          const { label: cardDiffLabel, value: cardDiffValue } = renderDifference(transaction.difference);
           return (
             <div
               key={index}
@@ -115,19 +101,18 @@ const TransactionDetails = ({ txInfo }) => {
                   {transaction.blockchain}
                 </div>
                 <a
-                  href={`https://etherscan.io/tx/${transaction.hash || transaction.txHash}`}
+                  href={`https://etherscan.io/tx/${transaction.hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash || transaction.txHash)}</p>
+                  <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash)}</p>
                 </a>
-                <p className="text-sm text-gray-700 mb-2">
+                <div className="text-sm text-gray-700 mb-2">
                   <strong>Amount:</strong>
-                  <br />
-                  {truncateAmount(transaction.amount)}
-                </p>
-                <p className="text-sm text-gray-700 mb-2"><strong>{label}:</strong> {value}</p>
+                  <div className="break-words">{transaction.amount}</div>
+                </div>
+                <p className="text-sm text-gray-700 mb-2"><strong>{cardDiffLabel}:</strong> {cardDiffValue}</p>
                 <p className="text-sm text-gray-700 mb-2"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
               </div>
             </div>
