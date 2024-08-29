@@ -31,6 +31,18 @@ const TransactionDetails = ({ txInfo }) => {
     }
   }, [txInfo]);
 
+  const renderDifference = (difference) => {
+    if (difference === 'N/A') return { label: 'Difference', value: 'N/A' };
+    const numDifference = parseFloat(difference.replace('$', ''));
+    if (numDifference > 0) {
+      return { label: 'You are a King 👑', value: `+$${numDifference.toFixed(2)}` };
+    } else if (numDifference < 0) {
+      return { label: 'You are a Fool 😂', value: `-$${Math.abs(numDifference).toFixed(2)}` };
+    } else {
+      return { label: 'No change', value: `$${numDifference.toFixed(2)}` };
+    }
+  };
+
   const DetailRow = ({ label, value, isAddress }) => (
     <div className="flex justify-between items-center py-2 border-b border-gray-300">
       <span className="font-semibold text-gray-700">{label}:</span>
@@ -72,9 +84,9 @@ const TransactionDetails = ({ txInfo }) => {
             <DetailRow label="Blockchain" value={txInfo.blockchain} />
             <DetailRow label="Status" value={txInfo.status} />
             <DetailRow label="Amount" value={txInfo.amount} />
-            <DetailRow label="Value USD when transacted" value={`$${txInfo.valueWhenTransacted || 'N/A'}`} />
-            <DetailRow label="Value USD today" value={`$${txInfo.valueToday || 'N/A'}`} />
-            <DetailRow label="Difference" value={txInfo.gainOrLoss} />
+            <DetailRow label="Value USD when transacted" value={txInfo.valueWhenTransacted} />
+            <DetailRow label="Value USD today" value={txInfo.valueToday} />
+            <DetailRow {...renderDifference(txInfo.difference)} />
             <DetailRow label="Fee" value={`${txInfo.fee} ($${txInfo.feeUSD || 'N/A'})`} />
             <DetailRow label="Confirmations" value={txInfo.confirmations} />
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
@@ -90,34 +102,37 @@ const TransactionDetails = ({ txInfo }) => {
 
       {/* Recent Transactions - Collectible Card Style */}
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-        {recentTransactions.map((transaction, index) => (
-          <div
-            key={index}
-            className="relative p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-yellow-300 to-yellow-500 border-2 border-yellow-600"
-          >
-            <div className="absolute inset-0 bg-white opacity-10 rounded-xl"></div>
-            <div className="relative z-10">
-              <div className="mb-3 text-xl font-bold text-purple-800 uppercase tracking-wide">
-                {transaction.blockchain}
+        {recentTransactions.map((transaction, index) => {
+          const { label, value } = renderDifference(transaction.difference);
+          return (
+            <div
+              key={index}
+              className="relative p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-yellow-300 to-yellow-500 border-2 border-yellow-600"
+            >
+              <div className="absolute inset-0 bg-white opacity-10 rounded-xl"></div>
+              <div className="relative z-10">
+                <div className="mb-3 text-xl font-bold text-purple-800 uppercase tracking-wide">
+                  {transaction.blockchain}
+                </div>
+                <a
+                  href={`https://etherscan.io/tx/${transaction.hash || transaction.txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash || transaction.txHash)}</p>
+                </a>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Amount:</strong>
+                  <br />
+                  {truncateAmount(transaction.amount)}
+                </p>
+                <p className="text-sm text-gray-700 mb-2"><strong>{label}:</strong> {value}</p>
+                <p className="text-sm text-gray-700 mb-2"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
               </div>
-              <a
-                href={`https://etherscan.io/tx/${transaction.hash || transaction.txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash || transaction.txHash)}</p>
-              </a>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Amount (ETH):</strong>
-                <br />
-                {truncateAmount(transaction.amount)}
-              </p>
-              <p className="text-sm text-gray-700 mb-2"><strong>Balance:</strong> {transaction.gainOrLoss}</p>
-              <p className="text-sm text-gray-700 mb-2"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

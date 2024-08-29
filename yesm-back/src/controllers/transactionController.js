@@ -23,3 +23,27 @@ exports.getTransactionDetails = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while processing your request.' });
   }
 };
+
+exports.getWalletTransactions = async (req, res) => {
+  try {
+    const { walletAddress } = req.params;
+    const chain = await chainDetectionService.detectChainForWallet(walletAddress);
+
+    if (!chain) {
+      return res.status(404).json({ error: 'Wallet not found on any known chain.' });
+    }
+
+    const walletTransactions = await chainDetectionService.fetchWalletTransactions(walletAddress, chain);
+
+    if (!walletTransactions) {
+      return res.status(404).json({ error: 'No transactions found for this wallet.' });
+    }
+
+    console.log('Wallet Transactions:', walletTransactions);
+
+    res.json(walletTransactions);
+  } catch (error) {
+    console.error('Error in getWalletTransactions:', error);
+    res.status(500).json({ error: 'An error occurred while processing your request.' });
+  }
+};

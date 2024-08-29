@@ -643,3 +643,381 @@
 {"level":"info","message":"Transaction hash 0x6c63a4b87e3d7fb98bd9cd868c8a6c8b0c305e6612138aa24eac53aaa3b2be96 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T09:32:37.561Z"}
 {"level":"debug","message":"Detecting chain for transaction hash: 0x28f83198b5d223cacd427acb53a47a684b5213effad3ec810ef03d6cd9e56b4c","timestamp":"2024-08-26T09:36:37.550Z"}
 {"level":"info","message":"Transaction hash 0x28f83198b5d223cacd427acb53a47a684b5213effad3ec810ef03d6cd9e56b4c detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T09:36:38.581Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T09:43:32.944Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T09:43:32.949Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T09:43:32.952Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-26T09:43:44.757Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T09:43:45.609Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T09:46:58.721Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T09:46:58.727Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T09:46:58.729Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-26T11:04:03.910Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T11:04:05.437Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T11:08:10.280Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T11:08:10.288Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T11:08:10.289Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-26T11:08:14.823Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T11:08:15.556Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T12:54:42.034Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T12:54:42.043Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T12:54:42.046Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-26T12:54:48.589Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T12:54:50.563Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-26T13:23:39.642Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T13:23:40.816Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T13:32:24.952Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T13:32:24.963Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T13:32:24.965Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-26T13:32:42.756Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T13:32:43.648Z"}
+{"level":"error","message":"Error fetching token price for 0xdac17f958d2ee523a2206206994597c13d831ec7: Request failed with status code 404","timestamp":"2024-08-26T13:32:45.404Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: ethPriceAtTransaction is not defined","stack":"ReferenceError: ethPriceAtTransaction is not defined\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:269:17)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-26T13:32:46.650Z","txHash":"0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-26T13:33:01.350Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-26T13:33:01.355Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-26T13:33:01.357Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-26T13:33:52.832Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T13:33:53.620Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-26T13:34:03.374Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-26T13:34:03.781Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T08:09:54.390Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T08:09:54.396Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T08:09:54.398Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T08:10:09.962Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:10:11.313Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:10:42.217Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:10:42.932Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T08:15:01.427Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T08:15:01.433Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T08:15:01.434Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:15:05.387Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:15:06.827Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:15:08.883Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T08:15:43.929Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:15:44.603Z"}
+{"level":"error","message":"Error fetching ETH price: Request failed with status code 401","timestamp":"2024-08-27T08:15:45.728Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:18:50.447Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:18:51.443Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:18:53.489Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T08:22:36.096Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T08:22:36.102Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T08:22:36.103Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:22:39.824Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:22:40.727Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:22:42.696Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T08:22:58.181Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:22:58.671Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T08:22:59.875Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:23:51.224Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:23:52.425Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:23:54.548Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T08:27:13.192Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T08:27:13.198Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T08:27:13.199Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:27:19.697Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:27:20.720Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:27:22.398Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:27:28.729Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:27:29.309Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T08:27:31.002Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T08:27:41.538Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:27:41.972Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T08:27:43.440Z"}
+{"level":"error","message":"Error fetching ETH price: Request failed with status code 429","timestamp":"2024-08-27T08:27:43.689Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T08:28:08.355Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:28:08.907Z"}
+{"level":"error","message":"Error fetching token price for 0xdac17f958d2ee523a2206206994597c13d831ec7: Request failed with status code 429","timestamp":"2024-08-27T08:28:10.388Z"}
+{"level":"error","message":"Error fetching token price for 0xdac17f958d2ee523a2206206994597c13d831ec7: Request failed with status code 429","timestamp":"2024-08-27T08:28:10.424Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T08:28:24.832Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T08:28:24.838Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T08:28:24.839Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T08:29:55.531Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T08:29:56.777Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T08:29:58.302Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T09:19:58.177Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T09:19:58.188Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T09:19:58.190Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T09:20:01.458Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T09:20:02.860Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T09:20:04.612Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T09:20:30.712Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T09:20:31.182Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T09:20:32.546Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T09:20:43.937Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T09:20:44.850Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-27T09:20:50.684Z"}
+{"level":"error","message":"Rate limit exceeded (429).","timestamp":"2024-08-27T09:20:50.739Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T10:54:29.187Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T10:54:29.195Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T10:54:29.196Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:04:41.603Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:04:41.607Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:04:41.608Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:04:59.106Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:05:01.353Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: config is not defined","stack":"ReferenceError: config is not defined\n    at EVMService.getApiUrlAndKey (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:151:9)\n    at EVMService.fetchTransactionAndReceipt (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:65:37)\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:14:51)\n    at ChainDetectionService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/chainDetectionService.js:123:27)\n    at exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:60)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2024-08-27T17:05:01.354Z","txHash":"0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:06:06.063Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:06:06.067Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:06:06.068Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:06:17.273Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:06:17.277Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:06:17.278Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:06:17.729Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:06:17.732Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:06:17.733Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:06:20.849Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:06:20.853Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:06:20.854Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:06:27.643Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:06:27.647Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:06:27.648Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:06:39.004Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:06:40.030Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T17:06:56.070Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:06:57.010Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:13:13.921Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:13:13.930Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:13:13.931Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:13:20.292Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:13:20.296Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:13:20.297Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:14:21.053Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:14:21.057Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:14:21.058Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-27T17:14:26.603Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:14:27.707Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:14:40.917Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:14:41.415Z"}
+{"level":"error","message":"Error fetching ETH price: Request failed with status code 401","timestamp":"2024-08-27T17:14:42.252Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:18:01.195Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:18:01.199Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:18:01.199Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:18:10.675Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:18:10.679Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:18:10.679Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:18:14.820Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:18:15.603Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:18:16.546Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:48:15.382Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:48:15.386Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:48:15.388Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:48:25.575Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:48:26.331Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:48:27.143Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:51:18.150Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:51:18.158Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:51:18.159Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:51:32.086Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:51:32.090Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:51:32.091Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:51:46.383Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:51:46.387Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:51:46.388Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:51:49.982Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:51:49.986Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:51:49.986Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:52:16.641Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:52:16.645Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:52:16.646Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:52:28.888Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:52:28.892Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:52:28.893Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:52:38.358Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:52:38.361Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:52:38.362Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:52:53.030Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:52:53.034Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:52:53.035Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:53:01.628Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:53:02.405Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:53:03.676Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:54:11.023Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:54:11.027Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:54:11.028Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:54:20.823Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:54:21.535Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:54:22.322Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:52:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:13:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T17:54:22.369Z","txHash":"0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:54:42.705Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:54:42.709Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:54:42.710Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:54:45.198Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:54:45.626Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:54:46.463Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:52:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T17:54:46.516Z","txHash":"0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:56:09.795Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:56:09.800Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:56:09.801Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T17:56:12.997Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T17:56:14.137Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T17:56:15.114Z"}
+{"level":"error","message":"ETH price at transaction time could not be fetched.","timestamp":"2024-08-27T17:56:15.115Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:62:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T17:56:15.164Z","txHash":"0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:57:56.260Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:57:56.265Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:57:56.266Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:58:02.332Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:58:02.337Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:58:02.339Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:59:18.500Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:59:18.504Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:59:18.505Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T17:59:59.888Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T17:59:59.893Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T17:59:59.894Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:00:34.076Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:00:34.080Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:00:34.081Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:02:29.021Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:02:29.026Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:02:29.027Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9","timestamp":"2024-08-27T18:02:48.181Z"}
+{"level":"info","message":"Transaction hash 0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T18:02:48.899Z"}
+{"level":"warn","message":"Retrying request... Attempt 1 of 3","timestamp":"2024-08-27T18:02:50.058Z"}
+{"level":"warn","message":"Retrying request... Attempt 2 of 3","timestamp":"2024-08-27T18:02:51.257Z"}
+{"level":"error","message":"Error fetching ETH price: Max retries reached: Request failed with status code 401","timestamp":"2024-08-27T18:02:52.457Z"}
+{"level":"warn","message":"ETH price at transaction time could not be fetched.","timestamp":"2024-08-27T18:02:52.458Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:67:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T18:02:52.623Z","txHash":"0x527bd7856a8481a265f069bdcbd576d230647e153276422907d99a67f518b7d9"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-27T18:03:27.610Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T18:03:28.070Z"}
+{"level":"warn","message":"Retrying request... Attempt 1 of 3","timestamp":"2024-08-27T18:03:29.152Z"}
+{"level":"warn","message":"Retrying request... Attempt 2 of 3","timestamp":"2024-08-27T18:03:30.369Z"}
+{"level":"error","message":"Error fetching ETH price: Max retries reached: Request failed with status code 401","timestamp":"2024-08-27T18:03:31.930Z"}
+{"level":"warn","message":"ETH price at transaction time could not be fetched.","timestamp":"2024-08-27T18:03:31.931Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:67:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T18:03:31.983Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:05:46.568Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:05:46.573Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:05:46.574Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:05:49.664Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:05:49.668Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:05:49.669Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:05:50.984Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:05:50.988Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:05:50.989Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-27T18:05:54.229Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T18:05:55.025Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-27T18:05:55.995Z"}
+{"level":"warn","message":"ETH price at transaction time could not be fetched.","timestamp":"2024-08-27T18:05:55.996Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:67:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T18:05:56.042Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:11:35.674Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:11:35.679Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:11:35.680Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:11:44.960Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:11:44.965Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:11:44.966Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-27T18:11:47.087Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-27T18:11:47.090Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-27T18:11:47.091Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-27T18:11:48.350Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-27T18:11:49.113Z"}
+{"level":"error","message":"Error fetching ETH price: Request failed with status code 401","timestamp":"2024-08-27T18:11:50.258Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:61:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-27T18:11:50.340Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T08:41:56.470Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T08:41:56.475Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T08:41:56.476Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T08:45:35.469Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T08:45:36.732Z"}
+{"level":"error","message":"Error fetching ETH price: Request failed with status code 401","timestamp":"2024-08-29T08:45:37.740Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:61:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T08:45:37.811Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T08:53:47.615Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T08:53:47.622Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T08:53:47.622Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T08:53:50.769Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T08:53:51.834Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-29T08:53:52.734Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:61:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T08:53:52.789Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T08:57:24.881Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T08:57:24.886Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T08:57:24.887Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T08:57:27.429Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T08:57:28.193Z"}
+{"level":"error","message":"Error fetching ETH price: Unauthorized (401). Check your API key or rate limit.","timestamp":"2024-08-29T08:57:29.350Z"}
+{"level":"warn","message":"ETH price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T08:57:29.350Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:65:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T08:57:29.425Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:00:26.952Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:00:26.957Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:00:26.958Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:00:29.782Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:00:30.965Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:00:32.182Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:00:32.689Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:65:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T09:00:32.760Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:01:43.468Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:01:43.473Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:01:43.474Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:03:22.368Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:03:22.379Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:03:22.380Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:03:28.825Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:03:29.635Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:03:30.863Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:03:31.299Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:65:48)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T09:03:31.361Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:05:22.109Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:05:22.115Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:05:22.116Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:17:56.428Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:17:57.535Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:17:58.542Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:17:59.355Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot read properties of undefined (reading 'eth')","stack":"TypeError: Cannot read properties of undefined (reading 'eth')\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:65:48)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:12:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T09:17:59.433Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:19:31.008Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:19:31.019Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:19:31.021Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:19:38.651Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:19:38.655Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:19:38.656Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:20:06.390Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:20:06.399Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:20:06.401Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:20:09.754Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:20:09.758Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:20:09.759Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:22:36.379Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:22:36.384Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:22:36.385Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:22:48.400Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:22:48.404Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:22:48.405Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:23:51.034Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:23:52.131Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:23:53.321Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:23:54.012Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Invalid time value","stack":"RangeError: Invalid time value\n    at Date.toISOString (<anonymous>)\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:88:67)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:15:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T09:23:54.937Z","txHash":"0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:25:51.061Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:25:51.065Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:25:51.066Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:26:04.392Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:26:04.396Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:26:04.396Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:26:06.779Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:26:06.782Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:26:06.783Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:26:20.738Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:26:24.204Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:26:25.182Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:26:25.520Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:26:26.242Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T09:36:02.820Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:36:04.169Z"}
+{"level":"error","message":"Error fetching token details for token address: 0xdac17f958d2ee523a2206206994597c13d831ec7 Web3 is not defined","stack":"ReferenceError: Web3 is not defined\n    at getTokenDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/tokenService.js:18:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:37:60)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:17:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T09:36:05.095Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-29T09:36:06.000Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T09:36:06.001Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:36:06.636Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:46:59.683Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:47:00.832Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:47:02.649Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:47:04.825Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:47:05.483Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:48:11.069Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:48:12.714Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:48:13.449Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:48:13.898Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:48:14.531Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T09:56:01.632Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T09:56:01.641Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T09:56:01.642Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T09:56:31.468Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T09:56:32.352Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:56:33.627Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:56:34.209Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:56:34.976Z"}
