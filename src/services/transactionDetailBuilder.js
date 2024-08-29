@@ -12,6 +12,7 @@ class TransactionDetailBuilder {
     let tokenSymbol = 'ETH';
     let tokenAddress = null;
     let isERC20 = false;
+    let tokenDecimals = 18;
 
     let ethPriceAtTransaction = null;
     let valueWhenTransacted = 'N/A';
@@ -19,7 +20,7 @@ class TransactionDetailBuilder {
 
     try {
       if (BigInt(transaction.value) > 0) {
-        amount = fromWei(transaction.value, 'ether');
+        amount = fromWei(transaction.value, 18);
         ethPriceAtTransaction = await getEthPrice(parseInt(receipt.blockNumber, 16));
 
         if (ethPriceAtTransaction) {
@@ -31,12 +32,13 @@ class TransactionDetailBuilder {
         for (const log of receipt.logs) {
           if (log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
             tokenAddress = log.address;
-            amount = BigInt(log.data).toString();
+            amount = log.data;
             isERC20 = true;
 
-            const { tokenDecimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
+            const { tokenDecimals: decimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
+            tokenDecimals = decimals;
             tokenSymbol = symbol;
-            amount = (BigInt(log.data) / BigInt(10 ** tokenDecimals)).toString();
+            amount = fromWei(amount, tokenDecimals);
 
             const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, parseInt(receipt.blockNumber, 16));
             if (tokenPriceAtTransaction !== null) {
@@ -49,13 +51,14 @@ class TransactionDetailBuilder {
         }
       }
 
-      const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 'ether');
+      const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 18);
       const currentEthPrice = await getEthPrice();
+      const currentTokenPrice = isERC20 ? await getTokenPrice(tokenAddress) : currentEthPrice;
 
-      if (currentEthPrice !== null) {
-        valueToday = (parseFloat(amount) * currentEthPrice).toFixed(2);
+      if (currentTokenPrice !== null) {
+        valueToday = (parseFloat(amount) * currentTokenPrice).toFixed(2);
       } else {
-        logger.warn('Current ETH price could not be fetched. Proceeding with available information.');
+        logger.warn('Current token price could not be fetched. Proceeding with available information.');
       }
 
       const difference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A'

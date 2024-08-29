@@ -1021,3 +1021,77 @@
 {"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T09:56:33.627Z"}
 {"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T09:56:34.209Z"}
 {"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T09:56:34.976Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:10:42.901Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:10:42.905Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:10:42.906Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T10:10:54.741Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T10:10:55.762Z"}
+{"level":"error","message":"Error fetching token details for token address: 0xdac17f958d2ee523a2206206994597c13d831ec7 Web3 is not defined","stack":"ReferenceError: Web3 is not defined\n    at getTokenDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/tokenService.js:18:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:37:60)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:17:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-29T10:10:56.520Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-29T10:10:57.093Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T10:10:57.094Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T10:10:57.681Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:19:57.910Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:19:57.916Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:19:57.917Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:20:00.575Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:20:00.580Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:20:00.581Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:20:16.874Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:20:16.880Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:20:16.881Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:46:14.679Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:46:14.689Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:46:14.690Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:46:25.307Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:46:25.313Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:46:25.314Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T10:46:33.262Z"}
+{"errorDetails":{"code":"C0006","isMoralisError":true,"name":"Moralis SDK Core Error"},"level":"error","message":"Error detecting chain for transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io","stack":"Moralis SDK Core Error: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io\n    at RequestController.makeError (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1235:16)\n    at RequestController.<anonymous> (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1205:38)\n    at step (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:83:23)\n    at Object.throw (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:64:53)\n    at rejected (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:55:65)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2024-08-29T10:46:33.305Z","txHash":"0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:47:11.320Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:47:11.326Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:47:11.326Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:47:24.878Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:47:24.884Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:47:24.885Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T10:47:26.172Z"}
+{"errorDetails":{"code":"C0006","isMoralisError":true,"name":"Moralis SDK Core Error"},"level":"error","message":"Error detecting chain for transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io","stack":"Moralis SDK Core Error: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io\n    at RequestController.makeError (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1235:16)\n    at RequestController.<anonymous> (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1205:38)\n    at step (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:83:23)\n    at Object.throw (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:64:53)\n    at rejected (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:55:65)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2024-08-29T10:47:26.205Z","txHash":"0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T10:47:49.388Z"}
+{"errorDetails":{"code":"C0006","isMoralisError":true,"name":"Moralis SDK Core Error"},"level":"error","message":"Error detecting chain for transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io","stack":"Moralis SDK Core Error: [C0006] Request failed: getaddrinfo ENOTFOUND deep-index.moralis.io\n    at RequestController.makeError (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1235:16)\n    at RequestController.<anonymous> (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:1205:38)\n    at step (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:83:23)\n    at Object.throw (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:64:53)\n    at rejected (/Users/mmg/Documents/yesm/yesm-back/node_modules/@moralisweb3/common-core/lib/cjs/index.cjs:55:65)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2024-08-29T10:47:49.400Z","txHash":"0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24","timestamp":"2024-08-29T10:50:50.290Z"}
+{"level":"info","message":"Transaction hash 0xa24f0b8dc25b1f86db1df2aa927e847822dbde6f5ff3e7e85ae505a8acd0ae24 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T10:50:51.803Z"}
+{"level":"error","message":"Token price for 0xdac17f958d2ee523a2206206994597c13d831ec7 not found (404).","timestamp":"2024-08-29T10:50:53.799Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T10:50:53.799Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T10:50:54.959Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-29T10:50:56.944Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-29T10:50:56.951Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-29T10:50:56.952Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x6b96f709bac8ab7e7479f93ca54bdee28e1c3bf6ed71c12b50bd5f2ce28d0bf6","timestamp":"2024-08-29T10:54:44.113Z"}
+{"level":"info","message":"Transaction hash 0x6b96f709bac8ab7e7479f93ca54bdee28e1c3bf6ed71c12b50bd5f2ce28d0bf6 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T10:54:45.113Z"}
+{"level":"error","message":"Token price for 0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2 not found (404).","timestamp":"2024-08-29T10:54:46.195Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T10:54:46.198Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T10:54:47.080Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x3e387f7c874216e738ddb32686f4d507887f3847b3afaddf460427a68e67e6bf","timestamp":"2024-08-29T10:55:38.213Z"}
+{"level":"info","message":"Transaction hash 0x3e387f7c874216e738ddb32686f4d507887f3847b3afaddf460427a68e67e6bf detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T10:55:38.712Z"}
+{"level":"error","message":"Token price for 0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce not found (404).","timestamp":"2024-08-29T10:55:39.893Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T10:55:39.894Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T10:55:40.841Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x6a4b144f63fe7e0eacb07b65c07d52efec7ea2566bd4537684356dcf4d063aa6","timestamp":"2024-08-29T11:02:34.979Z"}
+{"level":"info","message":"Transaction hash 0x6a4b144f63fe7e0eacb07b65c07d52efec7ea2566bd4537684356dcf4d063aa6 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T11:02:35.723Z"}
+{"level":"error","message":"Token price for 0x63696fc66795b51d02c1590b536484a41fbddf9a not found (404).","timestamp":"2024-08-29T11:02:37.494Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T11:02:37.494Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T11:02:38.300Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xc585ad84bb1d7f66efb85dc79e2da2da28a91d60d358ae7c09a2bb4ddbb05403","timestamp":"2024-08-29T11:07:51.541Z"}
+{"level":"info","message":"Transaction hash 0xc585ad84bb1d7f66efb85dc79e2da2da28a91d60d358ae7c09a2bb4ddbb05403 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T11:07:52.584Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T11:07:53.733Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T11:07:54.052Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T11:07:54.655Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xa9ec8399f53fa159391b0b3bcada1de88136ba346581ec9a3d29106d0592f721","timestamp":"2024-08-29T11:09:04.857Z"}
+{"level":"info","message":"Transaction hash 0xa9ec8399f53fa159391b0b3bcada1de88136ba346581ec9a3d29106d0592f721 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T11:09:06.340Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-29T11:09:07.287Z"}
+{"level":"warn","message":"Token price at transaction time could not be fetched. Proceeding with available information.","timestamp":"2024-08-29T11:09:07.287Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T11:09:08.430Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853","timestamp":"2024-08-29T11:09:20.776Z"}
+{"level":"info","message":"Transaction hash 0x99e537b256063003bdf4ca37f7b4a6c8d96794c10ddfdb39c3e38751feb8a853 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-29T11:09:22.005Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T11:09:22.897Z"}
+{"level":"info","message":"Fetched ETH price from Dexscreener as a fallback.","timestamp":"2024-08-29T11:09:23.616Z"}
+{"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-29T11:09:24.206Z"}
