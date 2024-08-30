@@ -18,7 +18,14 @@ class TransactionDetailBuilder {
     let valueWhenTransacted = 'N/A';
     let valueToday = 'N/A';
 
+    let transactionMethod = this.getTransactionMethod(transaction);
+    let swapInfo = null;
+
     try {
+      if (this.isSwapTransaction(transaction)) {
+        swapInfo = await this.extractSwapInfo(transaction, receipt, apiUrl, apiKey);
+      }
+
       if (BigInt(transaction.value) > 0) {
         amount = fromWei(transaction.value, 18);
         ethPriceAtTransaction = await getEthPrice(parseInt(receipt.blockNumber, 16));
@@ -37,7 +44,7 @@ class TransactionDetailBuilder {
 
             const { tokenDecimals: decimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
             tokenDecimals = decimals;
-            tokenSymbol = symbol;
+            tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, ''); // Remove non-printable characters
             amount = fromWei(amount, tokenDecimals);
 
             const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, parseInt(receipt.blockNumber, 16));
@@ -84,6 +91,8 @@ class TransactionDetailBuilder {
       return {
         blockchain: chain,
         status: isSuccessful ? 'Success' : 'Failed',
+        method: transactionMethod,
+        swapInfo: swapInfo,
         amount: `${amount} ${tokenSymbol}`,
         valueWhenTransacted: valueWhenTransacted !== 'N/A' ? `$${valueWhenTransacted}` : 'N/A',
         valueToday: valueToday !== 'N/A' ? `$${valueToday}` : 'N/A',
@@ -99,6 +108,50 @@ class TransactionDetailBuilder {
     } catch (error) {
       logger.error('Error building transaction details:', error.message, { context: error });
       throw error;
+    }
+  }
+
+  getTransactionMethod(transaction) {
+    if (transaction.input && transaction.input.length >= 10) {
+      const methodSignature = transaction.input.slice(0, 10);
+      // Add more method signatures as needed
+      switch (methodSignature) {
+        case '0x38ed1739': return 'Swap';
+        case '0xa9059cbb': return 'Transfer';
+        case '0x095ea7b3': return 'Approve';
+        default: return 'Unknown';
+      }
+    }
+    return 'Transfer';
+  }
+
+  isSwapTransaction(transaction) {
+    return this.getTransactionMethod(transaction) === 'Swap';
+  }
+
+  async extractSwapInfo(transaction, receipt, apiUrl, apiKey) {
+    try {
+      const decodedInput = this.web3.eth.abi.decodeParameters(
+        ['address[]', 'uint256', 'uint256', 'uint256[]'],
+        '0x' + transaction.input.slice(10)
+      );
+
+      const path = decodedInput[0];
+      const amountIn = fromWei(decodedInput[1], 18);
+      const amountOutMin = fromWei(decodedInput[2], 18);
+
+      const fromToken = await getTokenDetails(path[0], apiUrl, apiKey);
+      const toToken = await getTokenDetails(path[path.length - 1], apiUrl, apiKey);
+
+      return {
+        fromToken: fromToken.tokenSymbol,
+        toToken: toToken.tokenSymbol,
+        amountIn: amountIn,
+        amountOutMin: amountOutMin,
+      };
+    } catch (error) {
+      logger.error('Error extracting swap info:', error.message);
+      return null;
     }
   }
 }
