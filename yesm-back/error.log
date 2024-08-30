@@ -115,3 +115,12 @@
 {"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T11:07:53.733Z"}
 {"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-29T11:09:07.287Z"}
 {"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-29T11:09:22.897Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-30T08:08:36.463Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-30T08:09:59.099Z"}
+{"level":"error","message":"Token price for 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 not found (404).","timestamp":"2024-08-30T08:10:53.776Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-30T08:12:03.032Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-30T08:29:14.501Z"}
+{"level":"error","message":"Token price for 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 not found (404).","timestamp":"2024-08-30T08:30:48.956Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-30T08:34:55.430Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-30T08:35:11.683Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Request failed with status code 401","timestamp":"2024-08-30T08:35:24.212Z"}

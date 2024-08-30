@@ -39,10 +39,10 @@ const TransactionDetails = ({ txInfo }) => {
     }
   };
 
-  const DetailRow = ({ label, value, isAddress }) => (
-    <div className="py-3 border-b border-gray-300">
-      <div className="font-semibold text-gray-700 mb-1">{label}</div>
-      <div className="text-right break-words">
+  const DetailRow = ({ label, value, isAddress, isLongValue }) => (
+    <div className={`py-2 border-b border-gray-200 ${isLongValue ? 'flex-col' : 'flex justify-between items-center'}`}>
+      <div className="text-sm font-medium text-gray-600">{label}</div>
+      <div className={`text-right break-words ${isLongValue ? 'mt-1' : ''}`}>
         {isAddress ? (
           <a
             href={`https://etherscan.io/address/${value}`}
@@ -50,26 +50,39 @@ const TransactionDetails = ({ txInfo }) => {
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
           >
-            {value}
+            {truncateHash(value)}
           </a>
         ) : (
-          value
+          <span className="font-semibold">{value}</span>
         )}
       </div>
     </div>
   );
 
+  const renderSwapInfo = (swapInfo) => {
+    if (!swapInfo) return null;
+    return (
+      <div className="mt-2 p-2 bg-blue-50 rounded-md">
+        <p className="text-sm">
+          Swap: {swapInfo.amountIn} {swapInfo.fromToken} ➔ {swapInfo.amountOutMin} {swapInfo.toToken}
+        </p>
+      </div>
+    );
+  };
+
   const { label: differenceLabel, value: differenceValue } = renderDifference(txInfo.difference);
 
   return (
-    <div className="p-8 min-h-screen flex flex-col items-center shadow-2xl" style={{ backgroundColor: '#FFEBCC' }}>
-      <div className="w-full max-w-4xl mb-8 text-center">
-        <div className="p-8 rounded-lg shadow-md bg-yellow-100 border-2" style={{ backgroundColor: '#FFF7E6', borderColor: '#FFD700', borderWidth: '2px' }}>
-        <h2 className="text-4xl mb-6 text-[#4A0E4E] font-bold tracking-wide">Last Transaction</h2>
-          <div className="space-y-4 text-left">
+    <div className="p-4 min-h-screen flex flex-col items-center shadow-2xl" style={{ backgroundColor: '#FFEBCC' }}>
+      <div className="w-full max-w-2xl mb-8 text-center">
+        <div className="p-6 rounded-lg shadow-md bg-yellow-50 border-2" style={{ borderColor: '#FFD700' }}>
+          <h2 className="text-3xl mb-4 text-[#4A0E4E] font-bold tracking-wide">Last Transaction</h2>
+          <div className="space-y-2 text-left">
             <DetailRow label="Blockchain" value={txInfo.blockchain} />
             <DetailRow label="Status" value={txInfo.status} />
-            <DetailRow label="Amount" value={txInfo.amount} />
+            <DetailRow label="Method" value={txInfo.method} />
+            {txInfo.swapInfo && renderSwapInfo(txInfo.swapInfo)}
+            <DetailRow label="Amount" value={txInfo.amount} isLongValue={true} />
             <DetailRow label="Value USD when transacted" value={txInfo.valueWhenTransacted} />
             <DetailRow label="Value USD today" value={txInfo.valueToday} />
             <DetailRow label={differenceLabel} value={differenceValue} />
@@ -78,26 +91,25 @@ const TransactionDetails = ({ txInfo }) => {
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
             <DetailRow label="Receiver" value={txInfo.to} isAddress={true} />
             <DetailRow label="Block Number" value={txInfo.blockNumber} />
-            <DetailRow label="Timestamp" value={txInfo.timestamp ? new Date(txInfo.timestamp).toLocaleString() : 'N/A'} />
+            <DetailRow label="Timestamp" value={new Date(txInfo.timestamp).toLocaleString()} />
           </div>
-          <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#FFE4B5' }}>
-            <p className="text-sm font-semibold"><strong>Did you know?</strong> {renderConfirmationInfo()}</p>
+          <div className="mt-4 p-3 rounded-lg bg-yellow-100 text-sm">
+            <p className="font-semibold"><strong>Did you know?</strong> {renderConfirmationInfo()}</p>
           </div>
         </div>
       </div>
 
       {/* Recent Transactions - Collectible Card Style */}
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+      <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         {recentTransactions.map((transaction, index) => {
           const { label: cardDiffLabel, value: cardDiffValue } = renderDifference(transaction.difference);
           return (
             <div
               key={index}
-              className="relative p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-yellow-300 to-yellow-500 border-2 border-yellow-600"
+              className="relative p-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-yellow-200 to-yellow-400 border border-yellow-500"
             >
-              <div className="absolute inset-0 bg-white opacity-10 rounded-xl"></div>
               <div className="relative z-10">
-                <div className="mb-3 text-xl font-bold text-purple-800 uppercase tracking-wide">
+                <div className="mb-2 text-lg font-bold text-purple-800 uppercase tracking-wide">
                   {transaction.blockchain}
                 </div>
                 <a
@@ -106,14 +118,20 @@ const TransactionDetails = ({ txInfo }) => {
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  <p className="text-sm text-gray-700 mb-2"><strong>Hash:</strong> {truncateHash(transaction.hash)}</p>
+                  <p className="text-xs text-gray-700 mb-1"><strong>Hash:</strong> {truncateHash(transaction.hash)}</p>
                 </a>
-                <div className="text-sm text-gray-700 mb-2">
+                <p className="text-xs text-gray-700 mb-1"><strong>Method:</strong> {transaction.method}</p>
+                {transaction.swapInfo && (
+                  <p className="text-xs text-gray-700 mb-1">
+                    <strong>Swap:</strong> {transaction.swapInfo.fromToken} ➔ {transaction.swapInfo.toToken}
+                  </p>
+                )}
+                <div className="text-xs text-gray-700 mb-1">
                   <strong>Amount:</strong>
                   <div className="break-words">{transaction.amount}</div>
                 </div>
-                <p className="text-sm text-gray-700 mb-2"><strong>{cardDiffLabel}:</strong> {cardDiffValue}</p>
-                <p className="text-sm text-gray-700 mb-2"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
+                <p className="text-xs text-gray-700 mb-1"><strong>{cardDiffLabel}:</strong> {cardDiffValue}</p>
+                <p className="text-xs text-gray-700"><strong>Date:</strong> {new Date(transaction.timestamp).toLocaleDateString()}</p>
               </div>
             </div>
           );
