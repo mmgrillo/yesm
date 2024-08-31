@@ -1558,3 +1558,274 @@
 {"level":"warn","message":"No timestamp found in transaction or receipt. Using current time.","timestamp":"2024-08-31T17:01:57.517Z"}
 {"level":"debug","message":"Timestamp: 2024-08-31T17:01:57.517Z","timestamp":"2024-08-31T17:01:57.517Z"}
 {"amount":"12.95500 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"7716","difference":"12.33","fee":"0.00019 ETH","from":"0x21a31ee1afc51d94c2efccaa2092ad1028285549","hash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-31T17:01:57.517Z","to":"0x9c2e658ffc8ea7fad00a4829bd4b554e8a716f73","valueToday":"$32746.23","valueWhenTransacted":"$32733.90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:05:36.667Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:05:36.673Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:05:36.675Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T17:05:54.096Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T17:05:54.818Z"}
+{"level":"debug","message":"Transaction amount: 12.95500 ETH","timestamp":"2024-08-31T17:05:55.978Z"}
+{"level":"debug","message":"Fetching ETH price for block 0x13af993 at timestamp 1725030563","timestamp":"2024-08-31T17:05:55.978Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T17:05:55.978Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Cannot mix BigInt and other types, use explicit conversions","timestamp":"2024-08-31T17:05:55.978Z"}
+{"level":"debug","message":"CryptoCompare returned ETH price: 2527.97","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.97","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2527.97","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 32749.85","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: undefined","timestamp":"2024-08-31T17:05:56.202Z"}
+{"level":"error","message":"Error fetching ETH price from Coingecko: Invalid time value","timestamp":"2024-08-31T17:05:56.203Z"}
+{"level":"debug","message":"CryptoCompare returned ETH price: 2526.02","timestamp":"2024-08-31T17:05:56.256Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.02","timestamp":"2024-08-31T17:05:56.257Z"}
+{"level":"debug","message":"Fetched current price: 2526.02","timestamp":"2024-08-31T17:05:56.257Z"}
+{"level":"debug","message":"Calculated valueToday: 32724.59","timestamp":"2024-08-31T17:05:56.257Z"}
+{"level":"debug","message":"Calculated difference: -25.26","timestamp":"2024-08-31T17:05:56.257Z"}
+{"level":"debug","message":"Calculated confirmations: 7736","timestamp":"2024-08-31T17:05:56.401Z"}
+{"level":"error","message":"Error building transaction details:","timestamp":"2024-08-31T17:05:56.402Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: Cannot mix BigInt and other types, use explicit conversions","stack":"TypeError: Cannot mix BigInt and other types, use explicit conversions\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:98:55)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:17:14)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-31T17:05:56.403Z","txHash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:07:25.200Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:07:25.206Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:07:25.207Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T17:07:30.177Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T17:07:30.952Z"}
+{"errorDetails":{},"level":"error","message":"Error fetching transaction details from ethereum: this.getTransactionMethod is not a function","stack":"TypeError: this.getTransactionMethod is not a function\n    at TransactionDetailBuilder.buildTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/transactionDetailBuilder.js:21:34)\n    at EVMService.fetchTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/services/evmService.js:17:50)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async exports.getTransactionDetails (/Users/mmg/Documents/yesm/yesm-back/src/controllers/transactionController.js:12:32)","timestamp":"2024-08-31T17:07:31.724Z","txHash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:09:34.080Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:09:34.086Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:09:34.087Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T17:09:38.765Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T17:09:39.652Z"}
+{"level":"debug","message":"Transaction amount: 12.95500 ETH","timestamp":"2024-08-31T17:09:40.841Z"}
+{"level":"debug","message":"Fetching ETH price for block 0x13af993 at timestamp 1725030563","timestamp":"2024-08-31T17:09:40.841Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T17:09:40.841Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:09:40.956Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:09:40.957Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:09:40.957Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 32733.90","timestamp":"2024-08-31T17:09:40.957Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T17:09:40.957Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725124180","timestamp":"2024-08-31T17:09:40.957Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T17:09:41.006Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T17:09:41.006Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T17:09:41.007Z"}
+{"level":"debug","message":"Calculated valueToday: 32746.23","timestamp":"2024-08-31T17:09:41.007Z"}
+{"level":"debug","message":"Calculated difference: 12.33","timestamp":"2024-08-31T17:09:41.007Z"}
+{"level":"debug","message":"Calculated confirmations: 7755","timestamp":"2024-08-31T17:09:41.146Z"}
+{"level":"debug","message":"Timestamp: 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T17:09:41.147Z"}
+{"amount":"12.95500 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"7755","difference":"12.33","fee":"0.00019 ETH","from":"0x21a31ee1afc51d94c2efccaa2092ad1028285549","hash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0x9c2e658ffc8ea7fad00a4829bd4b554e8a716f73","valueToday":"$32746.23","valueWhenTransacted":"$32733.90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:19:53.338Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:19:53.347Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:19:53.348Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T17:19:57.215Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T17:19:57.980Z"}
+{"level":"debug","message":"Transaction timestamp: 1725030563","timestamp":"2024-08-31T17:19:59.127Z"}
+{"level":"debug","message":"Transaction amount: 12.95500 ETH","timestamp":"2024-08-31T17:19:59.128Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T17:19:59.128Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T17:19:59.129Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 32733.90","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Current timestamp: 1725124799","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725124799","timestamp":"2024-08-31T17:19:59.239Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T17:19:59.282Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T17:19:59.283Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T17:19:59.283Z"}
+{"level":"debug","message":"Calculated valueToday: 32746.23","timestamp":"2024-08-31T17:19:59.283Z"}
+{"level":"debug","message":"Calculated difference: 12.33","timestamp":"2024-08-31T17:19:59.283Z"}
+{"level":"debug","message":"Calculated confirmations: 7806","timestamp":"2024-08-31T17:19:59.413Z"}
+{"level":"debug","message":"Transaction timestamp: 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T17:19:59.413Z"}
+{"amount":"12.95500 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"7806","difference":"12.33","fee":"0.00019 ETH","from":"0x21a31ee1afc51d94c2efccaa2092ad1028285549","hash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0x9c2e658ffc8ea7fad00a4829bd4b554e8a716f73","valueToday":"$32746.23","valueWhenTransacted":"$32733.90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:22:15.092Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:22:15.098Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:22:15.098Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:27:29.655Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:27:29.661Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:27:29.662Z"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T17:27:42.298Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T17:27:42.304Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T17:27:42.305Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T17:27:49.618Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T17:27:50.512Z"}
+{"level":"debug","message":"Transaction timestamp: 1725030563","timestamp":"2024-08-31T17:27:51.692Z"}
+{"level":"debug","message":"Transaction amount: 12.95500 ETH","timestamp":"2024-08-31T17:27:51.693Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T17:27:51.693Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T17:27:51.694Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 32733.90","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Current timestamp: 1725125272","timestamp":"2024-08-31T17:27:52.303Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725125272","timestamp":"2024-08-31T17:27:52.304Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T17:27:52.371Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T17:27:52.371Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T17:27:52.371Z"}
+{"level":"debug","message":"Calculated valueToday: 32746.23","timestamp":"2024-08-31T17:27:52.371Z"}
+{"level":"debug","message":"Calculated difference: 12.33","timestamp":"2024-08-31T17:27:52.371Z"}
+{"level":"debug","message":"Calculated confirmations: 7846","timestamp":"2024-08-31T17:27:52.511Z"}
+{"level":"debug","message":"Transaction timestamp: 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T17:27:52.511Z"}
+{"amount":"12.95500 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"7846","difference":"12.33","fee":"0.00019 ETH","from":"0x21a31ee1afc51d94c2efccaa2092ad1028285549","hash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0x9c2e658ffc8ea7fad00a4829bd4b554e8a716f73","valueToday":"$32746.23","valueWhenTransacted":"$32733.90"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","timestamp":"2024-08-31T18:01:21.193Z"}
+{"level":"info","message":"Transaction hash 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:01:21.957Z"}
+{"level":"debug","message":"Transaction timestamp: 1725030563","timestamp":"2024-08-31T18:01:23.288Z"}
+{"level":"debug","message":"Transaction amount: 117.79565 ETH","timestamp":"2024-08-31T18:01:23.289Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T18:01:23.289Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T18:01:23.289Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 297638.79","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Current timestamp: 1725127283","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725127283","timestamp":"2024-08-31T18:01:23.540Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:01:24.022Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:01:24.022Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:01:24.022Z"}
+{"level":"debug","message":"Calculated valueToday: 297750.91","timestamp":"2024-08-31T18:01:24.023Z"}
+{"level":"debug","message":"Calculated difference: 112.12","timestamp":"2024-08-31T18:01:24.023Z"}
+{"level":"debug","message":"Calculated confirmations: 8013","timestamp":"2024-08-31T18:01:24.155Z"}
+{"level":"debug","message":"Transaction timestamp: 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:01:24.155Z"}
+{"amount":"117.79565 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"8013","difference":"112.12","fee":"0.00015 ETH","from":"0xcac87eb2f203cf60fbb78e584ec27ce83fdcb60d","hash":"0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0xfe500c274f72f1d1a9978c903d97e6d45cd9121b","valueToday":"$297750.91","valueWhenTransacted":"$297638.79"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:05:32.087Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:05:32.097Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:05:32.098Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","timestamp":"2024-08-31T18:05:34.639Z"}
+{"level":"info","message":"Transaction hash 0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:05:35.311Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:05:36.616Z"}
+{"level":"debug","message":"Transaction amount: 12.95500 ETH","timestamp":"2024-08-31T18:05:36.617Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T18:05:36.617Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T18:05:36.617Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 32733.90","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725127536","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725127536","timestamp":"2024-08-31T18:05:36.803Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:05:36.850Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:05:36.851Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:05:36.851Z"}
+{"level":"debug","message":"Calculated valueToday: 32746.23","timestamp":"2024-08-31T18:05:36.851Z"}
+{"level":"debug","message":"Calculated difference: 12.33","timestamp":"2024-08-31T18:05:36.851Z"}
+{"level":"debug","message":"Calculated confirmations: 8035","timestamp":"2024-08-31T18:05:36.990Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:05:36.990Z"}
+{"amount":"12.95500 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"8035","difference":"12.33","fee":"0.00019 ETH","from":"0x21a31ee1afc51d94c2efccaa2092ad1028285549","hash":"0x0355c44efcb8dc3476e99bbae52ab6256fbd48ac657c907ee96b8c71f8c6a625","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0x9c2e658ffc8ea7fad00a4829bd4b554e8a716f73","valueToday":"$32746.23","valueWhenTransacted":"$32733.90"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:05:39.422Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:05:39.427Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:05:39.428Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","timestamp":"2024-08-31T18:05:41.184Z"}
+{"level":"info","message":"Transaction hash 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:05:41.982Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:05:43.184Z"}
+{"level":"debug","message":"Transaction amount: 117.79565 ETH","timestamp":"2024-08-31T18:05:43.185Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T18:05:43.185Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T18:05:43.185Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:43.291Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 297638.79","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725127543","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725127543","timestamp":"2024-08-31T18:05:43.292Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:05:43.335Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:05:43.336Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:05:43.336Z"}
+{"level":"debug","message":"Calculated valueToday: 297750.91","timestamp":"2024-08-31T18:05:43.336Z"}
+{"level":"debug","message":"Calculated difference: 112.12","timestamp":"2024-08-31T18:05:43.336Z"}
+{"level":"debug","message":"Calculated confirmations: 8035","timestamp":"2024-08-31T18:05:43.541Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:05:43.542Z"}
+{"amount":"117.79565 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"8035","difference":"112.12","fee":"0.00015 ETH","from":"0xcac87eb2f203cf60fbb78e584ec27ce83fdcb60d","hash":"0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0xfe500c274f72f1d1a9978c903d97e6d45cd9121b","valueToday":"$297750.91","valueWhenTransacted":"$297638.79"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:08:26.105Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:08:26.111Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:08:26.112Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","timestamp":"2024-08-31T18:08:34.190Z"}
+{"level":"info","message":"Transaction hash 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:08:34.889Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:08:36.436Z"}
+{"level":"debug","message":"Transaction amount: 117.79565 ETH","timestamp":"2024-08-31T18:08:36.437Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T18:08:36.437Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T18:08:36.437Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:08:36.658Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:08:36.659Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:08:36.659Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 297638.79","timestamp":"2024-08-31T18:08:36.659Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:08:36.659Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725127716","timestamp":"2024-08-31T18:08:36.659Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725127716","timestamp":"2024-08-31T18:08:36.660Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:08:36.709Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:08:36.710Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:08:36.710Z"}
+{"level":"debug","message":"Calculated valueToday: 297750.91","timestamp":"2024-08-31T18:08:36.710Z"}
+{"level":"debug","message":"Calculated difference: 112.12","timestamp":"2024-08-31T18:08:36.710Z"}
+{"level":"debug","message":"Calculated confirmations: 8049","timestamp":"2024-08-31T18:08:36.841Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:08:36.842Z"}
+{"amount":"117.79565 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"8049","difference":"112.12","fee":"0.00015 ETH","from":"0xcac87eb2f203cf60fbb78e584ec27ce83fdcb60d","hash":"0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0xfe500c274f72f1d1a9978c903d97e6d45cd9121b","valueToday":"$297750.91","valueWhenTransacted":"$297638.79"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:15:14.301Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:15:14.307Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:15:14.308Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","timestamp":"2024-08-31T18:15:28.323Z"}
+{"level":"info","message":"Transaction hash 0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:15:29.200Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:15:30.373Z"}
+{"level":"debug","message":"Transaction amount: 117.79565 ETH","timestamp":"2024-08-31T18:15:30.373Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1725030563","timestamp":"2024-08-31T18:15:30.373Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725030563","timestamp":"2024-08-31T18:15:30.373Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Fetched historical ETH price: 2526.7383553003406","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 297638.79","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725128130","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725128130","timestamp":"2024-08-31T18:15:30.489Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:15:30.547Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:15:30.547Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:15:30.547Z"}
+{"level":"debug","message":"Calculated valueToday: 297750.91","timestamp":"2024-08-31T18:15:30.548Z"}
+{"level":"debug","message":"Calculated difference: 112.12","timestamp":"2024-08-31T18:15:30.548Z"}
+{"level":"debug","message":"Calculated confirmations: 8084","timestamp":"2024-08-31T18:15:30.687Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-30T15:09:23.000Z","timestamp":"2024-08-31T18:15:30.687Z"}
+{"amount":"117.79565 ETH","blockNumber":20642195,"blockchain":"ethereum","confirmations":"8084","difference":"112.12","fee":"0.00015 ETH","from":"0xcac87eb2f203cf60fbb78e584ec27ce83fdcb60d","hash":"0x58f6aa89339e5d694cab51f477ad2ee5ed40d01a94593991254645dcd7714818","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-30T15:09:23.000Z","to":"0xfe500c274f72f1d1a9978c903d97e6d45cd9121b","valueToday":"$297750.91","valueWhenTransacted":"$297638.79"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:21:39.133Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:21:39.141Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:21:39.143Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1","timestamp":"2024-08-31T18:21:46.164Z"}
+{"level":"info","message":"Transaction hash 0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:21:47.660Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-02T16:56:35.000Z","timestamp":"2024-08-31T18:21:48.828Z"}
+{"level":"debug","message":"Transaction amount: 9.43611 ETH","timestamp":"2024-08-31T18:21:48.828Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1722617795","timestamp":"2024-08-31T18:21:48.828Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1722617795","timestamp":"2024-08-31T18:21:48.829Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:21:49.393Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Fetched historical ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 30235.62","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725128509","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725128509","timestamp":"2024-08-31T18:21:49.394Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:21:49.457Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:21:49.457Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:21:49.458Z"}
+{"level":"debug","message":"Calculated valueToday: 23851.56","timestamp":"2024-08-31T18:21:49.458Z"}
+{"level":"debug","message":"Calculated difference: -6384.06","timestamp":"2024-08-31T18:21:49.458Z"}
+{"level":"debug","message":"Calculated confirmations: 208118","timestamp":"2024-08-31T18:21:49.592Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-02T16:56:35.000Z","timestamp":"2024-08-31T18:21:49.592Z"}
+{"amount":"9.43611 ETH","blockNumber":20442193,"blockchain":"ethereum","confirmations":"208118","difference":"-6384.06","fee":"0.00012 ETH","from":"0xd2674da94285660c9b2353131bef2d8211369a4b","hash":"0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-02T16:56:35.000Z","to":"0x3dc2e6535a37300f744b0b744098b5a537e5b720","valueToday":"$23851.56","valueWhenTransacted":"$30235.62"}
+{"level":"info","message":"Web3 initialized successfully","timestamp":"2024-08-31T18:22:18.433Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-08-31T18:22:18.443Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-08-31T18:22:18.444Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1","timestamp":"2024-08-31T18:22:20.837Z"}
+{"level":"info","message":"Transaction hash 0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1 detected on EVM chain: Ethereum Mainnet","timestamp":"2024-08-31T18:22:21.235Z"}
+{"level":"debug","message":"Correct Transaction timestamp (from block): 2024-08-02T16:56:35.000Z","timestamp":"2024-08-31T18:22:22.355Z"}
+{"level":"debug","message":"Transaction amount: 9.43611 ETH","timestamp":"2024-08-31T18:22:22.356Z"}
+{"level":"debug","message":"Fetching historical ETH price for timestamp 1722617795","timestamp":"2024-08-31T18:22:22.356Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1722617795","timestamp":"2024-08-31T18:22:22.357Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:22:22.500Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Fetched historical ETH price: 3204.2465237463616","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Calculated valueWhenTransacted: 30235.62","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Fetching current price for ETH","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Current timestamp (for logging purposes): 1725128542","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Fetching ETH price for timestamp: 1725128542","timestamp":"2024-08-31T18:22:22.501Z"}
+{"level":"debug","message":"Coingecko returned ETH price: 2527.690204915795","timestamp":"2024-08-31T18:22:22.550Z"}
+{"level":"debug","message":"Successfully fetched ETH price: 2527.690204915795","timestamp":"2024-08-31T18:22:22.551Z"}
+{"level":"debug","message":"Fetched current price: 2527.690204915795","timestamp":"2024-08-31T18:22:22.551Z"}
+{"level":"debug","message":"Calculated valueToday: 23851.56","timestamp":"2024-08-31T18:22:22.551Z"}
+{"level":"debug","message":"Calculated difference: -6384.06","timestamp":"2024-08-31T18:22:22.551Z"}
+{"level":"debug","message":"Calculated confirmations: 208120","timestamp":"2024-08-31T18:22:22.683Z"}
+{"level":"debug","message":"Transaction timestamp (final log, correct): 2024-08-02T16:56:35.000Z","timestamp":"2024-08-31T18:22:22.683Z"}
+{"amount":"9.43611 ETH","blockNumber":20442193,"blockchain":"ethereum","confirmations":"208120","difference":"-6384.06","fee":"0.00012 ETH","from":"0xd2674da94285660c9b2353131bef2d8211369a4b","hash":"0x8032674885f14e9ef6a28f4fd1301b8b9f2fcd678043dff74eff43d97f53a2b1","level":"debug","message":"Transaction details built successfully","method":"Transfer","status":"Success","swapInfo":null,"timestamp":"2024-08-02T16:56:35.000Z","to":"0x3dc2e6535a37300f744b0b744098b5a537e5b720","valueToday":"$23851.56","valueWhenTransacted":"$30235.62"}
