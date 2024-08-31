@@ -28,10 +28,13 @@ class TransactionDetailBuilder {
 
       if (BigInt(transaction.value) > 0) {
         amount = fromWei(transaction.value, 18);
+        logger.debug(`Fetching ETH price for block ${receipt.blockNumber}`);
         ethPriceAtTransaction = await getEthPrice(parseInt(receipt.blockNumber, 16));
+        logger.debug(`Fetched ETH price: ${ethPriceAtTransaction}`);
 
         if (ethPriceAtTransaction) {
           valueWhenTransacted = (parseFloat(amount) * ethPriceAtTransaction).toFixed(2);
+          logger.debug(`Calculated valueWhenTransacted: ${valueWhenTransacted}`);
         } else {
           logger.warn('ETH price at transaction time could not be fetched. Proceeding with available information.');
         }
@@ -42,14 +45,20 @@ class TransactionDetailBuilder {
             amount = log.data;
             isERC20 = true;
 
+            logger.debug(`Fetching token details for address: ${tokenAddress}`);
             const { tokenDecimals: decimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
             tokenDecimals = decimals;
             tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, ''); // Remove non-printable characters
             amount = fromWei(amount, tokenDecimals);
+            logger.debug(`Token details fetched. Symbol: ${tokenSymbol}, Decimals: ${tokenDecimals}, Amount: ${amount}`);
 
+            logger.debug(`Fetching token price for block ${receipt.blockNumber}`);
             const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, parseInt(receipt.blockNumber, 16));
+            logger.debug(`Fetched token price: ${tokenPriceAtTransaction}`);
+
             if (tokenPriceAtTransaction !== null) {
               valueWhenTransacted = (parseFloat(amount) * tokenPriceAtTransaction).toFixed(2);
+              logger.debug(`Calculated valueWhenTransacted: ${valueWhenTransacted}`);
             } else {
               logger.warn('Token price at transaction time could not be fetched. Proceeding with available information.');
             }
@@ -59,11 +68,17 @@ class TransactionDetailBuilder {
       }
 
       const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 18);
+      logger.debug(`Fetching current ETH price`);
       const currentEthPrice = await getEthPrice();
+      logger.debug(`Fetched current ETH price: ${currentEthPrice}`);
+
+      logger.debug(`Fetching current token price for ${isERC20 ? tokenAddress : 'ETH'}`);
       const currentTokenPrice = isERC20 ? await getTokenPrice(tokenAddress) : currentEthPrice;
+      logger.debug(`Fetched current token price: ${currentTokenPrice}`);
 
       if (currentTokenPrice !== null) {
         valueToday = (parseFloat(amount) * currentTokenPrice).toFixed(2);
+        logger.debug(`Calculated valueToday: ${valueToday}`);
       } else {
         logger.warn('Current token price could not be fetched. Proceeding with available information.');
       }
@@ -71,12 +86,14 @@ class TransactionDetailBuilder {
       const difference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A'
         ? (parseFloat(valueToday) - parseFloat(valueWhenTransacted)).toFixed(2)
         : 'N/A';
+      logger.debug(`Calculated difference: ${difference}`);
 
       const currentBlockNumber = await this.web3.eth.getBlockNumber();
       const transactionBlockNumber = parseInt(receipt.blockNumber, 16);
       const confirmations = currentBlockNumber && transactionBlockNumber
         ? BigInt(currentBlockNumber) - BigInt(transactionBlockNumber)
         : 'N/A';
+      logger.debug(`Calculated confirmations: ${confirmations}`);
 
       let timestamp;
       if (transaction.timestamp) {
@@ -87,8 +104,9 @@ class TransactionDetailBuilder {
         timestamp = new Date().toISOString();
         logger.warn('No timestamp found in transaction or receipt. Using current time.');
       }
+      logger.debug(`Timestamp: ${timestamp}`);
 
-      return {
+      const result = {
         blockchain: chain,
         status: isSuccessful ? 'Success' : 'Failed',
         method: transactionMethod,
@@ -105,6 +123,9 @@ class TransactionDetailBuilder {
         timestamp: timestamp,
         hash: transaction.hash,
       };
+
+      logger.debug('Transaction details built successfully', result);
+      return result;
     } catch (error) {
       logger.error('Error building transaction details:', error.message, { context: error });
       throw error;

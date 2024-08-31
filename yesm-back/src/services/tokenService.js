@@ -1,9 +1,9 @@
 const Web3 = require('web3').default;
 const axios = require('axios');
 const logger = require('../utils/logger');
-const CustomError = require('../utils/customError');
+const config = require('../utils/config');
 
-const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+const web3 = new Web3('https://mainnet.infura.io/v3/' + config.infuraProjectId);
 
 const getTokenDetails = async (tokenAddress, apiUrl, apiKey) => {
   try {
@@ -32,61 +32,117 @@ const fromWei = (value, decimals = 18) => {
   return (Number(result) / 100000).toFixed(5);
 };
 
-const getEthPrice = async (timestamp = null) => {
+const getEthPrice = async (blockNumber) => {
   try {
-    let response;
-    if (timestamp) {
-      const date = new Date(timestamp * 1000).toISOString().split('T')[0];
-      const formattedDate = date.split('-').reverse().join('-');
-      response = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/history`, {
-        params: { date: formattedDate, localization: 'false' }
-      });
-    } else {
-      response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
-        params: { ids: 'ethereum', vs_currencies: 'usd' }
-      });
-    }
+    logger.debug(`Fetching ETH price for block number: ${blockNumber}`);
+    
+    // First, get the timestamp for the block
+    const timestamp = await getBlockTimestamp(blockNumber);
+    logger.debug(`Block timestamp: ${timestamp}`);
 
-    if (response && response.data) {
-      if (response.data.market_data && response.data.market_data.current_price && response.data.market_data.current_price.usd) {
-        return response.data.market_data.current_price.usd;
-      } else if (response.data.ethereum && response.data.ethereum.usd) {
-        return response.data.ethereum.usd;
-      } else {
-        logger.error(`Unexpected response structure from Coingecko ETH price API: ${JSON.stringify(response.data)}`);
-        return null;
-      }
-    } else {
-      logger.error(`No data received from Coingecko ETH price API: ${JSON.stringify(response)}`);
-      return null;
+    let price = await getEthPriceFromCoingecko(timestamp);
+    if (price === null) {
+      price = await getEthPriceFromCryptoCompare(timestamp);
     }
+    if (price === null) {
+      logger.warn(`Failed to fetch ETH price for timestamp ${timestamp}`);
+    } else {
+      logger.debug(`Successfully fetched ETH price: ${price}`);
+    }
+    return price;
+  } catch (error) {
+    logger.error(`Error fetching ETH price: ${error.message}`);
+    return null;
+  }
+};
+
+const getBlockTimestamp = async (blockNumber) => {
+  try {
+    const response = await axios.get(`https://api.etherscan.io/api`, {
+      params: {
+        module: 'block',
+        action: 'getblockreward',
+        blockno: blockNumber,
+        apikey: config.etherscanApiKey
+      }
+    });
+    if (response.data && response.data.result && response.data.result.timeStamp) {
+      return parseInt(response.data.result.timeStamp);
+    }
+    throw new Error('Failed to fetch block timestamp');
+  } catch (error) {
+    logger.error(`Error fetching block timestamp: ${error.message}`);
+    return Math.floor(Date.now() / 1000); // fallback to current timestamp
+  }
+};
+
+const getEthPriceFromCoingecko = async (timestamp) => {
+  try {
+    logger.debug(`Fetching ETH price from Coingecko for timestamp: ${timestamp}`);
+    const date = new Date(timestamp * 1000).toISOString().split('T')[0];
+    const formattedDate = date.split('-').reverse().join('-');
+    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/history`, {
+      params: { date: formattedDate, localization: 'false' }
+    });
+
+    if (response.data && response.data.market_data && response.data.market_data.current_price && response.data.market_data.current_price.usd) {
+      const price = response.data.market_data.current_price.usd;
+      logger.debug(`Coingecko returned ETH price: ${price}`);
+      return price;
+    }
+    logger.warn('Coingecko response did not contain expected price data');
+    return null;
   } catch (error) {
     logger.error(`Error fetching ETH price from Coingecko: ${error.message}`);
+    return null;
+  }
+};
 
-    // Fallback to Dexscreener API
-    try {
-      const dexScreenerResponse = await axios.get('https://api.dexscreener.com/latest/dex/tokens/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-      if (dexScreenerResponse && dexScreenerResponse.data) {
-        const ethPrice = dexScreenerResponse.data.pairs?.[0]?.priceUsd;
-        if (ethPrice) {
-          logger.info('Fetched ETH price from Dexscreener as a fallback.');
-          return parseFloat(ethPrice);
-        } else {
-          logger.error(`Unexpected response structure from Dexscreener ETH price API: ${JSON.stringify(dexScreenerResponse.data)}`);
-          return null;
-        }
-      } else {
-        logger.error(`No data received from Dexscreener ETH price API: ${JSON.stringify(dexScreenerResponse)}`);
-        return null;
+const getEthPriceFromCryptoCompare = async (timestamp) => {
+  try {
+    logger.debug(`Fetching ETH price from CryptoCompare for timestamp: ${timestamp}`);
+    const response = await axios.get('https://min-api.cryptocompare.com/data/v2/histoday', {
+      params: {
+        fsym: 'ETH',
+        tsym: 'USD',
+        limit: 1,
+        toTs: timestamp
+      },
+      headers: {
+        'Authorization': `Apikey ${config.cryptoCompareApiKey}`
       }
-    } catch (fallbackError) {
-      logger.error(`Error fetching ETH price from Dexscreener: ${fallbackError.message}`);
-      return null;
+    });
+
+    if (response.data && response.data.Data && response.data.Data.Data && response.data.Data.Data[0]) {
+      const price = response.data.Data.Data[0].close;
+      logger.debug(`CryptoCompare returned ETH price: ${price}`);
+      return price;
     }
+    logger.warn('CryptoCompare response did not contain expected price data');
+    return null;
+  } catch (error) {
+    logger.error(`Error fetching ETH price from CryptoCompare: ${error.message}`);
+    return null;
   }
 };
 
 const getTokenPrice = async (tokenAddress, timestamp = null) => {
+  try {
+    let price = await getTokenPriceFromCoingecko(tokenAddress, timestamp);
+    if (price === null) {
+      price = await getTokenPriceFromCryptoCompare(tokenAddress, timestamp);
+    }
+    if (price === null) {
+      logger.warn(`Failed to fetch token price for address ${tokenAddress} and timestamp ${timestamp}`);
+    }
+    return price;
+  } catch (error) {
+    logger.error(`Error fetching token price for ${tokenAddress}: ${error.message}`);
+    return null;
+  }
+};
+
+const getTokenPriceFromCoingecko = async (tokenAddress, timestamp = null) => {
   try {
     let url, params;
     if (timestamp) {
@@ -104,28 +160,51 @@ const getTokenPrice = async (tokenAddress, timestamp = null) => {
     if (timestamp) {
       if (response.data && response.data.market_data && response.data.market_data.current_price && response.data.market_data.current_price.usd) {
         return response.data.market_data.current_price.usd;
-      } else {
-        logger.error(`Unexpected response structure from historical token price API: ${JSON.stringify(response.data)}`);
-        return null;
       }
     } else {
       if (response.data && response.data[tokenAddress.toLowerCase()] && response.data[tokenAddress.toLowerCase()].usd) {
         return response.data[tokenAddress.toLowerCase()].usd;
-      } else {
-        logger.error(`Unexpected response structure from current token price API: ${JSON.stringify(response.data)}`);
-        return null;
       }
     }
+    return null;
   } catch (error) {
-    if (error.response) {
-      if (error.response.status === 404) {
-        logger.error(`Token price for ${tokenAddress} not found (404).`);
-      } else if (error.response.status === 429) {
-        logger.error(`Rate limit exceeded (429).`);
+    logger.error(`Error fetching token price from Coingecko: ${error.message}`);
+    return null;
+  }
+};
+
+const getTokenPriceFromCryptoCompare = async (tokenAddress, timestamp = null) => {
+  try {
+    // First, we need to get the token symbol from the contract address
+    const { tokenSymbol } = await getTokenDetails(tokenAddress, `https://api.etherscan.io/api`, config.etherscanApiKey);
+    
+    let url = 'https://min-api.cryptocompare.com/data/price';
+    let params = { fsym: tokenSymbol, tsyms: 'USD' };
+
+    if (timestamp) {
+      url = 'https://min-api.cryptocompare.com/data/v2/histoday';
+      params = { fsym: tokenSymbol, tsym: 'USD', limit: 1, toTs: timestamp };
+    }
+
+    const response = await axios.get(url, {
+      params,
+      headers: {
+        'Authorization': `Apikey ${config.cryptoCompareApiKey}`
+      }
+    });
+
+    if (timestamp) {
+      if (response.data && response.data.Data && response.data.Data.Data && response.data.Data.Data[0]) {
+        return response.data.Data.Data[0].close;
       }
     } else {
-      logger.error(`Error fetching token price for ${tokenAddress}: ${error.message}`);
+      if (response.data && response.data.USD) {
+        return response.data.USD;
+      }
     }
+    return null;
+  } catch (error) {
+    logger.error(`Error fetching token price from CryptoCompare: ${error.message}`);
     return null;
   }
 };
