@@ -32,13 +32,9 @@ const fromWei = (value, decimals = 18) => {
   return (Number(result) / 100000).toFixed(5);
 };
 
-const getEthPrice = async (blockNumber) => {
+const getEthPrice = async (timestamp) => {
   try {
-    logger.debug(`Fetching ETH price for block number: ${blockNumber}`);
-    
-    // First, get the timestamp for the block
-    const timestamp = await getBlockTimestamp(blockNumber);
-    logger.debug(`Block timestamp: ${timestamp}`);
+    logger.debug(`Fetching ETH price for timestamp: ${timestamp}`);
 
     let price = await getEthPriceFromCoingecko(timestamp);
     if (price === null) {
@@ -56,31 +52,10 @@ const getEthPrice = async (blockNumber) => {
   }
 };
 
-const getBlockTimestamp = async (blockNumber) => {
-  try {
-    const response = await axios.get(`https://api.etherscan.io/api`, {
-      params: {
-        module: 'block',
-        action: 'getblockreward',
-        blockno: blockNumber,
-        apikey: config.etherscanApiKey
-      }
-    });
-    if (response.data && response.data.result && response.data.result.timeStamp) {
-      return parseInt(response.data.result.timeStamp);
-    }
-    throw new Error('Failed to fetch block timestamp');
-  } catch (error) {
-    logger.error(`Error fetching block timestamp: ${error.message}`);
-    return Math.floor(Date.now() / 1000); // fallback to current timestamp
-  }
-};
-
 const getEthPriceFromCoingecko = async (timestamp) => {
   try {
-    logger.debug(`Fetching ETH price from Coingecko for timestamp: ${timestamp}`);
-    const date = new Date(timestamp * 1000).toISOString().split('T')[0];
-    const formattedDate = date.split('-').reverse().join('-');
+    const date = new Date(timestamp * 1000).toISOString().split('T')[0]; // Convert to YYYY-MM-DD
+    const formattedDate = date.split('-').reverse().join('-'); // Format as required by CoinGecko
     const response = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/history`, {
       params: { date: formattedDate, localization: 'false' }
     });
@@ -98,9 +73,9 @@ const getEthPriceFromCoingecko = async (timestamp) => {
   }
 };
 
+
 const getEthPriceFromCryptoCompare = async (timestamp) => {
   try {
-    logger.debug(`Fetching ETH price from CryptoCompare for timestamp: ${timestamp}`);
     const response = await axios.get('https://min-api.cryptocompare.com/data/v2/histoday', {
       params: {
         fsym: 'ETH',
@@ -175,7 +150,6 @@ const getTokenPriceFromCoingecko = async (tokenAddress, timestamp = null) => {
 
 const getTokenPriceFromCryptoCompare = async (tokenAddress, timestamp = null) => {
   try {
-    // First, we need to get the token symbol from the contract address
     const { tokenSymbol } = await getTokenDetails(tokenAddress, `https://api.etherscan.io/api`, config.etherscanApiKey);
     
     let url = 'https://min-api.cryptocompare.com/data/price';

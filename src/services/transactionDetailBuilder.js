@@ -26,11 +26,19 @@ class TransactionDetailBuilder {
         swapInfo = await this.extractSwapInfo(transaction, receipt, apiUrl, apiKey);
       }
 
-      if (BigInt(transaction.value) > 0) {
+      const block = await this.web3.eth.getBlock(receipt.blockNumber);
+      const transactionTimestamp = Number(block.timestamp);
+
+      logger.debug(`Correct Transaction timestamp (from block): ${new Date(transactionTimestamp * 1000).toISOString()}`);
+
+      if (BigInt(transaction.value) > 0n) {
         amount = fromWei(transaction.value, 18);
-        logger.debug(`Fetching ETH price for block ${receipt.blockNumber}`);
-        ethPriceAtTransaction = await getEthPrice(parseInt(receipt.blockNumber, 16));
-        logger.debug(`Fetched ETH price: ${ethPriceAtTransaction}`);
+        logger.debug(`Transaction amount: ${amount} ETH`);
+
+        // Ensure the correct timestamp is passed and logged
+        logger.debug(`Fetching historical ETH price for timestamp ${transactionTimestamp}`);
+        ethPriceAtTransaction = await getEthPrice(transactionTimestamp);
+        logger.debug(`Fetched historical ETH price: ${ethPriceAtTransaction}`);
 
         if (ethPriceAtTransaction) {
           valueWhenTransacted = (parseFloat(amount) * ethPriceAtTransaction).toFixed(2);
@@ -52,8 +60,8 @@ class TransactionDetailBuilder {
             amount = fromWei(amount, tokenDecimals);
             logger.debug(`Token details fetched. Symbol: ${tokenSymbol}, Decimals: ${tokenDecimals}, Amount: ${amount}`);
 
-            logger.debug(`Fetching token price for block ${receipt.blockNumber}`);
-            const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, parseInt(receipt.blockNumber, 16));
+            logger.debug(`Fetching token price for timestamp ${transactionTimestamp}`);
+            const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, transactionTimestamp);
             logger.debug(`Fetched token price: ${tokenPriceAtTransaction}`);
 
             if (tokenPriceAtTransaction !== null) {
@@ -68,19 +76,17 @@ class TransactionDetailBuilder {
       }
 
       const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 18);
-      logger.debug(`Fetching current ETH price`);
-      const currentEthPrice = await getEthPrice();
-      logger.debug(`Fetched current ETH price: ${currentEthPrice}`);
+      logger.debug(`Fetching current price for ${isERC20 ? tokenSymbol : 'ETH'}`);
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      logger.debug(`Current timestamp (for logging purposes): ${currentTimestamp}`);
+      const currentPrice = isERC20 ? await getTokenPrice(tokenAddress) : await getEthPrice(currentTimestamp);
+      logger.debug(`Fetched current price: ${currentPrice}`);
 
-      logger.debug(`Fetching current token price for ${isERC20 ? tokenAddress : 'ETH'}`);
-      const currentTokenPrice = isERC20 ? await getTokenPrice(tokenAddress) : currentEthPrice;
-      logger.debug(`Fetched current token price: ${currentTokenPrice}`);
-
-      if (currentTokenPrice !== null) {
-        valueToday = (parseFloat(amount) * currentTokenPrice).toFixed(2);
+      if (currentPrice !== null) {
+        valueToday = (parseFloat(amount) * currentPrice).toFixed(2);
         logger.debug(`Calculated valueToday: ${valueToday}`);
       } else {
-        logger.warn('Current token price could not be fetched. Proceeding with available information.');
+        logger.warn('Current price could not be fetched. Proceeding with available information.');
       }
 
       const difference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A'
@@ -91,20 +97,12 @@ class TransactionDetailBuilder {
       const currentBlockNumber = await this.web3.eth.getBlockNumber();
       const transactionBlockNumber = parseInt(receipt.blockNumber, 16);
       const confirmations = currentBlockNumber && transactionBlockNumber
-        ? BigInt(currentBlockNumber) - BigInt(transactionBlockNumber)
+        ? (BigInt(currentBlockNumber) - BigInt(transactionBlockNumber)).toString()
         : 'N/A';
       logger.debug(`Calculated confirmations: ${confirmations}`);
 
-      let timestamp;
-      if (transaction.timestamp) {
-        timestamp = new Date(parseInt(transaction.timestamp) * 1000).toISOString();
-      } else if (receipt.timestamp) {
-        timestamp = new Date(parseInt(receipt.timestamp, 16) * 1000).toISOString();
-      } else {
-        timestamp = new Date().toISOString();
-        logger.warn('No timestamp found in transaction or receipt. Using current time.');
-      }
-      logger.debug(`Timestamp: ${timestamp}`);
+      const timestamp = new Date(transactionTimestamp * 1000).toISOString();
+      logger.debug(`Transaction timestamp (final log, correct): ${timestamp}`);
 
       const result = {
         blockchain: chain,
@@ -118,7 +116,7 @@ class TransactionDetailBuilder {
         fee: `${feeInEther} ETH`,
         from: transaction.from,
         to: transaction.to,
-        confirmations: confirmations !== 'N/A' ? confirmations.toString() : 'N/A',
+        confirmations: confirmations,
         blockNumber: transactionBlockNumber,
         timestamp: timestamp,
         hash: transaction.hash,
