@@ -1,3 +1,4 @@
+// src/server.js
 const dotenv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
@@ -6,15 +7,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const config = require('./utils/config');
 const logger = require('./utils/logger');
-const { handleError } = require('./utils/errorHandler');
 const { initializeMoralis } = require('./utils/moralisInit');
 
 const app = express();
 
 // Security middleware
 app.use(helmet());
-
-// Compress all responses
 app.use(compression());
 
 // Rate limiting
@@ -26,15 +24,16 @@ app.use(limiter);
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 // API routes
-app.use(cors());
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/transactions', transactionRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  handleError(err, req, res);
+  console.error('Error:', err);
+  res.status(500).json({ error: 'An error occurred.' });
 });
 
 // Start server

@@ -1,15 +1,14 @@
 // src/services/chainDetectionService.js
 const { Moralis, EvmChain } = require('../utils/moralisInit');
-const evmService = require('./evmService');
-const bitcoinService = require('./bitcoinService');
-const solanaService = require('./solanaService');
+const covalentService = require('./covalentService');
 const logger = require('../utils/logger');
 
 class ChainDetectionService {
+  // Use Moralis to detect the chain of the transaction hash automatically
   async detectChain(txHash) {
     try {
       logger.debug(`Detecting chain for transaction hash: ${txHash}`);
-      
+
       const evmChains = [
         EvmChain.ETHEREUM,
         EvmChain.POLYGON,
@@ -20,131 +19,114 @@ class ChainDetectionService {
 
       for (const chain of evmChains) {
         try {
+          // Use Moralis to check if the transaction exists on this EVM chain
           const response = await Moralis.EvmApi.transaction.getTransaction({
             transactionHash: txHash,
             chain: chain,
           });
 
           if (response && response.result) {
-            logger.info(`Transaction hash ${txHash} detected on EVM chain: ${chain.name}`);
-            return chain.name.split(' ')[0].toLowerCase();
+            logger.info(`Transaction detected on chain: ${chain.name}`);
+            return chain.name.split(' ')[0].toLowerCase(); // Return chain name
           }
         } catch (error) {
           if (error.message.includes('Transaction not found')) {
-            continue;
+            continue; // Try the next chain if not found
           }
           throw error;
         }
       }
 
-      if (await bitcoinService.checkBitcoin(txHash)) {
-        logger.info(`Transaction hash ${txHash} detected on Bitcoin`);
-        return 'bitcoin';
-      }
-
-      if (await solanaService.checkSolana(txHash)) {
-        logger.info(`Transaction hash ${txHash} detected on Solana`);
-        return 'solana';
-      }
-
-      logger.warn(`Transaction hash ${txHash} does not match any known chain`);
+      logger.warn(`Transaction hash ${txHash} not detected on any EVM chain.`);
       return 'unknown';
     } catch (error) {
-      logger.error(`Error detecting chain for transaction hash ${txHash}: ${error.message}`, {
-        stack: error.stack,
-        txHash,
-        errorDetails: error,
-      });
+      logger.error(`Error detecting chain for transaction hash ${txHash}: ${error.message}`);
       throw error;
     }
   }
 
-  async detectChainForWallet(walletAddress) {
+  // Fetch transaction details from Covalent after identifying the chain with Moralis
+  async fetchTransactionDetails(txHash) {
     try {
-      logger.debug(`Detecting chain for wallet address: ${walletAddress}`);
+      const detectedChain = await this.detectChain(txHash);
 
-      const evmChains = [
-        EvmChain.ETHEREUM,
-        EvmChain.POLYGON,
-        EvmChain.ARBITRUM,
-        EvmChain.OPTIMISM,
-        EvmChain.BSC,
-      ];
+      const chainMap = {
+        ethereum: 1,
+        polygon: 137,
+        arbitrum: 42161,
+        optimism: 10,
+        bsc: 56,
+        base: 8453,
+      };
 
-      for (const chain of evmChains) {
-        try {
-          const response = await Moralis.EvmApi.account.getTransactions({
-            address: walletAddress,
-            chain: chain,
-          });
+      const chainId = chainMap[detectedChain];
 
-          if (response && response.result.length > 0) {
-            logger.info(`Wallet address ${walletAddress} detected on EVM chain: ${chain.name}`);
-            return chain.name.split(' ')[0].toLowerCase();
-          }
-        } catch (error) {
-          if (error.message.includes('Wallet not found')) {
-            continue;
-          }
-          throw error;
-        }
+      if (!chainId) {
+        throw new Error(`Unsupported chain: ${detectedChain}`);
       }
 
-      if (await bitcoinService.checkBitcoinWallet(walletAddress)) {
-        logger.info(`Wallet address ${walletAddress} detected on Bitcoin`);
-        return 'bitcoin';
+      logger.debug(`Fetching transaction details for ${txHash} on chain ${chainId}`);
+      
+      const transactionDetails = await covalentService.getTransactionDetails(chainId, txHash);
+      
+      if (!transactionDetails || transactionDetails.length === 0) {
+        throw new Error(`Transaction not found on chain ${chainId}`);
       }
 
-      if (await solanaService.checkSolanaWallet(walletAddress)) {
-        logger.info(`Wallet address ${walletAddress} detected on Solana`);
-        return 'solana';
-      }
-
-      logger.warn(`Wallet address ${walletAddress} does not match any known chain`);
-      return 'unknown';
+      // Mapping Covalent data to the format expected by the app
+      const covalentItem = transactionDetails[0];  // Access the first item in the 'items' array
+      return {
+        blockchain: detectedChain,
+        status: covalentItem.successful ? 'Success' : 'Failed',
+        from: covalentItem.from_address,
+        to: covalentItem.to_address,
+        amount: (parseInt(covalentItem.value) / 1e18).toFixed(5),  // Convert from Wei to Ether
+        valueWhenTransacted: `$${covalentItem.value_quote.toFixed(2)}`,
+        valueToday: 'N/A',  // You can calculate this if needed
+        fee: `${(parseInt(covalentItem.fees_paid) / 1e18).toFixed(5)} ETH`,
+        confirmations: 'N/A',  // Covalent doesn’t seem to provide confirmations, but you can calculate it
+        blockNumber: covalentItem.block_height,
+        timestamp: covalentItem.block_signed_at,
+        hash: covalentItem.tx_hash
+      };
     } catch (error) {
-      logger.error(`Error detecting chain for wallet address ${walletAddress}: ${error.message}`, {
-        stack: error.stack,
-        walletAddress,
-        errorDetails: error,
-      });
+      logger.error(`Error fetching transaction details: ${error.message}`);
       throw error;
     }
   }
 
-  async fetchTransactionDetails(txHash, chain) {
-    switch (chain.toLowerCase().trim()) {
-      case 'ethereum':
-      case 'polygon':
-      case 'arbitrum':
-      case 'optimism':
-      case 'bsc':
-      case 'base':
-        return evmService.fetchTransactionDetails(txHash, chain);
-      case 'bitcoin':
-        return bitcoinService.fetchTransactionDetails(txHash);
-      case 'solana':
-        return solanaService.fetchTransactionDetails(txHash);
-      default:
-        throw new Error(`Chain ${chain} is not supported for fetching transaction details.`);
-    }
-  }
+  // Fetch wallet transactions from Covalent for a detected chain
+  async fetchWalletTransactions(walletAddress) {
+    try {
+      const detectedChain = await this.detectChainForWallet(walletAddress);
 
-  async fetchWalletTransactions(walletAddress, chain) {
-    switch (chain.toLowerCase().trim()) {
-      case 'ethereum':
-      case 'polygon':
-      case 'arbitrum':
-      case 'optimism':
-      case 'bsc':
-      case 'base':
-        return evmService.fetchWalletTransactions(walletAddress, chain);
-      case 'bitcoin':
-        return bitcoinService.fetchWalletTransactions(walletAddress);
-      case 'solana':
-        return solanaService.fetchWalletTransactions(walletAddress);
-      default:
-        throw new Error(`Chain ${chain} is not supported for fetching wallet transactions.`);
+      const chainMap = {
+        ethereum: 1,
+        polygon: 137,
+        arbitrum: 42161,
+        optimism: 10,
+        bsc: 56,
+        base: 8453,
+      };
+
+      const chainId = chainMap[detectedChain];
+
+      if (!chainId) {
+        throw new Error(`Unsupported chain: ${detectedChain}`);
+      }
+
+      logger.debug(`Fetching wallet transactions for ${walletAddress} on chain ${chainId}`);
+
+      const walletTransactions = await covalentService.getERCTransfers(chainId, walletAddress);
+
+      if (!walletTransactions || walletTransactions.length === 0) {
+        throw new Error(`No transactions found for wallet on chain ${chainId}`);
+      }
+
+      return walletTransactions;
+    } catch (error) {
+      logger.error(`Error fetching wallet transactions: ${error.message}`);
+      throw error;
     }
   }
 }
