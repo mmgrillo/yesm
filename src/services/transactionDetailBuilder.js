@@ -17,34 +17,37 @@ class TransactionDetailBuilder {
     let ethPriceAtTransaction = null;
     let valueWhenTransacted = 'N/A';
     let valueToday = 'N/A';
+    let transactionTimestamp = null;
 
     let transactionMethod = this.getTransactionMethod(transaction);
     let swapInfo = null;
 
     try {
+      // Fetch the block to get the transaction timestamp
+      if (receipt.blockNumber) {
+        const block = await this.web3.eth.getBlock(receipt.blockNumber);
+        transactionTimestamp = block.timestamp || null;
+      } else if (transaction.blockNumber) {
+        const block = await this.web3.eth.getBlock(transaction.blockNumber);
+        transactionTimestamp = block.timestamp || null;
+      }
+
+      if (!transactionTimestamp) {
+        // Log a warning and set a fallback timestamp
+        logger.warn('Transaction timestamp is null, using fallback timestamp.');
+        transactionTimestamp = Math.floor(Date.now() / 1000); // Fallback to current time
+      }
+
       if (this.isSwapTransaction(transaction)) {
         swapInfo = await this.extractSwapInfo(transaction, receipt, apiUrl, apiKey);
       }
 
-      const block = await this.web3.eth.getBlock(receipt.blockNumber);
-      const transactionTimestamp = Number(block.timestamp);
-
-      logger.debug(`Correct Transaction timestamp (from block): ${new Date(transactionTimestamp * 1000).toISOString()}`);
-
       if (BigInt(transaction.value) > 0n) {
         amount = fromWei(transaction.value, 18);
-        logger.debug(`Transaction amount: ${amount} ETH`);
 
-        // Ensure the correct timestamp is passed and logged
-        logger.debug(`Fetching historical ETH price for timestamp ${transactionTimestamp}`);
-        ethPriceAtTransaction = await getEthPrice(transactionTimestamp);
-        logger.debug(`Fetched historical ETH price: ${ethPriceAtTransaction}`);
-
+        ethPriceAtTransaction = await this.getPriceForChain(transactionTimestamp, chain);
         if (ethPriceAtTransaction) {
           valueWhenTransacted = (parseFloat(amount) * ethPriceAtTransaction).toFixed(2);
-          logger.debug(`Calculated valueWhenTransacted: ${valueWhenTransacted}`);
-        } else {
-          logger.warn('ETH price at transaction time could not be fetched. Proceeding with available information.');
         }
       } else {
         for (const log of receipt.logs) {
@@ -53,22 +56,14 @@ class TransactionDetailBuilder {
             amount = log.data;
             isERC20 = true;
 
-            logger.debug(`Fetching token details for address: ${tokenAddress}`);
             const { tokenDecimals: decimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
             tokenDecimals = decimals;
-            tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, ''); // Remove non-printable characters
+            tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, '');
             amount = fromWei(amount, tokenDecimals);
-            logger.debug(`Token details fetched. Symbol: ${tokenSymbol}, Decimals: ${tokenDecimals}, Amount: ${amount}`);
 
-            logger.debug(`Fetching token price for timestamp ${transactionTimestamp}`);
-            const tokenPriceAtTransaction = await getTokenPrice(tokenAddress, transactionTimestamp);
-            logger.debug(`Fetched token price: ${tokenPriceAtTransaction}`);
-
+            const tokenPriceAtTransaction = await this.getTokenPriceForChain(tokenAddress, transactionTimestamp, chain);
             if (tokenPriceAtTransaction !== null) {
               valueWhenTransacted = (parseFloat(amount) * tokenPriceAtTransaction).toFixed(2);
-              logger.debug(`Calculated valueWhenTransacted: ${valueWhenTransacted}`);
-            } else {
-              logger.warn('Token price at transaction time could not be fetched. Proceeding with available information.');
             }
             break;
           }
@@ -76,33 +71,24 @@ class TransactionDetailBuilder {
       }
 
       const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 18);
-      logger.debug(`Fetching current price for ${isERC20 ? tokenSymbol : 'ETH'}`);
       const currentTimestamp = Math.floor(Date.now() / 1000);
-      logger.debug(`Current timestamp (for logging purposes): ${currentTimestamp}`);
-      const currentPrice = isERC20 ? await getTokenPrice(tokenAddress) : await getEthPrice(currentTimestamp);
-      logger.debug(`Fetched current price: ${currentPrice}`);
+      const currentPrice = isERC20 ? await this.getTokenPriceForChain(tokenAddress, null, chain) : await this.getPriceForChain(currentTimestamp, chain);
 
       if (currentPrice !== null) {
         valueToday = (parseFloat(amount) * currentPrice).toFixed(2);
-        logger.debug(`Calculated valueToday: ${valueToday}`);
-      } else {
-        logger.warn('Current price could not be fetched. Proceeding with available information.');
       }
 
       const difference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A'
         ? (parseFloat(valueToday) - parseFloat(valueWhenTransacted)).toFixed(2)
         : 'N/A';
-      logger.debug(`Calculated difference: ${difference}`);
 
       const currentBlockNumber = await this.web3.eth.getBlockNumber();
       const transactionBlockNumber = parseInt(receipt.blockNumber, 16);
       const confirmations = currentBlockNumber && transactionBlockNumber
         ? (BigInt(currentBlockNumber) - BigInt(transactionBlockNumber)).toString()
         : 'N/A';
-      logger.debug(`Calculated confirmations: ${confirmations}`);
 
       const timestamp = new Date(transactionTimestamp * 1000).toISOString();
-      logger.debug(`Transaction timestamp (final log, correct): ${timestamp}`);
 
       const result = {
         blockchain: chain,
@@ -133,7 +119,6 @@ class TransactionDetailBuilder {
   getTransactionMethod(transaction) {
     if (transaction.input && transaction.input.length >= 10) {
       const methodSignature = transaction.input.slice(0, 10);
-      // Add more method signatures as needed
       switch (methodSignature) {
         case '0x38ed1739': return 'Swap';
         case '0xa9059cbb': return 'Transfer';
@@ -172,6 +157,22 @@ class TransactionDetailBuilder {
       logger.error('Error extracting swap info:', error.message);
       return null;
     }
+  }
+
+  async getPriceForChain(timestamp, chain) {
+    if (chain.toLowerCase() === 'ethereum' || chain.toLowerCase() === 'arbitrum') {
+      return await getEthPrice(timestamp);
+    }
+    // Add more chains as necessary
+    return null;
+  }
+
+  async getTokenPriceForChain(tokenAddress, timestamp, chain) {
+    if (chain.toLowerCase() === 'ethereum' || chain.toLowerCase() === 'arbitrum') {
+      return await getTokenPrice(tokenAddress, timestamp);
+    }
+    // Add more chains as necessary
+    return null;
   }
 }
 

@@ -1,7 +1,6 @@
 // src/services/transactionService.js
-const axios = require('axios');
+const covalentService = require('./covalentService');
 const initWeb3 = require('./web3Provider');
-const { getApiUrlAndKey } = require('./apiService');
 const logger = require('../utils/logger');
 
 class TransactionService {
@@ -9,25 +8,18 @@ class TransactionService {
     this.web3 = initWeb3();
   }
 
-  async fetchTransactionAndReceipt(txHash, chain) {
-    const { apiUrl, apiKey } = getApiUrlAndKey(chain);
-
+  async fetchTransactionDetails(txHash, chain) {
     try {
-      const [transactionResponse, receiptResponse] = await Promise.all([
-        axios.get(apiUrl, { params: { module: 'proxy', action: 'eth_getTransactionByHash', txhash: txHash, apikey: apiKey } }),
-        axios.get(apiUrl, { params: { module: 'proxy', action: 'eth_getTransactionReceipt', txhash: txHash, apikey: apiKey } }),
-      ]);
+      // Assuming chain has already been detected by chainDetectionService
+      const transactionDetails = await covalentService.getTransactionDetails(chain, txHash);
 
-      const transaction = transactionResponse.data.result;
-      const receipt = receiptResponse.data.result;
-
-      if (!transaction || !receipt) {
-        throw new Error(`Transaction or receipt not found on ${chain}`);
+      if (!transactionDetails || transactionDetails.length === 0) {
+        throw new Error(`Transaction or receipt not found for ${txHash} on ${chain}`);
       }
 
-      return { transaction, receipt };
+      return transactionDetails;
     } catch (error) {
-      logger.error(`Error fetching transaction or receipt from ${chain}: ${error.message}`);
+      logger.error(`Error fetching transaction details from Covalent: ${error.message}`);
       throw error;
     }
   }
