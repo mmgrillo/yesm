@@ -3,40 +3,35 @@ import React, { useState, useEffect } from 'react';
 const TransactionDetails = ({ txInfo }) => {
   const [recentTransactions, setRecentTransactions] = useState([]);
 
-  const renderConfirmationInfo = () => {
-    switch (txInfo.blockchain?.toLowerCase()) {
-      case 'ethereum':
-        return "On Ethereum, 12 confirmations are generally considered safe for most transactions.";
-      case 'bitcoin':
-        return "For Bitcoin, 6 confirmations are typically considered secure, which takes about an hour.";
-      default:
-        return `For ${txInfo.blockchain}, ${txInfo.confirmations} confirmations have been recorded so far.`;
-    }
-  };
+  useEffect(() => {
+    // Simulating recent transactions data for testing purposes
+    const sampleRecentTransactions = [
+      {
+        blockchain: 'Ethereum',
+        hash: '0xabc123...',
+        method: 'Swap',
+        amount: '100.50 USDT',
+        difference: '10.50',
+        swapInfo: {
+          fromToken: 'USDT',
+          toToken: 'ETH',
+        },
+        timestamp: Date.now(),
+      },
+      {
+        blockchain: 'Ethereum',
+        hash: '0xdef456...',
+        method: 'Transfer',
+        amount: '50.00 USDC',
+        difference: '0.00',
+        timestamp: Date.now(),
+      }
+    ];
+    setRecentTransactions(sampleRecentTransactions); // Setting recent transactions for testing
+  }, []);
 
   const truncateHash = (hash) => {
     return hash && hash.length > 15 ? hash.substring(0, 12) + '...' : hash;
-  };
-
-  useEffect(() => {
-    if (txInfo) {
-      setRecentTransactions((prevTransactions) => {
-        const updatedTransactions = [txInfo, ...prevTransactions];
-        return updatedTransactions.slice(0, 3); // Keep only the last three transactions
-      });
-    }
-  }, [txInfo]);
-
-  const renderDifference = (difference) => {
-    if (difference === 'N/A') return { label: 'Difference', value: 'N/A' };
-    const diff = parseFloat(difference);
-    if (diff > 0) {
-      return { label: 'You are a King 👑', value: `$${diff.toFixed(2)}` };
-    } else if (diff < 0) {
-      return { label: 'You are a Fool 😂', value: `-$${Math.abs(diff).toFixed(2)}` };
-    } else {
-      return { label: 'No change', value: '$0.00' };
-    }
   };
 
   const DetailRow = ({ label, value, isAddress, isLongValue }) => (
@@ -59,18 +54,16 @@ const TransactionDetails = ({ txInfo }) => {
     </div>
   );
 
-  const renderSwapInfo = (swapInfo) => {
-    if (!swapInfo) return null;
-    return (
-      <div className="mt-2 p-2 bg-blue-50 rounded-md">
-        <p className="text-sm">
-          Swap: {swapInfo.amountIn} {swapInfo.fromToken} ➔ {swapInfo.amountOutMin} {swapInfo.toToken}
-        </p>
-      </div>
-    );
+  const renderDifference = (difference) => {
+    const diff = parseFloat(difference);
+    if (diff > 0) {
+      return { label: 'Gain', value: `$${diff.toFixed(2)}` };
+    } else if (diff < 0) {
+      return { label: 'Loss', value: `-$${Math.abs(diff).toFixed(2)}` };
+    } else {
+      return { label: 'No change', value: '$0.00' };
+    }
   };
-
-  const { label: differenceLabel, value: differenceValue } = renderDifference(txInfo.difference);
 
   return (
     <div className="p-4 min-h-screen flex flex-col items-center shadow-2xl" style={{ backgroundColor: '#FFEBCC' }}>
@@ -81,11 +74,14 @@ const TransactionDetails = ({ txInfo }) => {
             <DetailRow label="Blockchain" value={txInfo.blockchain} />
             <DetailRow label="Status" value={txInfo.status} />
             <DetailRow label="Method" value={txInfo.method} />
-            {txInfo.swapInfo && renderSwapInfo(txInfo.swapInfo)}
-            <DetailRow label="Amount" value={txInfo.amount} isLongValue={true} />
+            <DetailRow label="Amount" value={
+              <>
+                {txInfo.amount}
+                {txInfo.tokenLogo && <img src={txInfo.tokenLogo} alt="Token Logo" className="inline w-5 h-5 ml-2" />}
+              </>
+            } isLongValue={true} />
             <DetailRow label="Value USD when transacted" value={txInfo.valueWhenTransacted} />
             <DetailRow label="Value USD today" value={txInfo.valueToday} />
-            <DetailRow label={differenceLabel} value={differenceValue} />
             <DetailRow label="Fee" value={txInfo.fee} />
             <DetailRow label="Confirmations" value={txInfo.confirmations} />
             <DetailRow label="Sender" value={txInfo.from} isAddress={true} />
@@ -93,8 +89,9 @@ const TransactionDetails = ({ txInfo }) => {
             <DetailRow label="Block Number" value={txInfo.blockNumber} />
             <DetailRow label="Timestamp" value={new Date(txInfo.timestamp).toLocaleString()} />
           </div>
+
           <div className="mt-4 p-3 rounded-lg bg-yellow-100 text-sm">
-            <p className="font-semibold"><strong>Did you know?</strong> {renderConfirmationInfo()}</p>
+            <p className="font-semibold"><strong>Did you know?</strong> {txInfo.explanation}</p>
           </div>
         </div>
       </div>
