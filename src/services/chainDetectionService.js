@@ -49,7 +49,7 @@ class ChainDetectionService {
   async fetchTransactionDetails(txHash) {
     try {
       const detectedChain = await this.detectChain(txHash);
-
+  
       const chainMap = {
         ethereum: 1,
         polygon: 137,
@@ -58,13 +58,12 @@ class ChainDetectionService {
         bsc: 56,
         base: 8453,
       };
-
+  
       const chainId = chainMap[detectedChain];
-
       if (!chainId) {
         throw new Error(`Unsupported chain: ${detectedChain}`);
       }
-
+  
       logger.debug(`Fetching transaction details for ${txHash} on chain ${chainId}`);
       
       const transactionDetails = await covalentService.getTransactionDetails(chainId, txHash);
@@ -72,28 +71,44 @@ class ChainDetectionService {
       if (!transactionDetails || transactionDetails.length === 0) {
         throw new Error(`Transaction not found on chain ${chainId}`);
       }
-
-      // Mapping Covalent data to the format expected by the app
+  
       const covalentItem = transactionDetails[0];  // Access the first item in the 'items' array
+  
+      // Check if ERC-20 tokens are transferred
+      const erc20Transfers = covalentItem.log_events.filter(event => event.decoded && event.decoded.name === "Transfer");
+  
+      // Map ERC-20 transfers
+      const erc20Details = erc20Transfers.map(transfer => {
+        const from = transfer.sender_address;
+        const to = transfer.receiver_address;
+        const amount = (parseInt(transfer.decoded.params[2].value) / (10 ** transfer.sender_contract_decimals)).toFixed(5); // Convert to human-readable format
+        const tokenSymbol = transfer.sender_contract_ticker_symbol;
+        const tokenLogo = transfer.sender_logo_url;
+  
+        return { from, to, amount, tokenSymbol, tokenLogo };
+      });
+  
       return {
         blockchain: detectedChain,
         status: covalentItem.successful ? 'Success' : 'Failed',
         from: covalentItem.from_address,
         to: covalentItem.to_address,
-        amount: (parseInt(covalentItem.value) / 1e18).toFixed(5),  // Convert from Wei to Ether
+        amount: erc20Details.length > 0 ? `${erc20Details[0].amount} ${erc20Details[0].tokenSymbol}` : (parseInt(covalentItem.value) / 1e18).toFixed(5),  // Handle ERC-20 transfers if available
         valueWhenTransacted: `$${covalentItem.value_quote.toFixed(2)}`,
         valueToday: 'N/A',  // You can calculate this if needed
         fee: `${(parseInt(covalentItem.fees_paid) / 1e18).toFixed(5)} ETH`,
         confirmations: 'N/A',  // Covalent doesn’t seem to provide confirmations, but you can calculate it
         blockNumber: covalentItem.block_height,
         timestamp: covalentItem.block_signed_at,
-        hash: covalentItem.tx_hash
+        hash: covalentItem.tx_hash,
+        erc20Details  // Return ERC-20 details
       };
     } catch (error) {
       logger.error(`Error fetching transaction details: ${error.message}`);
       throw error;
     }
   }
+  
 
   // Fetch wallet transactions from Covalent for a detected chain
   async fetchWalletTransactions(walletAddress) {

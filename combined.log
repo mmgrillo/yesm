@@ -1978,3 +1978,42 @@
 {"level":"debug","message":"Detecting chain for transaction hash: 0x52dd4e7026c5bfe240eeebfce15d2a45988737dc63e99e3761a78d18292044ce","timestamp":"2024-09-08T14:33:37.360Z"}
 {"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-08T14:33:39.496Z"}
 {"level":"debug","message":"Fetching transaction details for 0x52dd4e7026c5bfe240eeebfce15d2a45988737dc63e99e3761a78d18292044ce on chain 1","timestamp":"2024-09-08T14:33:39.496Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T11:59:52.369Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T11:59:52.373Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x7d64454804b7d16a8b7eba31ab49b24549207e69c90321a08101bb82ad6328d2","timestamp":"2024-09-09T12:00:23.002Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T12:00:23.951Z"}
+{"level":"debug","message":"Fetching transaction details for 0x7d64454804b7d16a8b7eba31ab49b24549207e69c90321a08101bb82ad6328d2 on chain 1","timestamp":"2024-09-09T12:00:23.952Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T12:04:06.741Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T12:04:06.745Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x7d64454804b7d16a8b7eba31ab49b24549207e69c90321a08101bb82ad6328d2","timestamp":"2024-09-09T12:06:09.808Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T12:06:11.032Z"}
+{"level":"debug","message":"Fetching transaction details for 0x7d64454804b7d16a8b7eba31ab49b24549207e69c90321a08101bb82ad6328d2 on chain 1","timestamp":"2024-09-09T12:06:11.032Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 5ZbL249z8X8jr1aeHEyUanvLZvuWhpFgGqqK67JQmfN9MMTq8LBVt3reEt5peB2MVa9TRsmxUnrc7NNSrRhTz29B","timestamp":"2024-09-09T12:11:38.345Z"}
+{"level":"error","message":"Error detecting chain for transaction hash 5ZbL249z8X8jr1aeHEyUanvLZvuWhpFgGqqK67JQmfN9MMTq8LBVt3reEt5peB2MVa9TRsmxUnrc7NNSrRhTz29B: [C0006] Request failed, Bad Request(400): transaction_hash is not a valid hex address","timestamp":"2024-09-09T12:11:39.417Z"}
+{"level":"error","message":"Error fetching transaction details: [C0006] Request failed, Bad Request(400): transaction_hash is not a valid hex address","timestamp":"2024-09-09T12:11:39.418Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T12:23:30.387Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T12:23:30.394Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-09T12:33:53.426Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T12:33:54.486Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-09T12:33:54.486Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-09T13:05:40.091Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T13:05:41.597Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-09T13:05:41.597Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-09T15:05:06.119Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T15:05:07.077Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-09T15:05:07.077Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:24:20.855Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:24:20.864Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:24:21.152Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:24:21.156Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:24:34.932Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:24:34.936Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:24:41.899Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:24:41.903Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:32:04.197Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:32:04.214Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-09T15:33:34.646Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-09T15:33:35.960Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-09T15:33:35.961Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:33:50.138Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:33:50.143Z"}

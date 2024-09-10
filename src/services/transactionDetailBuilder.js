@@ -1,4 +1,5 @@
-const { getTokenDetails, fromWei, getEthPrice, getTokenPrice } = require('./tokenService');
+const getTokenDetails = require('./tokenService');
+const getTransactionExplanation = require('./transactionExplanations');
 const logger = require('../utils/logger');
 
 class TransactionDetailBuilder {
@@ -20,6 +21,7 @@ class TransactionDetailBuilder {
     let transactionTimestamp = null;
 
     let transactionMethod = this.getTransactionMethod(transaction);
+    let explanation = getTransactionExplanation(transactionMethod); // Get explanation for the transaction method
     let swapInfo = null;
 
     try {
@@ -33,15 +35,16 @@ class TransactionDetailBuilder {
       }
 
       if (!transactionTimestamp) {
-        // Log a warning and set a fallback timestamp
         logger.warn('Transaction timestamp is null, using fallback timestamp.');
         transactionTimestamp = Math.floor(Date.now() / 1000); // Fallback to current time
       }
 
+      // Extract swap info if the transaction is a swap
       if (this.isSwapTransaction(transaction)) {
         swapInfo = await this.extractSwapInfo(transaction, receipt, apiUrl, apiKey);
       }
 
+      // If ETH is transferred
       if (BigInt(transaction.value) > 0n) {
         amount = fromWei(transaction.value, 18);
 
@@ -50,6 +53,7 @@ class TransactionDetailBuilder {
           valueWhenTransacted = (parseFloat(amount) * ethPriceAtTransaction).toFixed(2);
         }
       } else {
+        // Handle ERC-20 transfers
         for (const log of receipt.logs) {
           if (log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
             tokenAddress = log.address;
@@ -58,9 +62,10 @@ class TransactionDetailBuilder {
 
             const { tokenDecimals: decimals, tokenSymbol: symbol } = await getTokenDetails(tokenAddress, apiUrl, apiKey);
             tokenDecimals = decimals;
-            tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, '');
+            tokenSymbol = symbol.replace(/[^\x20-\x7E]/g, ''); // Clean token symbol
             amount = fromWei(amount, tokenDecimals);
 
+            // Get token price at the time of the transaction
             const tokenPriceAtTransaction = await this.getTokenPriceForChain(tokenAddress, transactionTimestamp, chain);
             if (tokenPriceAtTransaction !== null) {
               valueWhenTransacted = (parseFloat(amount) * tokenPriceAtTransaction).toFixed(2);
@@ -70,31 +75,38 @@ class TransactionDetailBuilder {
         }
       }
 
+      // Calculate the fee paid in Ether
       const feeInEther = fromWei(BigInt(receipt.gasUsed) * BigInt(transaction.gasPrice), 18);
+
+      // Get the current price of the token
       const currentTimestamp = Math.floor(Date.now() / 1000);
-      const currentPrice = isERC20 ? await this.getTokenPriceForChain(tokenAddress, null, chain) : await this.getPriceForChain(currentTimestamp, chain);
+      const currentPrice = isERC20
+        ? await this.getTokenPriceForChain(tokenAddress, null, chain)
+        : await this.getPriceForChain(currentTimestamp, chain);
 
       if (currentPrice !== null) {
         valueToday = (parseFloat(amount) * currentPrice).toFixed(2);
       }
 
+      // Calculate the difference between the transacted value and today's value
       const difference = valueWhenTransacted !== 'N/A' && valueToday !== 'N/A'
         ? (parseFloat(valueToday) - parseFloat(valueWhenTransacted)).toFixed(2)
         : 'N/A';
 
+      // Get the number of confirmations
       const currentBlockNumber = await this.web3.eth.getBlockNumber();
       const transactionBlockNumber = parseInt(receipt.blockNumber, 16);
       const confirmations = currentBlockNumber && transactionBlockNumber
         ? (BigInt(currentBlockNumber) - BigInt(transactionBlockNumber)).toString()
         : 'N/A';
 
-      const timestamp = new Date(transactionTimestamp * 1000).toISOString();
-
-      const result = {
+      // Return the transaction details
+      return {
         blockchain: chain,
         status: isSuccessful ? 'Success' : 'Failed',
         method: transactionMethod,
-        swapInfo: swapInfo,
+        explanation,  // Include explanation from backend
+        swapInfo,     // Include swap info if available
         amount: `${amount} ${tokenSymbol}`,
         valueWhenTransacted: valueWhenTransacted !== 'N/A' ? `$${valueWhenTransacted}` : 'N/A',
         valueToday: valueToday !== 'N/A' ? `$${valueToday}` : 'N/A',
@@ -104,12 +116,9 @@ class TransactionDetailBuilder {
         to: transaction.to,
         confirmations: confirmations,
         blockNumber: transactionBlockNumber,
-        timestamp: timestamp,
+        timestamp: new Date(transactionTimestamp * 1000).toLocaleString(),
         hash: transaction.hash,
       };
-
-      logger.debug('Transaction details built successfully', result);
-      return result;
     } catch (error) {
       logger.error('Error building transaction details:', error.message, { context: error });
       throw error;
