@@ -1,52 +1,63 @@
-// src/components/TransactionLookup.js
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import axios from 'axios';
-import TransactionDetails from './TransactionDetails';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
   const [walletAddress, setWalletAddress] = useState('');
-  const [walletTransactions, setWalletTransactions] = useState([]);  // Store transactions
+  const [walletTransactions, setWalletTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Function to check wallet transactions
   const handleWalletCheck = async () => {
+    console.log("Check Wallet button clicked!"); 
     setIsLoading(true);
     setError(null);
 
-    if (!walletAddress) {
+    if (!walletAddress || walletAddress.length < 10) {  
       setError('Please provide a valid wallet address.');
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log(`Fetching transactions for wallet: ${walletAddress}`);
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
       console.log('Fetched Wallet Transactions:', response.data);
-      setWalletTransactions(response.data.data);  // Ensure to map correctly from backend response
+
+      if (response.data && response.data.data) {
+        setWalletTransactions(response.data.data); 
+      } else {
+        setError('No transactions found for this wallet.');
+        setWalletTransactions([]);
+      }
     } catch (err) {
+      console.error('Failed to fetch wallet transactions:', err);
       setError('Failed to fetch wallet transactions. Please try again.');
-      console.error('Error fetching wallet transactions:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const viewDetails = (transaction) => {
+    console.log('Navigating to transaction details:', transaction);
+    navigate(`/transaction-details/${transaction.id}`, { state: { transaction } });
+  };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Wallet Address Lookup */}
-      <div className="flex mt-10 mb-6">
-        <input 
-          type="text" 
-          value={walletAddress} 
+    <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">
+      <div className="flex mt-5 mb-3">
+        <input
+          type="text"
+          value={walletAddress}
           onChange={(e) => setWalletAddress(e.target.value)}
           placeholder="Enter your wallet address"
-          className="flex-grow p-3 rounded-l-lg bg-[#FFEBCC] border-none focus:outline-none focus:ring-2 focus:ring-[#4A0E4E] text-[#4A0E4E] placeholder-[#4A0E4E]"
+          className="flex-grow p-3 rounded-l-lg bg-white border border-[#4A0E4E] text-[#4A0E4E] focus:outline-none focus:ring-2 focus:ring-[#4A0E4E]"
         />
-        <button 
+        <button
           onClick={handleWalletCheck}
           className="bg-[#4A0E4E] text-white p-3 rounded-r-lg flex items-center hover:bg-[#6A2C6A] transition-colors"
           disabled={isLoading}
@@ -56,9 +67,20 @@ const TransactionLookup = () => {
         </button>
       </div>
 
-      {/* Display Wallet Transactions */}
       {walletTransactions.length > 0 ? (
-        <TransactionDetails walletTransactions={walletTransactions} />
+        <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
+          {walletTransactions.map((transaction, index) => (
+            <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
+              <p><strong>Token:</strong> {transaction.token || 'N/A'}</p>
+              <p><strong>Type:</strong> {transaction.type || 'N/A'}</p>  
+              <p><strong>Token Value:</strong> {transaction.tokenValue || 'N/A'}</p>
+              <p><strong>Performance:</strong> {transaction.performance ? `${transaction.performance}%` : 'N/A'}</p>
+              <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded" onClick={() => viewDetails(transaction)}>
+                Details
+              </button>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className="text-red-500 mb-4">{error}</p>
       )}
