@@ -1,5 +1,5 @@
 // src/services/transactionService.js
-const covalentService = require('./covalentService');
+const zerionService = require('./zerionService');
 const initWeb3 = require('./web3Provider');
 const logger = require('../utils/logger');
 
@@ -10,8 +10,8 @@ class TransactionService {
 
   async fetchTransactionDetails(txHash, chain) {
     try {
-      // Assuming chain has already been detected by chainDetectionService
-      const transactionDetails = await covalentService.getTransactionDetails(chain, txHash);
+      // Replace Covalent with Zerion API for fetching transaction details
+      const transactionDetails = await zerionService.getTransactionDetails(chain, txHash);
 
       if (!transactionDetails || transactionDetails.length === 0) {
         throw new Error(`Transaction or receipt not found for ${txHash} on ${chain}`);
@@ -19,7 +19,7 @@ class TransactionService {
 
       return transactionDetails;
     } catch (error) {
-      logger.error(`Error fetching transaction details from Covalent: ${error.message}`);
+      logger.error(`Error fetching transaction details from Zerion: ${error.message}`);
       throw error;
     }
   }

@@ -176,3 +176,5 @@
 {"level":"error","message":"Error fetching transaction details: Request failed with status code 401","timestamp":"2024-09-08T12:56:56.871Z"}
 {"level":"error","message":"Error detecting chain for transaction hash 5ZbL249z8X8jr1aeHEyUanvLZvuWhpFgGqqK67JQmfN9MMTq8LBVt3reEt5peB2MVa9TRsmxUnrc7NNSrRhTz29B: [C0006] Request failed, Bad Request(400): transaction_hash is not a valid hex address","timestamp":"2024-09-09T12:11:39.417Z"}
 {"level":"error","message":"Error fetching transaction details: [C0006] Request failed, Bad Request(400): transaction_hash is not a valid hex address","timestamp":"2024-09-09T12:11:39.418Z"}
+{"level":"error","message":"Error fetching transaction details: Cannot read properties of undefined (reading 'filter')","timestamp":"2024-09-16T10:14:48.879Z"}
+{"level":"error","message":"Error fetching transaction details: Unsupported chain: unknown","timestamp":"2024-09-16T10:15:01.166Z"}

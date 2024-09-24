@@ -28,7 +28,8 @@ app.use(cors());
 
 // API routes
 const transactionRoutes = require('./routes/transactionRoutes');
-app.use('/api/transactions', transactionRoutes);
+app.use('/api', transactionRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,4 +1,3 @@
-// src/services/apiService.js
 const config = require('../utils/config');
 
 const getApiUrlAndKey = (chain) => {
