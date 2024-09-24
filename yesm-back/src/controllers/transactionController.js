@@ -1,38 +1,36 @@
-// src/controllers/transactionController.js
 const chainDetectionService = require('../services/chainDetectionService');
-
-exports.getTransactionDetails = async (req, res) => {
-  try {
-    const { txHash } = req.params;
-
-    // Fetch transaction details after detecting the chain
-    const transactionDetails = await chainDetectionService.fetchTransactionDetails(txHash);
-
-    if (!transactionDetails) {
-      return res.status(404).json({ error: 'Transaction not found.' });
-    }
-
-    res.json(transactionDetails);
-  } catch (error) {
-    console.error('Error in getTransactionDetails:', error);
-    res.status(500).json({ error: 'An error occurred while fetching transaction details.' });
-  }
-};
+const axios = require('axios');
 
 exports.getWalletTransactions = async (req, res) => {
   try {
     const { walletAddress } = req.params;
+    const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions`;
+    const ZERION_API_KEY = process.env.ZERION_API_KEY;
 
-    // Fetch wallet transactions after detecting the chain
-    const walletTransactions = await chainDetectionService.fetchWalletTransactions(walletAddress);
+    // Fetch wallet transactions from Zerion API using Basic Authentication
+    try {
+      const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
+      const response = await axios.get(ZERION_API_URL, {
+        headers: {
+          accept: 'application/json',
+          Authorization: `Basic ${encodedApiKey}`,
+        },
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Zerion API failed:', error.message);
 
-    if (!walletTransactions) {
-      return res.status(404).json({ error: 'No transactions found for this wallet.' });
+      // Handle specific 401 Unauthorized error
+      if (error.response && error.response.status === 401) {
+        return res.status(401).json({ error: 'Unauthorized. Please check your API key.' });
+      }
+
+      // Fallback to backup
+      const backupTransactions = await chainDetectionService.fetchWalletTransactions(walletAddress);
+      res.json(backupTransactions);
     }
-
-    res.json(walletTransactions);
   } catch (error) {
-    console.error('Error in getWalletTransactions:', error);
-    res.status(500).json({ error: 'An error occurred while processing your request.' });
+    console.error('Error fetching wallet transactions:', error);
+    res.status(500).json({ error: 'Failed to fetch wallet transactions' });
   }
 };

@@ -2017,3 +2017,93 @@
 {"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-09T15:33:35.961Z"}
 {"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-09T15:33:50.138Z"}
 {"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-09T15:33:50.143Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-16T10:14:23.500Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-16T10:14:23.503Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-16T10:14:34.966Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-16T10:14:35.789Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-16T10:14:35.790Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0x34d1533277b7b1adee5d2e723914aeeba3dc6b7893580acdb0d88a774a7b227d","timestamp":"2024-09-16T10:14:47.213Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-16T10:14:47.853Z"}
+{"level":"debug","message":"Fetching transaction details for 0x34d1533277b7b1adee5d2e723914aeeba3dc6b7893580acdb0d88a774a7b227d on chain 1","timestamp":"2024-09-16T10:14:47.853Z"}
+{"level":"error","message":"Error fetching transaction details: Cannot read properties of undefined (reading 'filter')","timestamp":"2024-09-16T10:14:48.879Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xf4b3ac068bd901bc0009c18e92e8ea2a75f77c25f9b246b085740e433113bb5a","timestamp":"2024-09-16T10:14:59.532Z"}
+{"level":"warn","message":"Transaction hash 0xf4b3ac068bd901bc0009c18e92e8ea2a75f77c25f9b246b085740e433113bb5a not detected on any EVM chain.","timestamp":"2024-09-16T10:15:01.165Z"}
+{"level":"error","message":"Error fetching transaction details: Unsupported chain: unknown","timestamp":"2024-09-16T10:15:01.166Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-16T10:15:28.939Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-16T10:15:28.941Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-16T10:15:44.835Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-16T10:15:44.842Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-16T10:19:26.418Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-16T10:19:26.424Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xf4b3ac068bd901bc0009c18e92e8ea2a75f77c25f9b246b085740e433113bb5a","timestamp":"2024-09-16T10:19:42.679Z"}
+{"level":"info","message":"Transaction detected on chain: Base","timestamp":"2024-09-16T10:19:46.275Z"}
+{"level":"debug","message":"Fetching transaction details for 0xf4b3ac068bd901bc0009c18e92e8ea2a75f77c25f9b246b085740e433113bb5a on chain 8453","timestamp":"2024-09-16T10:19:46.276Z"}
+{"level":"debug","message":"Detecting chain for transaction hash: 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e","timestamp":"2024-09-16T10:20:17.712Z"}
+{"level":"info","message":"Transaction detected on chain: Ethereum Mainnet","timestamp":"2024-09-16T10:20:18.220Z"}
+{"level":"debug","message":"Fetching transaction details for 0xff548043b39a7412d3efc60c9dce50f9f29dc2fb10eea1698169870cb734b60e on chain 1","timestamp":"2024-09-16T10:20:18.220Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T09:34:19.782Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T09:34:19.785Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T09:49:22.964Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T09:49:22.971Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T09:49:31.875Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T09:49:31.878Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T09:57:50.959Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T09:57:50.961Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T09:57:57.166Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T09:57:57.169Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T10:03:10.666Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T10:03:10.668Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-17T10:03:16.310Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-17T10:03:16.312Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T11:30:11.327Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T11:30:11.329Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:11:09.717Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:11:09.724Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:11:20.154Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:11:20.156Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:11:31.610Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:11:31.612Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:11:43.940Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:11:43.942Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:18:52.563Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:18:52.566Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T12:19:45.073Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T12:19:45.075Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8","timestamp":"2024-09-19T12:19:51.693Z"}
+{"level":"warn","message":"No transactions found for wallet 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8 on any EVM chain.","timestamp":"2024-09-19T12:19:51.694Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8","timestamp":"2024-09-19T12:20:15.913Z"}
+{"level":"warn","message":"No transactions found for wallet 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8 on any EVM chain.","timestamp":"2024-09-19T12:20:15.915Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8","timestamp":"2024-09-19T12:54:05.970Z"}
+{"level":"warn","message":"No transactions found for wallet 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8 on any EVM chain.","timestamp":"2024-09-19T12:54:05.975Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T13:25:01.437Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T13:25:01.446Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-19T13:25:08.790Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-19T13:25:08.794Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T14:38:54.481Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T14:38:54.483Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8","timestamp":"2024-09-21T14:39:25.470Z"}
+{"level":"warn","message":"No transactions found for wallet 0xA0b9faAc81f34a849D57516a0193B37Ec23e70b8 on any EVM chain.","timestamp":"2024-09-21T14:39:25.471Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xc1a1037F6A31012C5075d3EaD628C1c5f5ea6299","timestamp":"2024-09-21T14:41:11.120Z"}
+{"level":"warn","message":"No transactions found for wallet 0xc1a1037F6A31012C5075d3EaD628C1c5f5ea6299 on any EVM chain.","timestamp":"2024-09-21T14:41:11.124Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T14:42:40.401Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T14:42:40.404Z"}
+{"level":"debug","message":"Detecting chain for wallet address: 0xCad97616f91872C02BA3553dB315Db4015cBE850","timestamp":"2024-09-21T14:42:58.134Z"}
+{"level":"warn","message":"No transactions found for wallet 0xCad97616f91872C02BA3553dB315Db4015cBE850 on any EVM chain.","timestamp":"2024-09-21T14:42:58.136Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T14:55:08.708Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T14:55:08.710Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T15:11:38.098Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T15:11:38.105Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T15:33:19.447Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T15:33:19.452Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-21T15:33:34.927Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-21T15:33:34.929Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-23T10:11:12.700Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-23T10:11:12.703Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T07:41:53.602Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T07:41:53.605Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T08:08:06.820Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T08:08:06.826Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T08:08:16.009Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T08:08:16.011Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T08:08:54.733Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T08:08:54.735Z"}
