@@ -2141,3 +2141,7 @@
 {"level":"warn","message":"No transactions found for wallet mmgrillo.eth on any EVM chain.","timestamp":"2024-09-24T12:04:35.328Z"}
 {"level":"debug","message":"Detecting chain for wallet address: Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T","timestamp":"2024-09-24T12:07:27.458Z"}
 {"level":"warn","message":"No transactions found for wallet Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T on any EVM chain.","timestamp":"2024-09-24T12:07:27.463Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T12:11:59.016Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T12:11:59.019Z"}
+{"level":"debug","message":"Detecting chain for wallet address: Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T","timestamp":"2024-09-24T12:47:37.262Z"}
+{"level":"warn","message":"No transactions found for wallet Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T on any EVM chain.","timestamp":"2024-09-24T12:47:37.263Z"}

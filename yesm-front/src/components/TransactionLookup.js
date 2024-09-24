@@ -13,11 +13,11 @@ const TransactionLookup = () => {
   const navigate = useNavigate();
 
   const handleWalletCheck = async () => {
-    console.log("Check Wallet button clicked!"); 
+    console.log("Check Wallet button clicked!");
     setIsLoading(true);
     setError(null);
 
-    if (!walletAddress || walletAddress.length < 10) {  
+    if (!walletAddress || walletAddress.length < 10) {
       setError('Please provide a valid wallet address.');
       setIsLoading(false);
       return;
@@ -29,7 +29,7 @@ const TransactionLookup = () => {
       console.log('Fetched Wallet Transactions:', response.data);
 
       if (response.data && response.data.data) {
-        setWalletTransactions(response.data.data); 
+        setWalletTransactions(response.data.data);
       } else {
         setError('No transactions found for this wallet.');
         setWalletTransactions([]);
@@ -44,7 +44,7 @@ const TransactionLookup = () => {
 
   const viewDetails = (transaction) => {
     console.log('Navigating to transaction details:', transaction);
-    navigate(`/transaction-details/${transaction.id}`, { state: { transaction } });
+    navigate(`/transaction-details/${transaction.id}`, { state: { transaction, walletTransactions } });
   };
 
   return (
@@ -71,10 +71,26 @@ const TransactionLookup = () => {
         <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
           {walletTransactions.map((transaction, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
-              <p><strong>Token:</strong> {transaction.token || 'N/A'}</p>
-              <p><strong>Type:</strong> {transaction.type || 'N/A'}</p>  
-              <p><strong>Token Value:</strong> {transaction.tokenValue || 'N/A'}</p>
-              <p><strong>Performance:</strong> {transaction.performance ? `${transaction.performance}%` : 'N/A'}</p>
+              {/* Chain */}
+              <p>
+                <strong>Chain:</strong> {transaction.blockchain || 'N/A'}
+              </p>
+              {/* Sold Token */}
+              <p>
+                <strong>Sold:</strong> {transaction.attributes?.fee?.fungible_info?.symbol || 'N/A'}
+              </p>
+              {/* Bought Token */}
+              <p>
+                <strong>Bought:</strong> {transaction.attributes?.bought_token?.symbol || 'N/A'} {/* Assuming bought_token contains this data */}
+              </p>
+              {/* Token Value */}
+              <p><strong>Token Value:</strong> {transaction.attributes?.fee?.quantity?.float || 'N/A'}</p>
+              {/* Timestamp */}
+              <p><strong>Timestamp:</strong> {transaction.attributes?.mined_at ? new Date(transaction.attributes.mined_at).toLocaleString() : 'N/A'}</p>
+              {/* Performance */}
+              {transaction.operation_type !== 'receive' && transaction.operation_type !== 'transfer' && (
+                <p><strong>Performance:</strong> {/* Placeholder for performance calculation */}</p>
+              )}
               <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded" onClick={() => viewDetails(transaction)}>
                 Details
               </button>
