@@ -1,61 +1,71 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import axios from 'axios';
-import TransactionDetails from './TransactionDetails';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
   const [walletAddress, setWalletAddress] = useState('');
-  const [walletTransactions, setWalletTransactions] = useState([]);  // Store transactions
+  const [walletTransactions, setWalletTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Function to check wallet transactions
   const handleWalletCheck = async () => {
     setIsLoading(true);
     setError(null);
 
-    if (!walletAddress) {
+    if (!walletAddress || walletAddress.length < 10) {
       setError('Please provide a valid wallet address.');
       setIsLoading(false);
       return;
     }
 
     try {
-      console.log("API URL:", `${API_URL}/api/wallet/${walletAddress}`); // Log the full API URL
+      console.log(`Fetching transactions for wallet: ${walletAddress}`);
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
-      console.log('Fetched Wallet Transactions:', response.data);
-
-      // Adjust the response structure based on what backend sends
       const transactions = response.data.data || response.data;
-      setWalletTransactions(transactions);
-    } catch (err) {
-      if (err.response && err.response.status === 404) {
-        setError('No transactions found for this wallet address.');
-      } else if (err.response && err.response.status === 400) {
-        setError('Invalid wallet address. Please check and try again.');
+      console.log('Fetched Wallet Transactions:', transactions);
+
+      if (transactions) {
+        setWalletTransactions(transactions);
       } else {
-        setError('Failed to fetch wallet transactions. Please try again.');
+        setError('No transactions found for this wallet.');
+        setWalletTransactions([]);
       }
-      console.error('Error fetching wallet transactions:', err.response ? err.response.data : err.message);
+    } catch (err) {
+      console.error('Failed to fetch wallet transactions:', err);
+      setError('Failed to fetch wallet transactions. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const viewDetails = (transaction) => {
+    console.log('Navigating to transaction details:', transaction);
+    navigate(`/transaction-details/${transaction.id}`, { state: { transaction, walletTransactions } });
+  };
+
+  // Calculate performance by comparing transaction value to today's value (placeholder logic)
+  const calculatePerformance = (transaction) => {
+    const originalValue = transaction.attributes?.fee?.quantity?.float || 0;
+    const currentValue = 100; // Placeholder: Fetch the current value via an API call
+    return ((currentValue - originalValue) / originalValue) * 100;
+  };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Wallet Address Lookup */}
-      <div className="flex mt-10 mb-6">
-        <input 
-          type="text" 
-          value={walletAddress} 
+    <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">
+      {/* Wallet Address Input */}
+      <div className="flex mt-5 mb-3">
+        <input
+          type="text"
+          value={walletAddress}
           onChange={(e) => setWalletAddress(e.target.value)}
           placeholder="Enter your wallet address"
-          className="flex-grow p-3 rounded-l-lg bg-[#FFEBCC] border-none focus:outline-none focus:ring-2 focus:ring-[#4A0E4E] text-[#4A0E4E] placeholder-[#4A0E4E]"
+          className="flex-grow p-3 rounded-l-lg bg-white border border-[#4A0E4E] text-[#4A0E4E] focus:outline-none focus:ring-2 focus:ring-[#4A0E4E]"
         />
-        <button 
+        <button
           onClick={handleWalletCheck}
           className="bg-[#4A0E4E] text-white p-3 rounded-r-lg flex items-center hover:bg-[#6A2C6A] transition-colors"
           disabled={isLoading}
@@ -65,9 +75,31 @@ const TransactionLookup = () => {
         </button>
       </div>
 
-      {/* Display Wallet Transactions */}
+      {/* Display Transactions */}
       {walletTransactions.length > 0 ? (
-        <TransactionDetails walletTransactions={walletTransactions} />
+        <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
+          {walletTransactions.map((transaction, index) => (
+            <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
+              {/* Chain */}
+              <p><strong>Chain:</strong> {transaction.blockchain || 'N/A'}</p>
+              {/* Type of Transaction */}
+              <p><strong>Type:</strong> {transaction.operation_type || 'N/A'}</p>
+              {/* Sold Token */}
+              <p><strong>Sold:</strong> {transaction.attributes?.fee?.fungible_info?.symbol || 'N/A'}</p>
+              {/* Bought Token */}
+              <p><strong>Bought:</strong> {transaction.attributes?.bought_token?.symbol || 'N/A'}</p>
+              {/* Token Value */}
+              <p><strong>Token Value:</strong> {transaction.attributes?.fee?.quantity?.float || 'N/A'}</p>
+              {/* Timestamp */}
+              <p><strong>Timestamp:</strong> {transaction.attributes?.mined_at ? new Date(transaction.attributes.mined_at).toLocaleString() : 'N/A'}</p>
+              {/* Performance */}
+              <p><strong>Performance:</strong> {calculatePerformance(transaction).toFixed(2)}%</p>
+              <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded" onClick={() => viewDetails(transaction)}>
+                Details
+              </button>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className="text-red-500 mb-4">{error}</p>
       )}
