@@ -1,15 +1,21 @@
-// src/server.js
 const dotenv = require('dotenv');
 const express = require('express');
-const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
 const config = require('./utils/config');
 const logger = require('./utils/logger');
-const { initializeMoralis } = require('./utils/moralisInit');
+const cors = require('cors');
 
-const app = express();
+// Load environment variables
+dotenv.config();
+
+const app = express(); // Initialize the app here
+
+// Enable CORS for your frontend
+app.use(cors({
+  origin: 'http://localhost:3000',  // Your frontend's URL
+}));
 
 // Security middleware
 app.use(helmet());
@@ -18,18 +24,16 @@ app.use(compression());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: config.rateLimitWindowMs,
-  max: config.rateLimitMax
+  max: config.rateLimitMax,
 });
 app.use(limiter);
 
 // Middleware
 app.use(express.json());
-app.use(cors());
 
 // API routes
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api', transactionRoutes);
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -40,7 +44,6 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    await initializeMoralis();
     app.listen(config.port, () => {
       logger.info(`Server is running on port ${config.port}`);
     });
