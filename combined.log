@@ -2145,3 +2145,46 @@
 {"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T12:11:59.019Z"}
 {"level":"debug","message":"Detecting chain for wallet address: Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T","timestamp":"2024-09-24T12:47:37.262Z"}
 {"level":"warn","message":"No transactions found for wallet Dc1UoXLt45TsK2FEuXDr9KnxzZxJFt5ioUoQ4Z36hq7T on any EVM chain.","timestamp":"2024-09-24T12:47:37.263Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T13:17:49.070Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T13:17:49.072Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T13:52:23.584Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T13:52:23.589Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T14:03:25.830Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:03:25.839Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T14:03:28.859Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:03:28.862Z"}
+{"level":"info","message":"Moralis initialized successfully","timestamp":"2024-09-24T14:08:39.420Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:08:39.424Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:16:07.309Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:16:18.998Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:16:28.416Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:23:19.808Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:25:30.359Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:25:53.679Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:26:06.446Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:40:18.061Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:42:38.008Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-24T14:42:55.675Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-25T12:18:18.889Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-25T12:19:26.649Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-25T12:20:30.863Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-27T10:29:22.981Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-27T10:29:43.508Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-27T10:29:52.547Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-09-30T14:42:46.407Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T07:47:58.011Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T07:53:05.422Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T07:54:42.837Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T07:57:05.438Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:00:38.526Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:00:41.824Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:29:34.225Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:42:10.727Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:42:18.357Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:42:27.427Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T08:49:35.863Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T11:36:36.665Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T11:40:09.652Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T11:45:38.462Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T12:16:13.816Z"}
+{"level":"info","message":"Server is running on port 5001","timestamp":"2024-10-01T12:17:05.606Z"}
