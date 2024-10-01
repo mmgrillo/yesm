@@ -12,6 +12,18 @@ const TransactionLookup = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Function to filter transactions based on type
+  const filterSwapTransactions = (transactions) => {
+    return transactions.filter((tx) => {
+      const attributes = tx.attributes || {};
+      const operationType = attributes.operation_type || '';
+
+      // Check if the operation is a swap or if tokens were bought/sold
+      return (operationType.includes('swap') || (attributes?.fee?.fungible_info?.symbol && attributes?.bought_token?.symbol));
+    });
+  };
+
+  // Function to check wallet transactions
   const handleWalletCheck = async () => {
     setIsLoading(true);
     setError(null);
@@ -25,13 +37,14 @@ const TransactionLookup = () => {
     try {
       console.log(`Fetching transactions for wallet: ${walletAddress}`);
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
-      const transactions = response.data.data || response.data;
-      console.log('Fetched Wallet Transactions:', transactions);
 
-      if (transactions) {
-        setWalletTransactions(transactions);
+      // Filter transactions for swaps/trades only
+      const swapTransactions = filterSwapTransactions(response.data.data || []);
+      
+      if (swapTransactions.length > 0) {
+        setWalletTransactions(swapTransactions);
       } else {
-        setError('No transactions found for this wallet.');
+        setError('No swap or trade transactions found for this wallet.');
         setWalletTransactions([]);
       }
     } catch (err) {
@@ -40,18 +53,6 @@ const TransactionLookup = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const viewDetails = (transaction) => {
-    console.log('Navigating to transaction details:', transaction);
-    navigate(`/transaction-details/${transaction.id}`, { state: { transaction, walletTransactions } });
-  };
-
-  // Calculate performance by comparing transaction value to today's value (placeholder logic)
-  const calculatePerformance = (transaction) => {
-    const originalValue = transaction.attributes?.fee?.quantity?.float || 0;
-    const currentValue = 100; // Placeholder: Fetch the current value via an API call
-    return ((currentValue - originalValue) / originalValue) * 100;
   };
 
   return (
@@ -75,28 +76,24 @@ const TransactionLookup = () => {
         </button>
       </div>
 
-      {/* Display Transactions */}
+      {/* Display Wallet Transactions */}
       {walletTransactions.length > 0 ? (
         <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
           {walletTransactions.map((transaction, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
               {/* Chain */}
-              <p><strong>Chain:</strong> {transaction.blockchain || 'N/A'}</p>
-              {/* Type of Transaction */}
-              <p><strong>Type:</strong> {transaction.operation_type || 'N/A'}</p>
-              {/* Sold Token */}
+              <p><strong>Chain:</strong> {transaction.attributes?.application_metadata?.contract_address?.slice(0, 8) || 'N/A'}</p>
+              {/* Transaction Action */}
+              <p><strong>Transaction Action:</strong> {transaction.attributes?.operation_type || 'N/A'}</p>
+              {/* Sold and Bought Tokens */}
               <p><strong>Sold:</strong> {transaction.attributes?.fee?.fungible_info?.symbol || 'N/A'}</p>
-              {/* Bought Token */}
               <p><strong>Bought:</strong> {transaction.attributes?.bought_token?.symbol || 'N/A'}</p>
               {/* Token Value */}
-              <p><strong>Token Value:</strong> {transaction.attributes?.fee?.quantity?.float || 'N/A'}</p>
+              <p><strong>Token Value (Sold):</strong> {transaction.attributes?.fee?.quantity?.float || 'N/A'}</p>
+              <p><strong>Token Value (Bought):</strong> {transaction.attributes?.bought_token?.quantity?.float || 'N/A'}</p>
               {/* Timestamp */}
               <p><strong>Timestamp:</strong> {transaction.attributes?.mined_at ? new Date(transaction.attributes.mined_at).toLocaleString() : 'N/A'}</p>
-              {/* Performance */}
-              <p><strong>Performance:</strong> {calculatePerformance(transaction).toFixed(2)}%</p>
-              <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded" onClick={() => viewDetails(transaction)}>
-                Details
-              </button>
+              <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded">Details</button>
             </div>
           ))}
         </div>
