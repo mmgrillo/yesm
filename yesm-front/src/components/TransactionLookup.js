@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Don't forget to import useEffect
 import { Search } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +13,16 @@ const TransactionLookup = () => {
   const navigate = useNavigate();
 
   // Function to filter transactions based on type
-  const filterSwapTransactions = (transactions) => {
+  const filterRelevantTransactions = (transactions) => {
     return transactions.filter((tx) => {
       const attributes = tx.attributes || {};
       const operationType = attributes.operation_type || '';
 
-      // Check if the operation is a swap or if tokens were bought/sold
-      return (operationType.includes('swap') || (attributes?.fee?.fungible_info?.symbol && attributes?.bought_token?.symbol));
+      // Add debug logging for better insight into the filtering process
+      console.log(`Operation Type: ${operationType}`);
+
+      // Check if the operation is either 'trade', 'send', 'receive', 'deposit', or 'withdraw'
+      return ['trade'].includes(operationType.toLowerCase());
     });
   };
 
@@ -38,13 +41,18 @@ const TransactionLookup = () => {
       console.log(`Fetching transactions for wallet: ${walletAddress}`);
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
 
-      // Filter transactions for swaps/trades only
-      const swapTransactions = filterSwapTransactions(response.data.data || []);
-      
-      if (swapTransactions.length > 0) {
-        setWalletTransactions(swapTransactions);
+      console.log('Full response data:', response.data); // Log the full response
+
+      // Filter transactions for relevant types (update to correct response structure)
+      const unfilteredTransactions = response.data.data || response.data; // Adjust based on actual structure
+      console.log('Unfiltered transactions:', unfilteredTransactions);
+
+      const relevantTransactions = filterRelevantTransactions(unfilteredTransactions || []);
+
+      if (relevantTransactions.length > 0) {
+        setWalletTransactions(relevantTransactions);
       } else {
-        setError('No swap or trade transactions found for this wallet.');
+        setError('No relevant transactions found for this wallet.');
         setWalletTransactions([]);
       }
     } catch (err) {
@@ -54,6 +62,12 @@ const TransactionLookup = () => {
       setIsLoading(false);
     }
   };
+
+  // Log the state of walletTransactions and error
+  useEffect(() => {
+    console.log('Wallet transactions:', walletTransactions);
+    console.log('Error message:', error);
+  }, [walletTransactions, error]); // This effect will run whenever walletTransactions or error changes
 
   return (
     <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">

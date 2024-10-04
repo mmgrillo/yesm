@@ -10,7 +10,7 @@ router.get('/wallet/:walletAddress', async (req, res) => {
     return res.status(400).json({ error: 'Wallet address is required.' });
   }
 
-  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions`;
+  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions?filter[operation_types]=trade,send,receive,deposit,withdraw`;
   const ZERION_API_KEY = process.env.ZERION_API_KEY;
 
   try {
@@ -24,11 +24,23 @@ router.get('/wallet/:walletAddress', async (req, res) => {
 
     console.log('Fetched transactions from Zerion:', response.data);
 
-    if (!response.data || !response.data.data) {
-      return res.status(404).json({ error: 'No transactions found for this wallet.' });
-    }
+    // Define and filter relevant transactions here
+    const transactions = response.data.data;
+    const relevantTransactions = transactions.filter((tx) => {
+      const attributes = tx.attributes || {};
+      const operationType = attributes.operation_type || '';
 
-    res.json(response.data.data);  // Send the correct data back to the frontend
+      console.log(`Transaction operation type: ${operationType}`);
+
+      // Check for relevant transaction types
+      return ['trade', 'send', 'receive', 'deposit', 'withdraw'].includes(operationType.toLowerCase());
+    });
+
+    if (relevantTransactions.length > 0) {
+      res.json(relevantTransactions); // Send relevant transactions to the frontend
+    } else {
+      res.status(404).json({ error: `No relevant transactions found. Fetched ${transactions.length} total transactions.` });
+    }
   } catch (error) {
     console.error('Error fetching wallet transactions from Zerion:', error.response ? error.response.data : error.message);
     return res.status(500).json({ error: 'An error occurred while fetching transactions.' });
