@@ -4,11 +4,11 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-// Function to dynamically fetch prices from CoinGecko for any token symbols
-const getCurrentTokenPrices = async (tokenSymbols) => {
-  const tokenList = tokenSymbols.join(',');
-  const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenList}&vs_currencies=usd`);
-  return response.data;  // Returns current prices for tokens
+// Function to dynamically fetch prices from CoinGecko using contract addresses
+const getCurrentTokenPricesByContract = async (contractAddresses) => {
+  const contractList = contractAddresses.join(',');
+  const response = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractList}&vs_currencies=usd`);
+  return response.data;  // Returns current prices for tokens by contract address
 };
 
 const TransactionLookup = () => {
@@ -18,7 +18,24 @@ const TransactionLookup = () => {
   const [error, setError] = useState(null);
   const [tokenPrices, setTokenPrices] = useState({});
 
-  // Function to extract unique token symbols from transactions
+  // Function to extract unique contract addresses from transactions
+  const extractContractAddresses = (transactions) => {
+    const contractAddresses = new Set();
+    transactions.forEach((transaction) => {
+      if (transaction.attributes?.transfers && Array.isArray(transaction.attributes.transfers)) {
+        transaction.attributes.transfers.forEach((transfer) => {
+          if (transfer.fungible_info?.implementations && transfer.fungible_info.implementations.length > 0) {
+            // Get the contract address from the first implementation (assuming it's on Ethereum)
+            const contractAddress = transfer.fungible_info.implementations[0].address;
+            contractAddresses.add(contractAddress.toLowerCase());
+          }
+        });
+      }
+    });
+    return Array.from(contractAddresses);  // Return unique contract addresses as an array
+  };
+
+  // Function to extract symbols from transfers
   const extractTokenSymbols = (transactions) => {
     const tokenSymbols = new Set();
     transactions.forEach((transaction) => {
@@ -67,11 +84,11 @@ const TransactionLookup = () => {
       if (relevantTransactions.length > 0) {
         setWalletTransactions(relevantTransactions);
 
-        // Extract token symbols and fetch their current prices
-        const tokenSymbols = extractTokenSymbols(relevantTransactions);
-        const prices = await getCurrentTokenPrices(tokenSymbols);
+        // Extract contract addresses and fetch their current prices
+        const contractAddresses = extractContractAddresses(relevantTransactions);
+        const prices = await getCurrentTokenPricesByContract(contractAddresses);
         setTokenPrices(prices);
-        console.log('Token prices:', prices);
+        console.log('Token prices by contract address:', prices);
       } else {
         setError('No relevant transactions found for this wallet.');
         setWalletTransactions([]);
@@ -127,42 +144,39 @@ const TransactionLookup = () => {
             const attributes = transaction.attributes || {};
             const transfers = attributes.transfers || [];
 
-            // Sold and bought values using value field in transfers
-            const soldTransfer = transfers.find(t => t.direction === 'out') || transfers[1] || {};
-            const boughtTransfer = transfers.find(t => t.direction === 'in') || transfers[0] || {};
+            // Summing all 'out' transfers for sold values
+            const totalSold = transfers
+              .filter(transfer => transfer.direction === 'out')
+              .reduce((sum, transfer) => sum + (transfer.quantity?.float || transfer.value || 0), 0);
 
-            console.log('Sold Transfer:', soldTransfer);
-            console.log('Bought Transfer:', boughtTransfer);
+            // Summing all 'in' transfers for bought values
+            const totalBought = transfers
+              .filter(transfer => transfer.direction === 'in')
+              .reduce((sum, transfer) => sum + (transfer.quantity?.float || transfer.value || 0), 0);
 
-            const soldValue = soldTransfer.quantity?.float || soldTransfer.value || 0;
-            const boughtValue = boughtTransfer.quantity?.float || boughtTransfer.value || 0;
-            const soldSymbol = soldTransfer.fungible_info?.symbol?.toLowerCase() || 'unknown';
-            const boughtSymbol = boughtTransfer.fungible_info?.symbol?.toLowerCase() || 'unknown';
+            // Extract symbols to show on frontend
+            const soldSymbol = transfers.find(t => t.direction === 'out')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
+            const boughtSymbol = transfers.find(t => t.direction === 'in')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
 
-            console.log('Sold Value:', soldValue, 'Sold Symbol:', soldSymbol);
-            console.log('Bought Value:', boughtValue, 'Bought Symbol:', boughtSymbol);
+            // Prices from the CoinGecko API using contract addresses (fetched in the background)
+            const soldContractAddress = transfers.find(t => t.direction === 'out')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
+            const boughtContractAddress = transfers.find(t => t.direction === 'in')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
+            const soldPriceThen = transfers.find(t => t.direction === 'out')?.price || 0;
+            const boughtPriceThen = transfers.find(t => t.direction === 'in')?.price || 0;
 
-            const soldPriceThen = soldTransfer.price || soldTransfer.fungible_info?.price || 0;
-            const boughtPriceThen = boughtTransfer.price || boughtTransfer.fungible_info?.price || 0;
+            // Fetch the current prices from the dynamically fetched data using contract addresses
+            const currentSoldPrice = tokenPrices[soldContractAddress]?.usd || soldPriceThen || 0;
+            const currentBoughtPrice = tokenPrices[boughtContractAddress]?.usd || boughtPriceThen || 0;
 
-            console.log('Sold Price Then:', soldPriceThen, 'Bought Price Then:', boughtPriceThen);
+            // USD Value calculations
+            const totalSoldUsdThen = (totalSold * soldPriceThen).toFixed(2);
+            const totalBoughtUsdThen = (totalBought * boughtPriceThen).toFixed(2);
+            const currentSoldUsd = (totalSold * currentSoldPrice).toFixed(2);
+            const currentBoughtUsd = (totalBought * currentBoughtPrice).toFixed(2);
 
-            // Calculate the USD value at the time of trade
-            const soldUsdThen = (soldValue * soldPriceThen).toFixed(2);
-            const boughtUsdThen = (boughtValue * boughtPriceThen).toFixed(2);
-
-            // Current price of the tokens from dynamic fetching
-            const currentSoldPrice = tokenPrices[soldSymbol]?.usd || soldPriceThen || 0;
-            const currentBoughtPrice = tokenPrices[boughtSymbol]?.usd || boughtPriceThen || 0;
-
-            console.log('Current Sold Price:', currentSoldPrice, 'Current Bought Price:', currentBoughtPrice);
-
-            const currentSoldUsd = (soldValue * currentSoldPrice).toFixed(2);
-            const currentBoughtUsd = (boughtValue * currentBoughtPrice).toFixed(2);
-
-            // Calculate performance
-            const performanceSold = calculatePerformance(parseFloat(soldUsdThen), parseFloat(currentSoldUsd));
-            const performanceBought = calculatePerformance(parseFloat(boughtUsdThen), parseFloat(currentBoughtUsd));
+            // Performance calculation
+            const performanceSold = calculatePerformance(parseFloat(totalSoldUsdThen), parseFloat(currentSoldUsd));
+            const performanceBought = calculatePerformance(parseFloat(totalBoughtUsdThen), parseFloat(currentBoughtUsd));
 
             return (
               <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
@@ -171,11 +185,11 @@ const TransactionLookup = () => {
                 {/* Transaction Action */}
                 <p><strong>Transaction Action:</strong> {attributes.operation_type || 'N/A'}</p>
                 {/* Sold and Bought Tokens */}
-                <p><strong>Sold:</strong> {soldValue !== 0 ? `${soldValue} ${soldSymbol?.toUpperCase()}` : 'N/A'}</p>
-                <p><strong>Bought:</strong> {boughtValue !== 0 ? `${boughtValue} ${boughtSymbol?.toUpperCase()}` : 'N/A'}</p>
+                <p><strong>Sold:</strong> {totalSold !== 0 ? `${totalSold} ${soldSymbol?.toUpperCase()}` : 'N/A'}</p>
+                <p><strong>Bought:</strong> {totalBought !== 0 ? `${totalBought} ${boughtSymbol?.toUpperCase()}` : 'N/A'}</p>
                 {/* USD Value at the time of trade */}
-                <p><strong>Sold (USD at time of trade):</strong> {soldUsdThen !== '0.00' ? `$${soldUsdThen}` : 'N/A'}</p>
-                <p><strong>Bought (USD at time of trade):</strong> {boughtUsdThen !== '0.00' ? `$${boughtUsdThen}` : 'N/A'}</p>
+                <p><strong>Sold (USD at time of trade):</strong> {totalSoldUsdThen !== '0.00' ? `$${totalSoldUsdThen}` : 'N/A'}</p>
+                <p><strong>Bought (USD at time of trade):</strong> {totalBoughtUsdThen !== '0.00' ? `$${totalBoughtUsdThen}` : 'N/A'}</p>
                 {/* Current USD Value */}
                 <p><strong>Sold (Current USD):</strong> ${currentSoldUsd}</p>
                 <p><strong>Bought (Current USD):</strong> ${currentBoughtUsd}</p>
