@@ -4,12 +4,6 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-// Function to dynamically fetch prices from CoinGecko using contract addresses
-const getCurrentTokenPricesByContract = async (contractAddresses) => {
-  const contractList = contractAddresses.join(',');
-  const response = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractList}&vs_currencies=usd`);
-  return response.data;  // Returns current prices for tokens by contract address
-};
 
 const TransactionLookup = () => {
   const [walletAddress, setWalletAddress] = useState('');
@@ -63,32 +57,41 @@ const TransactionLookup = () => {
   const handleWalletCheck = async () => {
     setIsLoading(true);
     setError(null);
-
+  
     if (!walletAddress || walletAddress.length < 10) {
       setError('Please provide a valid wallet address.');
       setIsLoading(false);
       return;
     }
-
+  
     try {
       console.log(`Fetching transactions for wallet: ${walletAddress}`);
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
       console.log('Full response data:', response.data);
-
+  
       const unfilteredTransactions = response.data.data || response.data;
-      console.log('Unfiltered transactions:', unfilteredTransactions);
-
       const relevantTransactions = filterRelevantTransactions(unfilteredTransactions || []);
       console.log('Relevant transactions:', relevantTransactions);
-
+  
       if (relevantTransactions.length > 0) {
         setWalletTransactions(relevantTransactions);
-
-        // Extract contract addresses and fetch their current prices
+  
+        // Extract contract addresses from the transactions
         const contractAddresses = extractContractAddresses(relevantTransactions);
-        const prices = await getCurrentTokenPricesByContract(contractAddresses);
-        setTokenPrices(prices);
-        console.log('Token prices by contract address:', prices);
+  
+        // Filter out any invalid/empty addresses
+        const validAddresses = contractAddresses.filter(address => address); // This filters out empty addresses
+  
+        // Fetch current prices for valid addresses
+        if (validAddresses.length > 0) {
+          const prices = await axios.get(`${API_URL}/api/token-prices`, {
+            params: { addresses: validAddresses.join(',') },
+          });
+          setTokenPrices(prices.data);
+          console.log('Token prices by contract address:', prices.data);
+        } else {
+          console.warn('No valid token addresses found.');
+        }
       } else {
         setError('No relevant transactions found for this wallet.');
         setWalletTransactions([]);
@@ -158,7 +161,7 @@ const TransactionLookup = () => {
             const soldSymbol = transfers.find(t => t.direction === 'out')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
             const boughtSymbol = transfers.find(t => t.direction === 'in')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
 
-            // Prices from the CoinGecko API using contract addresses (fetched in the background)
+            
             const soldContractAddress = transfers.find(t => t.direction === 'out')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
             const boughtContractAddress = transfers.find(t => t.direction === 'in')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
             const soldPriceThen = transfers.find(t => t.direction === 'out')?.price || 0;
