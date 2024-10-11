@@ -4,7 +4,6 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-
 const TransactionLookup = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [walletTransactions, setWalletTransactions] = useState([]);
@@ -12,36 +11,32 @@ const TransactionLookup = () => {
   const [error, setError] = useState(null);
   const [tokenPrices, setTokenPrices] = useState({});
 
-  // Function to extract unique contract addresses from transactions
-  const extractContractAddresses = (transactions) => {
+  // Updated function to extract contract addresses with chain information
+  const extractContractAddressesAndChains = (transactions) => {
     const contractAddresses = new Set();
+    const chainData = new Set();
+  
     transactions.forEach((transaction) => {
+      const chainId = transaction.relationships?.chain?.data?.id;
       if (transaction.attributes?.transfers && Array.isArray(transaction.attributes.transfers)) {
         transaction.attributes.transfers.forEach((transfer) => {
           if (transfer.fungible_info?.implementations && transfer.fungible_info.implementations.length > 0) {
-            // Get the contract address from the first implementation (assuming it's on Ethereum)
-            const contractAddress = transfer.fungible_info.implementations[0].address;
-            contractAddresses.add(contractAddress.toLowerCase());
+            // Find the implementation that matches the transaction's chain ID
+            const correctImplementation = transfer.fungible_info.implementations.find(
+              (impl) => impl.chain_id.toLowerCase() === chainId.toLowerCase()
+            );
+            
+            // If a matching implementation is found, use its address
+            if (correctImplementation) {
+              contractAddresses.add(correctImplementation.address.toLowerCase());
+              chainData.add(chainId.toLowerCase());
+            }
           }
         });
       }
     });
-    return Array.from(contractAddresses);  // Return unique contract addresses as an array
-  };
-
-  // Function to extract symbols from transfers
-  const extractTokenSymbols = (transactions) => {
-    const tokenSymbols = new Set();
-    transactions.forEach((transaction) => {
-      if (transaction.attributes?.transfers && Array.isArray(transaction.attributes.transfers)) {
-        transaction.attributes.transfers.forEach((transfer) => {
-          if (transfer.fungible_info?.symbol) {
-            tokenSymbols.add(transfer.fungible_info.symbol.toLowerCase());
-          }
-        });
-      }
-    });
-    return Array.from(tokenSymbols);  // Return unique token symbols as an array
+  
+    return { addresses: Array.from(contractAddresses), chains: Array.from(chainData) };
   };
 
   // Function to filter transactions based on type
@@ -53,7 +48,7 @@ const TransactionLookup = () => {
     });
   };
 
-  // Function to check wallet transactions
+  // Updated function to check wallet transactions
   const handleWalletCheck = async () => {
     setIsLoading(true);
     setError(null);
@@ -76,21 +71,18 @@ const TransactionLookup = () => {
       if (relevantTransactions.length > 0) {
         setWalletTransactions(relevantTransactions);
   
-        // Extract contract addresses from the transactions
-        const contractAddresses = extractContractAddresses(relevantTransactions);
-  
-        // Filter out any invalid/empty addresses
-        const validAddresses = contractAddresses.filter(address => address); // This filters out empty addresses
+        // Extract contract addresses with chain information from the transactions
+        const { addresses, chains } = extractContractAddressesAndChains(relevantTransactions);
   
         // Fetch current prices for valid addresses
-        if (validAddresses.length > 0) {
+        if (addresses.length > 0 && chains.length > 0) {
           const prices = await axios.get(`${API_URL}/api/token-prices`, {
-            params: { addresses: validAddresses.join(',') },
+            params: { addresses: addresses.join(','), chains: chains.join(',') },
           });
           setTokenPrices(prices.data);
-          console.log('Token prices by contract address:', prices.data);
+          console.log('Token prices:', prices.data);
         } else {
-          console.warn('No valid token addresses found.');
+          console.warn('No valid token addresses or chain data found.');
         }
       } else {
         setError('No relevant transactions found for this wallet.');
@@ -161,15 +153,14 @@ const TransactionLookup = () => {
             const soldSymbol = transfers.find(t => t.direction === 'out')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
             const boughtSymbol = transfers.find(t => t.direction === 'in')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
 
-            
             const soldContractAddress = transfers.find(t => t.direction === 'out')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
             const boughtContractAddress = transfers.find(t => t.direction === 'in')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
             const soldPriceThen = transfers.find(t => t.direction === 'out')?.price || 0;
             const boughtPriceThen = transfers.find(t => t.direction === 'in')?.price || 0;
 
             // Fetch the current prices from the dynamically fetched data using contract addresses
-            const currentSoldPrice = tokenPrices[soldContractAddress]?.usd || soldPriceThen || 0;
-            const currentBoughtPrice = tokenPrices[boughtContractAddress]?.usd || boughtPriceThen || 0;
+            const currentSoldPrice = tokenPrices[`${chainName}:${soldContractAddress}`]?.usd || 0;
+            const currentBoughtPrice = tokenPrices[`${chainName}:${boughtContractAddress}`]?.usd || 0;
 
             // USD Value calculations
             const totalSoldUsdThen = (totalSold * soldPriceThen).toFixed(2);
