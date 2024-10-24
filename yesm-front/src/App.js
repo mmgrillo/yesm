@@ -11,7 +11,9 @@ function App() {
         <div className="max-w-4xl mx-auto rounded-lg p-8">
           <Header />
           <Routes>
+            {/* Define the search route */}
             <Route path="/" element={<TransactionLookup />} />
+            <Route path="/search" element={<TransactionLookup />} />
             <Route path="/transaction-details/:id" element={<TransactionDetails />} />
           </Routes>
         </div>

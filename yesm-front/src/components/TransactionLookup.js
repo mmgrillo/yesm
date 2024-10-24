@@ -1,92 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
-  const [walletAddress, setWalletAddress] = useState('');
-  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [walletAddress, setWalletAddress] = useState(localStorage.getItem('walletAddress') || '');
+  const [walletTransactions, setWalletTransactions] = useState(JSON.parse(localStorage.getItem('walletTransactions')) || []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tokenPrices, setTokenPrices] = useState({});
+  const navigate = useNavigate();  // Used for navigating to the transaction details page
 
-  // Updated function to extract contract addresses with chain information
-  const extractContractAddressesAndChains = (transactions) => {
-    const contractAddresses = new Set();
-    const chainData = new Set();
-  
-    transactions.forEach((transaction) => {
-      const chainId = transaction.relationships?.chain?.data?.id;
-      if (transaction.attributes?.transfers && Array.isArray(transaction.attributes.transfers)) {
-        transaction.attributes.transfers.forEach((transfer) => {
-          if (transfer.fungible_info?.implementations && transfer.fungible_info.implementations.length > 0) {
-            // Find the implementation that matches the transaction's chain ID
-            const correctImplementation = transfer.fungible_info.implementations.find(
-              (impl) => impl.chain_id.toLowerCase() === chainId.toLowerCase()
-            );
-            
-            // If a matching implementation is found, use its address
-            if (correctImplementation) {
-              contractAddresses.add(correctImplementation.address.toLowerCase());
-              chainData.add(chainId.toLowerCase());
-            }
-          }
-        });
-      }
-    });
-  
-    return { addresses: Array.from(contractAddresses), chains: Array.from(chainData) };
-  };
+  // Clear stored transactions when leaving the page
+  useEffect(() => {
+    const storedTransactions = JSON.parse(localStorage.getItem('walletTransactions'));
+    if (storedTransactions) {
+      setWalletTransactions(storedTransactions);
+    }
+  }, []);
 
-  // Function to filter transactions based on type
-  const filterRelevantTransactions = (transactions) => {
-    return transactions.filter((tx) => {
-      const attributes = tx.attributes || {};
-      const operationType = attributes.operation_type || '';
-      return ['trade'].includes(operationType.toLowerCase());
-    });
-  };
-
-  // Updated function to check wallet transactions
   const handleWalletCheck = async () => {
     setIsLoading(true);
     setError(null);
-  
+
     if (!walletAddress || walletAddress.length < 10) {
       setError('Please provide a valid wallet address.');
       setIsLoading(false);
       return;
     }
-  
+
     try {
       console.log(`Fetching transactions for wallet: ${walletAddress}`);
+      
+      // Fetch transactions processed by the backend
       const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}`);
       console.log('Full response data:', response.data);
-  
-      const unfilteredTransactions = response.data.data || response.data;
-      const relevantTransactions = filterRelevantTransactions(unfilteredTransactions || []);
+
+      let relevantTransactions = response.data.map((tx, index) => ({
+        ...tx,
+        transactionNumber: index + 1,  // Add a transaction number starting from 1
+      }));
+
+      
+      if (relevantTransactions.length > 200) {
+        relevantTransactions = relevantTransactions.slice(0, 200);
+      }
+
       console.log('Relevant transactions:', relevantTransactions);
-  
+
       if (relevantTransactions.length > 0) {
         setWalletTransactions(relevantTransactions);
-  
-        // Extract contract addresses with chain information from the transactions
-        const { addresses, chains } = extractContractAddressesAndChains(relevantTransactions);
-  
-        // Fetch current prices for valid addresses
-        if (addresses.length > 0 && chains.length > 0) {
-          const prices = await axios.get(`${API_URL}/api/token-prices`, {
-            params: { addresses: addresses.join(','), chains: chains.join(',') },
-          });
-          setTokenPrices(prices.data);
-          console.log('Token prices:', prices.data);
-        } else {
-          console.warn('No valid token addresses or chain data found.');
-        }
+        localStorage.setItem('walletTransactions', JSON.stringify(relevantTransactions));
+        localStorage.setItem('walletAddress', walletAddress);
       } else {
         setError('No relevant transactions found for this wallet.');
         setWalletTransactions([]);
+        localStorage.removeItem('walletTransactions');  // Clear results if none found
       }
     } catch (err) {
       console.error('Failed to fetch wallet transactions:', err);
@@ -103,12 +73,6 @@ const TransactionLookup = () => {
     }
     return (((currentValue - initialValue) / initialValue) * 100).toFixed(2);  // Percentage
   };
-
-  // Log the state of walletTransactions and error
-  useEffect(() => {
-    console.log('Wallet transactions:', walletTransactions);
-    console.log('Error message:', error);
-  }, [walletTransactions, error]);
 
   return (
     <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">
@@ -134,7 +98,7 @@ const TransactionLookup = () => {
       {/* Display Wallet Transactions */}
       {walletTransactions.length > 0 ? (
         <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
-          {walletTransactions.map((transaction, index) => {
+          {walletTransactions.map((transaction) => {
             const chainName = transaction.relationships?.chain?.data?.id || 'N/A';
             const attributes = transaction.attributes || {};
             const transfers = attributes.transfers || [];
@@ -149,31 +113,20 @@ const TransactionLookup = () => {
               .filter(transfer => transfer.direction === 'in')
               .reduce((sum, transfer) => sum + (transfer.quantity?.float || transfer.value || 0), 0);
 
-            // Extract symbols to show on frontend
             const soldSymbol = transfers.find(t => t.direction === 'out')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
             const boughtSymbol = transfers.find(t => t.direction === 'in')?.fungible_info?.symbol?.toLowerCase() || 'unknown';
 
-            const soldContractAddress = transfers.find(t => t.direction === 'out')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
-            const boughtContractAddress = transfers.find(t => t.direction === 'in')?.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'unknown';
-            const soldPriceThen = transfers.find(t => t.direction === 'out')?.price || 0;
-            const boughtPriceThen = transfers.find(t => t.direction === 'in')?.price || 0;
-
-            // Fetch the current prices from the dynamically fetched data using contract addresses
-            const currentSoldPrice = tokenPrices[`${chainName}:${soldContractAddress}`]?.usd || 0;
-            const currentBoughtPrice = tokenPrices[`${chainName}:${boughtContractAddress}`]?.usd || 0;
-
-            // USD Value calculations
-            const totalSoldUsdThen = (totalSold * soldPriceThen).toFixed(2);
-            const totalBoughtUsdThen = (totalBought * boughtPriceThen).toFixed(2);
-            const currentSoldUsd = (totalSold * currentSoldPrice).toFixed(2);
-            const currentBoughtUsd = (totalBought * currentBoughtPrice).toFixed(2);
+            const totalSoldUsd = transfers.find(t => t.direction === 'out')?.currentPrice || 0;
+            const totalBoughtUsd = transfers.find(t => t.direction === 'in')?.currentPrice || 0;
 
             // Performance calculation
-            const performanceSold = calculatePerformance(parseFloat(totalSoldUsdThen), parseFloat(currentSoldUsd));
-            const performanceBought = calculatePerformance(parseFloat(totalBoughtUsdThen), parseFloat(currentBoughtUsd));
+            const performanceSold = calculatePerformance(totalSoldUsd, totalSoldUsd);  // Same for now; adjust if you fetch current prices
+            const performanceBought = calculatePerformance(totalBoughtUsd, totalBoughtUsd);
 
             return (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
+              <div key={transaction.transactionNumber} className="bg-white p-6 rounded-lg shadow-lg">
+                {/* Transaction Number */}
+                <p><strong>Transaction #{transaction.transactionNumber}:</strong></p>
                 {/* Chain */}
                 <p><strong>Chain:</strong> {chainName}</p>
                 {/* Transaction Action */}
@@ -182,17 +135,22 @@ const TransactionLookup = () => {
                 <p><strong>Sold:</strong> {totalSold !== 0 ? `${totalSold} ${soldSymbol?.toUpperCase()}` : 'N/A'}</p>
                 <p><strong>Bought:</strong> {totalBought !== 0 ? `${totalBought} ${boughtSymbol?.toUpperCase()}` : 'N/A'}</p>
                 {/* USD Value at the time of trade */}
-                <p><strong>Sold (USD at time of trade):</strong> {totalSoldUsdThen !== '0.00' ? `$${totalSoldUsdThen}` : 'N/A'}</p>
-                <p><strong>Bought (USD at time of trade):</strong> {totalBoughtUsdThen !== '0.00' ? `$${totalBoughtUsdThen}` : 'N/A'}</p>
-                {/* Current USD Value */}
-                <p><strong>Sold (Current USD):</strong> ${currentSoldUsd}</p>
-                <p><strong>Bought (Current USD):</strong> ${currentBoughtUsd}</p>
+                <p><strong>Sold (USD):</strong> ${totalSoldUsd.toFixed(2)}</p>
+                <p><strong>Bought (USD):</strong> ${totalBoughtUsd.toFixed(2)}</p>
                 {/* Performance */}
                 <p><strong>Performance (Sold):</strong> {performanceSold !== 'N/A' ? `${performanceSold}%` : 'N/A'}</p>
                 <p><strong>Performance (Bought):</strong> {performanceBought !== 'N/A' ? `${performanceBought}%` : 'N/A'}</p>
                 {/* Timestamp */}
                 <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
-                <button className="mt-2 p-2 bg-[#4A0E4E] text-white rounded">Details</button>
+
+                {/* Button to navigate to transaction details */}
+                <button
+                  className="mt-2 p-2 bg-[#4A0E4E] text-white rounded"
+                  onClick={() => navigate(`/transaction-details/${transaction.transactionNumber}`, { state: { transaction, prevPage: 'searchResults' } })}
+                >
+                  View Details
+                </button>
+
               </div>
             );
           })}
