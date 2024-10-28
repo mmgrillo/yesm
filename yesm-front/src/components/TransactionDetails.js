@@ -28,10 +28,11 @@ const TransactionDetails = () => {
   const transfers = attributes.transfers || [];
   const chainName = transaction.relationships?.chain?.data?.id || 'N/A';
 
-  // Handling safe access to quantity and prices
-  const soldValue = transfers.find(t => t.direction === 'out')?.quantity?.float || 0;
-  const soldValueInUsdThen = transfers.find(t => t.direction === 'out')?.price || 0;
-  const currentSoldValueInUsd = transfers.find(t => t.direction === 'out')?.currentPrice || 0;
+  // Handling safe access to quantity, prices, and current prices
+  const soldTransfer = transfers.find(t => t.direction === 'out') || {};
+  const soldValue = soldTransfer.quantity?.float || 0;
+  const soldValueInUsdThen = soldTransfer.price || 0; // Historical price
+  const currentSoldValueInUsd = soldTransfer.currentPrice || 0; // Current price
 
   return (
     <div className="p-4 min-h-screen flex flex-col items-center shadow-2xl bg-gradient-to-t from-[#FFB6C1] to-[#FFE4B5]">
@@ -44,7 +45,7 @@ const TransactionDetails = () => {
             <TransactionDetailRow label="Operation Type" value={transaction.attributes?.operation_type || 'N/A'} />
             <TransactionDetailRow label="Sold" value={`${soldValue} ETH`} />
             <TransactionDetailRow label="Token Value (Sold)" value={`$${(soldValue * soldValueInUsdThen).toFixed(2)}`} />
-            <TransactionDetailRow label="Current Value (USD)" value={`$${currentSoldValueInUsd.toFixed(2)}`} />
+            <TransactionDetailRow label="Current Value (USD)" value={`$${(soldValue * currentSoldValueInUsd).toFixed(2)}`} />
             <TransactionDetailRow label="From" value={transaction.sent_from || 'N/A'} isAddress={true} />
             <TransactionDetailRow label="To" value={transaction.sent_to || 'N/A'} isAddress={true} />
             <TransactionDetailRow label="Hash" value={transaction.hash || 'N/A'} />
@@ -70,11 +71,9 @@ const TransactionDetails = () => {
           <button
             className="mt-4 p-2 bg-[#4A0E4E] text-white rounded hover:bg-[#6A2C6A] transition-colors"
             onClick={() => navigate('/search')}
-            >
+          >
             Back
           </button>
-
-
         </div>
       </div>
     </div>
