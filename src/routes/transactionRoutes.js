@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 require('dotenv').config();  // Load .env file
+const ApiService = require('../services/apiService');
 
 // Use Zerion as the primary API for fetching wallet transactions
 router.get('/wallet/:walletAddress', async (req, res) => {
@@ -22,6 +23,7 @@ router.get('/wallet/:walletAddress', async (req, res) => {
       },
     });
 
+
     const transactions = response.data.data;
     if (!transactions || transactions.length === 0) {
       return res.status(404).json({ error: 'No relevant transactions found.' });
@@ -35,4 +37,22 @@ router.get('/wallet/:walletAddress', async (req, res) => {
   }
 });
 
+
+// Endpoint to get token prices
+router.post('/token-prices', async (req, res) => {
+  console.log('Received POST request to /api/token-prices');
+  const tokens = req.body.tokens; // Expect tokens to be an array of { chain, address }
+
+  try {
+    const prices = await ApiService.fetchTokenPrices(tokens);
+    res.json(prices);
+  } catch (error) {
+    console.error('Error fetching token prices:', error);
+    res.status(500).json({ error: 'Failed to fetch token prices' });
+  }
+});
+
 module.exports = router;
+
+
+
