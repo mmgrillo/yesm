@@ -37,10 +37,10 @@ router.get('/wallet/:walletAddress', async (req, res) => {
   }
 });
 
-
 // Endpoint to get token prices
 router.post('/token-prices', async (req, res) => {
-  console.log('Received POST request to /api/token-prices');
+  console.log('Received POST request to /token-prices');
+  console.log('Request body:', req.body);
   const tokens = req.body.tokens; // Expect tokens to be an array of { chain, address }
 
   try {
