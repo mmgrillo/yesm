@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const TransactionDetailRow = ({ label, value, isAddress }) => (
@@ -16,23 +16,23 @@ const TransactionDetailRow = ({ label, value, isAddress }) => (
   </div>
 );
 
-const TransactionDetails = () => {
+const TransactionDetails = ({ tokenPrices }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Safely retrieve transaction data passed via navigate
-  const transaction = location.state?.transaction || {};  // Ensure transaction is defined
-
-  // Safely access transaction attributes and transfers
+  const transaction = useMemo(() => location.state?.transaction || {}, [location.state]);
   const attributes = transaction.attributes || {};
-  const transfers = attributes.transfers || [];
-  const chainName = transaction.relationships?.chain?.data?.id || 'N/A';
+  const transfers = useMemo(() => attributes.transfers || [], [attributes.transfers]);
 
-  // Handling safe access to quantity, prices, and current prices
   const soldTransfer = transfers.find(t => t.direction === 'out') || {};
   const soldValue = soldTransfer.quantity?.float || 0;
-  const soldValueInUsdThen = soldTransfer.price || 0; // Historical price
-  const currentSoldValueInUsd = soldTransfer.currentPrice || 0; // Current price
+  const soldPriceThen = soldTransfer.price || 0; // Historical price
+  const soldValueInUsdThen = soldTransfer?.price || 0; 
+  const currentSoldValueInUsd = soldTransfer?.currentPrice || 0;
+
+  useEffect(() => {
+    console.log("Displaying transaction with updated current prices:", transaction);
+  }, [transaction, tokenPrices]);
 
   return (
     <div className="p-4 min-h-screen flex flex-col items-center shadow-2xl bg-gradient-to-t from-[#FFB6C1] to-[#FFE4B5]">
@@ -45,7 +45,9 @@ const TransactionDetails = () => {
             <TransactionDetailRow label="Operation Type" value={transaction.attributes?.operation_type || 'N/A'} />
             <TransactionDetailRow label="Sold" value={`${soldValue} ETH`} />
             <TransactionDetailRow label="Token Value (Sold)" value={`$${(soldValue * soldValueInUsdThen).toFixed(2)}`} />
-            <TransactionDetailRow label="Current Value (USD)" value={`$${(soldValue * currentSoldValueInUsd).toFixed(2)}`} />
+            <TransactionDetailRow label="USD Value at the time" value={`$${(soldValue * soldPriceThen).toFixed(2)}`} />
+            <TransactionDetailRow label="Current USD Value" value={`$${(soldValue * currentSoldValueInUsd).toFixed(2)}`} />
+            <TransactionDetailRow label="Token Value (Sold)" value={`$${(soldValue * soldValueInUsdThen).toFixed(2)}`} />
             <TransactionDetailRow label="From" value={transaction.sent_from || 'N/A'} isAddress={true} />
             <TransactionDetailRow label="To" value={transaction.sent_to || 'N/A'} isAddress={true} />
             <TransactionDetailRow label="Hash" value={transaction.hash || 'N/A'} />

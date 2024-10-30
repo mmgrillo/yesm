@@ -67,9 +67,11 @@ exports.getWalletTransactions = async (req, res) => {
         const priceData = prices[`${transfer.fungible_info.symbol.toLowerCase()}:${address}`] || { usd: null };
         return { ...transfer, currentPrice: priceData.usd };
       });
-
+    
       return { ...tx, attributes: { ...tx.attributes, transfers } };
     });
+    console.log('Transactions with current prices:', transactionsWithPrices);
+    
 
     res.json(transactionsWithPrices);
   } catch (error) {

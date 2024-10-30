@@ -51,6 +51,7 @@ class ApiService {
 
       try {
         const response = await axios.get(apiUrl, { headers });
+        console.log('API Response:', response.data);
         const price = response.data.data.attributes.market_data?.price;
         const tokenSymbol = response.data.data.attributes.symbol;
         const tokenName = response.data.data.attributes.name;
