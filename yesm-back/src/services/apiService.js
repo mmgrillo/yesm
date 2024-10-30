@@ -13,7 +13,7 @@ class ApiService {
       // Updated handling for Ethereum (ETH)
       if (symbol?.toUpperCase() === 'ETH' && chain === 'ethereum') {
         try {
-          const apiUrl = `${ZERION_API_URL}/fungibles/eth?currency=usd`;
+          const apiUrl = `${ZERION_API_URL}/fungibles/${address}?fields=market_data.price`;
           const headers = {
             Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
             accept: 'application/json',

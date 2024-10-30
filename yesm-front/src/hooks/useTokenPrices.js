@@ -20,35 +20,35 @@ const useTokenPrices = (API_URL, walletTransactions) => {
           
           // Only add tokens to uniqueTokens if not already in cache
           if (!tokenCache.current[tokenKey]) {
-            uniqueTokens.add(tokenKey);
+            uniqueTokens.add({ chain: implementation.chain_id, address: implementation.address || tokenInfo.symbol });
           }
         }
       });
     });
 
     if (uniqueTokens.size > 0) {
-      // Map tokens to fetch format and fetch only those not in the cache
-      const tokensToFetch = Array.from(uniqueTokens).map(key => {
-        const [chain, addressOrSymbol] = key.split(':');
-        return { chain, address: addressOrSymbol };
-      });
-
       try {
-        const fetchedPrices = await fetchTokenPrices(API_URL, tokensToFetch);
+        // Fetch prices for all unique tokens in a single POST request
+        const fetchedPrices = await fetchTokenPrices(API_URL, Array.from(uniqueTokens));
 
-        // Update cache and state with newly fetched prices
-        const newPrices = {};
-        tokensToFetch.forEach((token, index) => {
-          const tokenKey = `${token.chain}:${token.address}`;
-          const price = fetchedPrices[index]?.price;
-          
-          if (price !== undefined) {
-            newPrices[tokenKey] = price;
-            tokenCache.current[tokenKey] = price; // Store in cache
-          }
-        });
+        // Check if fetchedPrices is an object
+        if (typeof fetchedPrices === 'object' && fetchedPrices !== null) {
+          const newPrices = {};
+          Object.entries(fetchedPrices).forEach(([key, { symbol, usd }]) => {
+            if (symbol && usd) {
+              newPrices[key] = usd;
+              tokenCache.current[key] = usd; // Cache the price
+            }
+          });
 
-        setTokenPrices(prevPrices => ({ ...prevPrices, ...newPrices }));
+          setTokenPrices(prevPrices => ({ ...prevPrices, ...newPrices }));
+        } else {
+          console.error("Expected fetchedPrices to be an object, but got:", fetchedPrices);
+        }
+
+        // Log fetchedPrices within the function scope
+        console.log("Fetched token prices:", fetchedPrices);
+
       } catch (error) {
         console.error("Error fetching token prices:", error);
       }
@@ -58,6 +58,8 @@ const useTokenPrices = (API_URL, walletTransactions) => {
   useEffect(() => {
     fetchAllTokenPrices();
   }, [fetchAllTokenPrices]);
+
+  console.log("Current token prices state:", tokenPrices);
 
   return { tokenPrices };
 };
