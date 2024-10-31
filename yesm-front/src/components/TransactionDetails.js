@@ -1,3 +1,5 @@
+// TransactionDetails.js
+
 import React, { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -24,12 +26,6 @@ const TransactionDetails = ({ tokenPrices }) => {
   const attributes = transaction.attributes || {};
   const transfers = useMemo(() => attributes.transfers || [], [attributes.transfers]);
 
-  const soldTransfer = transfers.find(t => t.direction === 'out') || {};
-  const soldValue = soldTransfer.quantity?.float || 0;
-  const soldPriceThen = soldTransfer.price || 0; // Historical price
-  const soldValueInUsdThen = soldTransfer?.price || 0; 
-  const currentSoldValueInUsd = soldTransfer?.currentPrice || 0;
-
   useEffect(() => {
     console.log("Displaying transaction with updated current prices:", transaction);
   }, [transaction, tokenPrices]);
@@ -43,28 +39,24 @@ const TransactionDetails = ({ tokenPrices }) => {
           <div className="space-y-2 text-left">
             <TransactionDetailRow label="Blockchain" value={transaction.attributes?.application_metadata?.contract_address || 'N/A'} />
             <TransactionDetailRow label="Operation Type" value={transaction.attributes?.operation_type || 'N/A'} />
-            <TransactionDetailRow label="Sold" value={`${soldValue} ETH`} />
-            <TransactionDetailRow label="Token Value (Sold)" value={`$${(soldValue * soldValueInUsdThen).toFixed(2)}`} />
-            <TransactionDetailRow label="USD Value at the time" value={`$${(soldValue * soldPriceThen).toFixed(2)}`} />
-            <TransactionDetailRow label="Current USD Value" value={`$${(soldValue * currentSoldValueInUsd).toFixed(2)}`} />
-            <TransactionDetailRow label="Token Value (Sold)" value={`$${(soldValue * soldValueInUsdThen).toFixed(2)}`} />
-            <TransactionDetailRow label="From" value={transaction.sent_from || 'N/A'} isAddress={true} />
-            <TransactionDetailRow label="To" value={transaction.sent_to || 'N/A'} isAddress={true} />
-            <TransactionDetailRow label="Hash" value={transaction.hash || 'N/A'} />
-            <TransactionDetailRow label="Timestamp" value={transaction.attributes?.mined_at ? new Date(transaction.attributes.mined_at).toLocaleString() : 'N/A'} />
 
-            {/* Display all transfers */}
             <h3 className="text-2xl font-bold mt-4">Transfers</h3>
             {transfers.length > 0 ? (
-              transfers.map((transfer, index) => (
-                <div key={index} className="border p-2 rounded-lg mb-2">
-                  <TransactionDetailRow label="From" value={transfer.from || 'N/A'} isAddress={true} />
-                  <TransactionDetailRow label="To" value={transfer.to || 'N/A'} isAddress={true} />
-                  <TransactionDetailRow label="Amount" value={transfer.quantity?.float || 'N/A'} />
-                  <TransactionDetailRow label="USD Value at the time" value={`$${(transfer.quantity?.float * transfer.price || 0).toFixed(2)}`} />
-                  <TransactionDetailRow label="Current USD Value" value={`$${(transfer.quantity?.float * transfer.currentPrice || 0).toFixed(2)}`} />
-                </div>
-              ))
+              transfers.map((transfer, index) => {
+                const currentPrice = tokenPrices[`ethereum:${transfer.fungible_info?.implementations?.[0]?.address?.toLowerCase() || 'eth'}`]?.usd || 0;
+                const amount = transfer.quantity?.float || 0;
+                const historicalPrice = transfer.price || 0;
+
+                return (
+                  <div key={index} className="border p-2 rounded-lg mb-2">
+                    <TransactionDetailRow label="From" value={transfer.from || 'N/A'} isAddress={true} />
+                    <TransactionDetailRow label="To" value={transfer.to || 'N/A'} isAddress={true} />
+                    <TransactionDetailRow label="Amount" value={amount} />
+                    <TransactionDetailRow label="USD Value at the time" value={`$${(amount * historicalPrice).toFixed(2)}`} />
+                    <TransactionDetailRow label="Current USD Value" value={`$${(amount * currentPrice).toFixed(2)}`} />
+                  </div>
+                );
+              })
             ) : (
               <p>No transfer details available for this transaction.</p>
             )}

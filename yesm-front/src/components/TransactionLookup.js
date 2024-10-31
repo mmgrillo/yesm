@@ -1,24 +1,94 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import useWalletData from '../hooks/useWalletData';
 import useTokenPrices from '../hooks/useTokenPrices';
 import LoadingSpinner from './LoadingSpinner';
+import TransactionCard from './TransactionCard';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
   const [walletAddress, setWalletAddress] = useState(localStorage.getItem('walletAddress') || '');
-  const { walletTransactions, fetchWalletTransactions, isLoading: isTransactionsLoading, error } = useWalletData(API_URL);
-  const { tokenPrices, isLoading: isTokenPricesLoading } = useTokenPrices(API_URL, walletTransactions);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(5);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const { tokenPrices, isLoading: isTokenPricesLoading } = useTokenPrices(API_URL, allTransactions);
   const navigate = useNavigate();
 
+  const fetchWalletTransactionsPaginated = async (walletAddress, page = 1) => {
+    setIsFetchingNextPage(true);
+    try {
+      const response = await fetch(`${API_URL}/api/wallet/${walletAddress}?page=${page}&limit=25`);
+      const data = await response.json();
+      if (page === 1) {
+        setAllTransactions(data || []);
+      } else {
+        setAllTransactions((prev) => [...prev, ...(data || [])]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch transactions", err);
+      setError("Failed to fetch transactions");
+    } finally {
+      setIsFetchingNextPage(false);
+    }
+  };
+
+  const loadNextPageInBackground = (nextPage) => {
+    fetchWalletTransactionsPaginated(walletAddress, nextPage);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    loadNextPageInBackground(page + 1);
+  };
+
   const handleWalletCheck = () => {
-    fetchWalletTransactions(walletAddress);
+    fetchWalletTransactionsPaginated(walletAddress, 1);
     localStorage.setItem('walletAddress', walletAddress);
   };
 
-  const isLoading = isTransactionsLoading || isTokenPricesLoading;
+  const transactionsToShow = Array.isArray(allTransactions) 
+    ? allTransactions.slice((currentPage - 1) * 25, currentPage * 25) 
+    : [];
+
+  const renderPaginationBreadcrumb = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 rounded ${i === currentPage ? 'bg-[#4A0E4E] text-white' : 'bg-white text-[#4A0E4E]'} transition-colors`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex items-center space-x-2 mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="p-2 rounded bg-white text-[#4A0E4E] hover:bg-gray-200 disabled:opacity-50"
+        >
+          &larr;
+        </button>
+        {pages}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="p-2 rounded bg-white text-[#4A0E4E] hover:bg-gray-200 disabled:opacity-50"
+        >
+          &rarr;
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">
@@ -46,62 +116,24 @@ const TransactionLookup = () => {
         <>
           {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          {walletTransactions.length > 0 ? (
+          {transactionsToShow.length > 0 ? (
             <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
-              {walletTransactions.map((transaction) => {
-                const attributes = transaction.attributes || {};
-                const transfers = attributes.transfers || [];
-
-                const soldTransfer = transfers.find((t) => t.direction === 'out') || {};
-                const boughtTransfer = transfers.find((t) => t.direction === 'in') || {};
-
-                const soldValue = soldTransfer.quantity?.float || 0;
-                const soldPriceThen = soldTransfer.price || 0;
-                const soldSymbol = soldTransfer.fungible_info?.symbol?.toUpperCase() || 'N/A';
-                const soldAddress = soldTransfer.fungible_info?.implementations?.[0]?.address || '';
-
-                const boughtValue = boughtTransfer.quantity?.float || 0;
-                const boughtPriceThen = boughtTransfer.price || 0;
-                const boughtSymbol = boughtTransfer.fungible_info?.symbol?.toUpperCase() || 'N/A';
-                const boughtAddress = boughtTransfer.fungible_info?.implementations?.[0]?.address || '';
-
-                // Ensure unique keys by using transaction ID, address, and symbol
-                const soldKey = `${transaction.transactionNumber}-sold-${soldSymbol}-${soldAddress}`;
-                const boughtKey = `${transaction.transactionNumber}-bought-${boughtSymbol}-${boughtAddress}`;
-                console.log(`Looking up prices for keys: Sold=${soldKey}, Bought=${boughtKey}`);
-
-                const currentSoldPrice = tokenPrices && tokenPrices[`ethereum:${soldAddress.toLowerCase()}`] || 0;
-                const currentBoughtPrice = tokenPrices && tokenPrices[`ethereum:${boughtAddress.toLowerCase()}`] || 0;
-
-                const soldPerformance = soldPriceThen !== 0 ? ((currentSoldPrice - soldPriceThen) / soldPriceThen) * 100 : 'N/A';
-                const boughtPerformance = boughtPriceThen !== 0 ? ((currentBoughtPrice - boughtPriceThen) / boughtPriceThen) * 100 : 'N/A';
-
-                return (
-                  <div key={`${transaction.transactionNumber}-${soldKey}-${boughtKey}`} className="bg-white p-6 rounded-lg shadow-lg">
-                    <p><strong>Transaction #{transaction.transactionNumber}:</strong></p>
-                    <p><strong>Transaction Action:</strong> {attributes.operation_type || 'N/A'}</p>
-                    <p><strong>Sold:</strong> {soldValue ? `${soldValue} ${soldSymbol}` : 'N/A'}</p>
-                    <p><strong>Sold (USD at time of trade):</strong> {soldPriceThen ? `$${(soldValue * soldPriceThen).toFixed(2)}` : 'N/A'}</p>
-                    <p><strong>Bought:</strong> {boughtValue ? `${boughtValue} ${boughtSymbol}` : 'N/A'}</p>
-                    <p><strong>Bought (USD at time of trade):</strong> {boughtPriceThen ? `$${(boughtValue * boughtPriceThen).toFixed(2)}` : 'N/A'}</p>
-                    <p><strong>Current Sold Price (USD):</strong> {currentSoldPrice ? `$${(soldValue * currentSoldPrice).toFixed(2)}` : 'N/A'}</p>
-                    <p><strong>Current Bought Price (USD):</strong> {currentBoughtPrice ? `$${(boughtValue * currentBoughtPrice).toFixed(2)}` : 'N/A'}</p>
-                    <p><strong>Sold Performance:</strong> {soldPerformance !== 'N/A' ? `${soldPerformance.toFixed(2)}%` : 'N/A'}</p>
-                    <p><strong>Bought Performance:</strong> {boughtPerformance !== 'N/A' ? `${boughtPerformance.toFixed(2)}%` : 'N/A'}</p>
-                    <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
-                    <button
-                      className="mt-2 p-2 bg-[#4A0E4E] text-white rounded"
-                      onClick={() => navigate(`/transaction-details/${transaction.transactionNumber}`, { state: { transaction, prevPage: 'searchResults' } })}
-                    >
-                      View Details
-                    </button>
-                  </div>
-                );
-              })}
+              {transactionsToShow.map((transaction, index) => (
+                <TransactionCard
+                  key={`${transaction.transactionNumber}-${index}`}
+                  transaction={transaction}
+                  tokenPrices={tokenPrices}
+                  navigate={navigate}
+                />
+              ))}
             </div>
           ) : (
             !error && <p className="text-red-500 mb-4">No transactions available.</p>
           )}
+
+          {renderPaginationBreadcrumb()}
+
+          {isFetchingNextPage && <LoadingSpinner />}
         </>
       )}
     </div>

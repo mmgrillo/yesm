@@ -4,6 +4,8 @@ import { getSupportedImplementation } from '../utils/tokenUtils';
 
 const useTokenPrices = (API_URL, walletTransactions) => {
   const [tokenPrices, setTokenPrices] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const tokenCache = useRef({}); // Cache to store fetched token prices
 
   const fetchAllTokenPrices = useCallback(async () => {
@@ -12,15 +14,28 @@ const useTokenPrices = (API_URL, walletTransactions) => {
     // Collect unique tokens from wallet transactions
     walletTransactions.forEach(transaction => {
       const transfers = transaction.attributes?.transfers || [];
-      transfers.forEach(t => {
-        const tokenInfo = t.fungible_info;
+      transfers.forEach(transfer => {
+        const tokenInfo = transfer.fungible_info;
         const implementation = getSupportedImplementation(tokenInfo);
+
         if (implementation) {
-          const tokenKey = `${implementation.chain_id}:${implementation.address || tokenInfo.symbol}`;
-          
-          // Only add tokens to uniqueTokens if not already in cache
+          let tokenKey;
+          if (tokenInfo.symbol.toLowerCase() === 'eth' && implementation.chain_id === 'ethereum') {
+            // Special handling for ETH
+            tokenKey = 'ethereum:eth';
+          } else {
+            // Standard handling for tokens with contract addresses
+            tokenKey = `${implementation.chain_id}:${implementation.address || tokenInfo.symbol}`;
+          }
+
+          // Check if the token is already cached to avoid re-fetching
           if (!tokenCache.current[tokenKey]) {
-            uniqueTokens.add({ chain: implementation.chain_id, address: implementation.address || tokenInfo.symbol });
+            tokenCache.current[tokenKey] = true; // Mark this token as cached
+            uniqueTokens.add({
+              chain: implementation.chain_id,
+              address: tokenInfo.symbol.toLowerCase() === 'eth' ? 'eth' : implementation.address,
+              symbol: tokenInfo.symbol,
+            });
           }
         }
       });
@@ -28,40 +43,33 @@ const useTokenPrices = (API_URL, walletTransactions) => {
 
     if (uniqueTokens.size > 0) {
       try {
-        // Fetch prices for all unique tokens in a single POST request
-        const fetchedPrices = await fetchTokenPrices(API_URL, Array.from(uniqueTokens));
+        // Convert the Set to an array and fetch prices
+        const tokensArray = Array.from(uniqueTokens);
+        const fetchedPrices = await fetchTokenPrices(API_URL, tokensArray);
 
-        // Check if fetchedPrices is an object
-        if (typeof fetchedPrices === 'object' && fetchedPrices !== null) {
-          const newPrices = {};
-          Object.entries(fetchedPrices).forEach(([key, { symbol, usd }]) => {
-            if (symbol && usd) {
-              newPrices[key] = usd;
-              tokenCache.current[key] = usd; // Cache the price
-            }
-          });
-
-          setTokenPrices(prevPrices => ({ ...prevPrices, ...newPrices }));
-        } else {
-          console.error("Expected fetchedPrices to be an object, but got:", fetchedPrices);
-        }
-
-        // Log fetchedPrices within the function scope
-        console.log("Fetched token prices:", fetchedPrices);
-
-      } catch (error) {
-        console.error("Error fetching token prices:", error);
+        // Update the token cache and state with the new prices
+        Object.entries(fetchedPrices).forEach(([key, value]) => {
+          tokenCache.current[key] = true; // Ensure it is marked as cached
+          setTokenPrices(prevPrices => ({ ...prevPrices, [key]: value }));
+        });
+      } catch (err) {
+        console.error("Error fetching token prices:", err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
+    } else {
+      setIsLoading(false); // No tokens to fetch, mark as not loading
     }
   }, [API_URL, walletTransactions]);
 
   useEffect(() => {
-    fetchAllTokenPrices();
-  }, [fetchAllTokenPrices]);
+    if (walletTransactions?.length > 0) {
+      fetchAllTokenPrices();
+    }
+  }, [fetchAllTokenPrices, walletTransactions]);
 
-  console.log("Current token prices state:", tokenPrices);
-
-  return { tokenPrices };
+  return { tokenPrices, isLoading, error };
 };
 
 export default useTokenPrices;
