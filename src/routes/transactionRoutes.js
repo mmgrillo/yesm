@@ -7,11 +7,15 @@ const ApiService = require('../services/apiService');
 // Use Zerion as the primary API for fetching wallet transactions
 router.get('/wallet/:walletAddress', async (req, res) => {
   const { walletAddress } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 25;
+  const offset = (page - 1) * limit;
+
   if (!walletAddress) {
     return res.status(400).json({ error: 'Wallet address is required.' });
   }
 
-  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions?filter[operation_types]=trade`;
+  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions?limit=${limit}&offset=${offset}&filter[operation_types]=trade`;
   const ZERION_API_KEY = process.env.ZERION_API_KEY;
 
   try {
