@@ -16,7 +16,7 @@ const TransactionLookup = () => {
   const [totalPages, setTotalPages] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [shouldFetchBalance, setShouldFetchBalance] = useState(false); // New state to control WalletBalance fetching
+  const [shouldFetchBalance, setShouldFetchBalance] = useState(false);
 
   const { tokenPrices, isLoading: isTokenPricesLoading } = useTokenPrices(API_URL, allTransactions);
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const TransactionLookup = () => {
       setError("Please enter a valid wallet address.");
       return;
     }
-    setError(null); // Clear error on valid address
+    setError(null);
   }, [walletAddress]);
 
   const fetchWalletTransactionsPaginated = async (walletAddress, page = 1) => {
@@ -40,7 +40,7 @@ const TransactionLookup = () => {
       } else {
         setAllTransactions((prev) => [...prev, ...(data || [])]);
       }
-      setShouldFetchBalance(true); // Trigger WalletBalance fetching after transactions are loaded
+      setShouldFetchBalance(true);
     } catch (err) {
       console.error("Failed to fetch transactions", err);
       setError("Failed to fetch transactions");
@@ -55,7 +55,7 @@ const TransactionLookup = () => {
       setError("Wallet address cannot be empty.");
       return;
     }
-    setShouldFetchBalance(false); // Reset the WalletBalance fetch trigger
+    setShouldFetchBalance(false);
     setError(null);
     fetchWalletTransactionsPaginated(walletAddress, 1);
     localStorage.setItem('walletAddress', walletAddress);
@@ -129,6 +129,9 @@ const TransactionLookup = () => {
         </button>
       </div>
 
+      {/* WalletBalance component moved here */}
+      {shouldFetchBalance && <WalletBalance walletAddress={walletAddress} />}
+
       {isLoading || isTokenPricesLoading ? (
         <LoadingSpinner />
       ) : (
@@ -153,9 +156,6 @@ const TransactionLookup = () => {
           {renderPaginationBreadcrumb()}
 
           {isFetchingNextPage && <LoadingSpinner />}
-
-          {/* Only render WalletBalance if transactions and token prices are loaded */}
-          {shouldFetchBalance && <WalletBalance walletAddress={walletAddress} />}
         </>
       )}
     </div>

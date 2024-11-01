@@ -45,7 +45,8 @@ const TransactionCard = ({ transaction, tokenPrices, navigate }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-4 w-full">
-      <h3 className="text-lg font-semibold mb-2">Transaction # {transactionNumber}</h3>
+      <h3 className="text-lg font-semibold mb-2">{attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</h3>
+      <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
       <p><strong>Transaction Action:</strong> {action || 'N/A'}</p>
 
       {/* Sold Token Details */}
