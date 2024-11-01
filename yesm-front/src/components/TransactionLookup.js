@@ -9,7 +9,7 @@ import WalletBalance from './WalletBalance';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 const TransactionLookup = () => {
-  const [walletAddress, setWalletAddress] = useState(localStorage.getItem('walletAddress') || '');
+  const [walletAddresses, setWalletAddresses] = useState(['']); // Initialize with one input box
   const [currentPage, setCurrentPage] = useState(1);
   const [allTransactions, setAllTransactions] = useState([]);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
@@ -22,24 +22,27 @@ const TransactionLookup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!walletAddress) {
+    if (walletAddresses.some(addr => !addr)) {
       setError("Please enter a valid wallet address.");
       return;
     }
     setError(null);
-  }, [walletAddress]);
+  }, [walletAddresses]);
 
-  const fetchWalletTransactionsPaginated = async (walletAddress, page = 1) => {
+  const fetchWalletTransactionsAndBalances = async (page = 1) => {
     setIsLoading(true);
     setIsFetchingNextPage(true);
+    setAllTransactions([]); // Clear previous transactions
     try {
-      const response = await fetch(`${API_URL}/api/wallet/${walletAddress}?page=${page}&limit=25`);
-      const data = await response.json();
-      if (page === 1) {
-        setAllTransactions(data || []);
-      } else {
-        setAllTransactions((prev) => [...prev, ...(data || [])]);
+      const allFetchedTransactions = [];
+      for (const walletAddress of walletAddresses) {
+        const response = await fetch(`${API_URL}/api/wallet/${walletAddress}?page=${page}&limit=25`);
+        const data = await response.json();
+        if (data) {
+          allFetchedTransactions.push(...data);
+        }
       }
+      setAllTransactions(allFetchedTransactions);
       setShouldFetchBalance(true);
     } catch (err) {
       console.error("Failed to fetch transactions", err);
@@ -51,14 +54,13 @@ const TransactionLookup = () => {
   };
 
   const handleWalletCheck = () => {
-    if (!walletAddress) {
-      setError("Wallet address cannot be empty.");
+    if (walletAddresses.some(addr => !addr)) {
+      setError("Wallet addresses cannot be empty.");
       return;
     }
     setShouldFetchBalance(false);
     setError(null);
-    fetchWalletTransactionsPaginated(walletAddress, 1);
-    localStorage.setItem('walletAddress', walletAddress);
+    fetchWalletTransactionsAndBalances(1);
   };
 
   const handlePageChange = (page) => {
@@ -67,7 +69,17 @@ const TransactionLookup = () => {
   };
 
   const loadNextPageInBackground = (nextPage) => {
-    fetchWalletTransactionsPaginated(walletAddress, nextPage);
+    fetchWalletTransactionsAndBalances(nextPage);
+  };
+
+  const handleInputChange = (index, value) => {
+    const updatedAddresses = [...walletAddresses];
+    updatedAddresses[index] = value;
+    setWalletAddresses(updatedAddresses);
+  };
+
+  const addWalletInput = () => {
+    setWalletAddresses([...walletAddresses, '']);
   };
 
   const transactionsToShow = Array.isArray(allTransactions)
@@ -111,26 +123,39 @@ const TransactionLookup = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-gradient-to-b from-[#FFE4B5] to-[#FFB6C1] p-8 rounded-lg">
-      <div className="flex mt-5 mb-3">
-        <input
-          type="text"
-          value={walletAddress}
-          onChange={(e) => setWalletAddress(e.target.value)}
-          placeholder="Enter your wallet address"
-          className="flex-grow p-3 rounded-l-lg bg-white border border-[#4A0E4E] text-[#4A0E4E] focus:outline-none focus:ring-2 focus:ring-[#4A0E4E]"
-        />
+      <div className="space-y-4 mb-3">
+        {walletAddresses.map((address, index) => (
+          <input
+            key={index}
+            type="text"
+            value={address}
+            onChange={(e) => handleInputChange(index, e.target.value)}
+            placeholder={`Enter wallet address ${index + 1}`}
+            className="w-full p-3 rounded-lg bg-white border border-[#4A0E4E] text-[#4A0E4E] focus:outline-none focus:ring-2 focus:ring-[#4A0E4E]"
+          />
+        ))}
         <button
-          onClick={handleWalletCheck}
-          className="bg-[#4A0E4E] text-white p-3 rounded-r-lg flex items-center hover:bg-[#6A2C6A] transition-colors"
-          disabled={isLoading}
+          onClick={addWalletInput}
+          className="bg-[#4A0E4E] text-white px-4 py-2 rounded hover:bg-[#6A2C6A] transition-colors"
         >
-          <Search className="mr-2" />
-          {isLoading ? 'Checking...' : 'Check Wallet'}
+          Add One More Wallet
         </button>
       </div>
 
-      {/* WalletBalance component moved here */}
-      {shouldFetchBalance && <WalletBalance walletAddress={walletAddress} />}
+      <div className="flex mt-5">
+        <button
+          onClick={handleWalletCheck}
+          className="bg-[#4A0E4E] text-white px-4 py-2 rounded flex items-center hover:bg-[#6A2C6A] transition-colors"
+          disabled={isLoading}
+        >
+          <Search className="mr-2" />
+          {isLoading ? 'Checking...' : 'Check Wallets'}
+        </button>
+      </div>
+
+      {shouldFetchBalance && (
+        <WalletBalance walletAddresses={walletAddresses} />
+      )}
 
       {isLoading || isTokenPricesLoading ? (
         <LoadingSpinner />
@@ -138,7 +163,7 @@ const TransactionLookup = () => {
         <>
           {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          {transactionsToShow.length > 0 ? (
+          {transactionsToShow.length > 0 && (
             <div className="grid gap-6 lg:grid-cols-2 bg-gradient-to-b from-[#FFB6C1] to-[#FFE4B5] p-8 rounded-lg shadow-lg">
               {transactionsToShow.map((transaction, index) => (
                 <TransactionCard
@@ -149,8 +174,6 @@ const TransactionLookup = () => {
                 />
               ))}
             </div>
-          ) : (
-            !error && <p className="text-red-500 mb-4">No transactions available.</p>
           )}
 
           {renderPaginationBreadcrumb()}

@@ -1,38 +1,47 @@
 import React, { useEffect, useRef } from 'react';
 import useWalletData from '../hooks/useWalletData';
 
-const WalletBalance = ({ walletAddress }) => {
-  const { walletBalance, tokens, fetchWalletData, isLoading, error } = useWalletData(process.env.REACT_APP_API_URL);
+const WalletBalance = ({ walletAddresses }) => {
+  const { walletBalances, tokens, fetchWalletData, isLoading, error } = useWalletData(process.env.REACT_APP_API_URL);
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (walletAddress && !hasFetched.current) {
-      fetchWalletData(walletAddress);
+    if (walletAddresses && !hasFetched.current) {
+      walletAddresses.forEach((address) => fetchWalletData(address));
       hasFetched.current = true;
     }
-  }, [walletAddress, fetchWalletData]);
+  }, [walletAddresses, fetchWalletData]);
 
   if (isLoading) return <p>Loading wallet data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  const formattedBalance = typeof walletBalance === 'number' ? walletBalance.toLocaleString() : 'N/A';
+  const totalBalance = walletBalances.reduce((acc, balance) => acc + balance, 0).toFixed(2);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 mt-6 flex flex-col md:flex-row justify-between items-start md:items-center">
-      <div className="flex-1">
-        <h3 className="text-3xl font-bold mb-4">Wallet Balance</h3>
-        <p className="text-4xl font-semibold mb-4">
-          Total Balance: <span className="text-[#4A0E4E]">${formattedBalance}</span>
-        </p>
-      </div>
-      <div className="flex-1 bg-[#FFE4B5] p-4 rounded-lg shadow-md md:ml-4 w-full md:w-auto">
+    <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
+      <h3 className="text-3xl font-bold mb-4">Wallet Balances</h3>
+      {walletAddresses.map((address, index) => (
+        <div key={index} className="mb-4">
+          <p className="text-lg font-semibold">
+            Wallet Balance {index + 1} ({address.slice(0, 4)}...):{' '}
+            <span className="text-[#4A0E4E]">${walletBalances[index]?.toFixed(2) || '0.00'}</span>
+          </p>
+        </div>
+      ))}
+      <p className="text-2xl font-bold">
+        Total Balance: <span className="text-[#4A0E4E]">${totalBalance}</span>
+      </p>
+
+      <div className="bg-[#FFE4B5] p-4 rounded-lg shadow-md mt-4">
         <h4 className="text-lg font-semibold mb-2">Tokens:</h4>
         {tokens.length > 0 ? (
           <ul className="list-none space-y-2">
             {tokens.map((token, index) => (
               <li key={index} className="flex justify-between">
                 <span className="font-medium">{token.chain}</span>
-                <span className="text-right">${parseFloat(token.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-right">
+                  ${parseFloat(token.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
               </li>
             ))}
           </ul>
