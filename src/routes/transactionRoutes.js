@@ -56,7 +56,44 @@ router.post('/token-prices', async (req, res) => {
   }
 });
 
+// Route fetch wallet portfolio
+router.get('/wallet/:walletAddress/portfolio', async (req, res) => {
+  const { walletAddress } = req.params;
+  const ZERION_API_KEY = process.env.ZERION_API_KEY;
+
+  if (!walletAddress) {
+    return res.status(400).json({ error: 'Wallet address is required.' });
+  }
+
+  try {
+    const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
+    const ZERION_PORTFOLIO_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/portfolio?currency=usd`;
+
+    // Make the request to Zerion API to get portfolio
+    const portfolioResponse = await axios.get(ZERION_PORTFOLIO_URL, {
+      headers: {
+        accept: 'application/json',
+        Authorization: `Basic ${encodedApiKey}`,
+      },
+    });
+
+    // Extract the relevant data from the response
+    const portfolioData = portfolioResponse.data.data;
+    const balance = portfolioData.attributes.total?.positions || 0; // Get total balance
+
+    // Construct tokens array from positions_distribution_by_chain
+    const chainBalances = portfolioData.attributes.positions_distribution_by_chain || {};
+    const tokens = Object.entries(chainBalances).map(([chain, amount]) => ({
+      chain,
+      amount,
+    }));
+
+    // Respond with the adjusted portfolio data
+    res.json({ balance, tokens });
+  } catch (error) {
+    console.error('Error fetching wallet portfolio from Zerion:', error.response ? error.response.data : error.message);
+    return res.status(500).json({ error: 'An error occurred while fetching wallet portfolio.' });
+  }
+});
+
 module.exports = router;
-
-
-
