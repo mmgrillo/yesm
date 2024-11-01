@@ -72,8 +72,10 @@ exports.getWalletTransactions = async (req, res) => {
     });
     console.log('Transactions with current prices:', transactionsWithPrices);
     
+    // Fetch wallet balance and tokens
+    const { balance, tokens } = await ApiService.fetchWalletBalance(walletAddress);
 
-    res.json(transactionsWithPrices);
+    res.json({ transactions: transactionsWithPrices, balance, tokens });
   } catch (error) {
     console.error('Error fetching wallet transactions:', error.response ? error.response.data : error.message);
     return res.status(500).json({ error: 'Failed to fetch wallet transactions.' });

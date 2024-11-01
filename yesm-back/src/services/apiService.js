@@ -70,6 +70,7 @@ class ApiService {
 
     return prices;
   }
+  
 }
 
 module.exports = ApiService;

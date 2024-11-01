@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useTokenPrices from '../hooks/useTokenPrices';
 import LoadingSpinner from './LoadingSpinner';
 import TransactionCard from './TransactionCard';
+import WalletBalance from './WalletBalance';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
@@ -15,11 +16,21 @@ const TransactionLookup = () => {
   const [totalPages, setTotalPages] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [shouldFetchBalance, setShouldFetchBalance] = useState(false); // New state to control WalletBalance fetching
 
   const { tokenPrices, isLoading: isTokenPricesLoading } = useTokenPrices(API_URL, allTransactions);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!walletAddress) {
+      setError("Please enter a valid wallet address.");
+      return;
+    }
+    setError(null); // Clear error on valid address
+  }, [walletAddress]);
+
   const fetchWalletTransactionsPaginated = async (walletAddress, page = 1) => {
+    setIsLoading(true);
     setIsFetchingNextPage(true);
     try {
       const response = await fetch(`${API_URL}/api/wallet/${walletAddress}?page=${page}&limit=25`);
@@ -29,30 +40,38 @@ const TransactionLookup = () => {
       } else {
         setAllTransactions((prev) => [...prev, ...(data || [])]);
       }
+      setShouldFetchBalance(true); // Trigger WalletBalance fetching after transactions are loaded
     } catch (err) {
       console.error("Failed to fetch transactions", err);
       setError("Failed to fetch transactions");
     } finally {
+      setIsLoading(false);
       setIsFetchingNextPage(false);
     }
+  };
+
+  const handleWalletCheck = () => {
+    if (!walletAddress) {
+      setError("Wallet address cannot be empty.");
+      return;
+    }
+    setShouldFetchBalance(false); // Reset the WalletBalance fetch trigger
+    setError(null);
+    fetchWalletTransactionsPaginated(walletAddress, 1);
+    localStorage.setItem('walletAddress', walletAddress);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    loadNextPageInBackground(page);
   };
 
   const loadNextPageInBackground = (nextPage) => {
     fetchWalletTransactionsPaginated(walletAddress, nextPage);
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    loadNextPageInBackground(page + 1);
-  };
-
-  const handleWalletCheck = () => {
-    fetchWalletTransactionsPaginated(walletAddress, 1);
-    localStorage.setItem('walletAddress', walletAddress);
-  };
-
-  const transactionsToShow = Array.isArray(allTransactions) 
-    ? allTransactions.slice((currentPage - 1) * 25, currentPage * 25) 
+  const transactionsToShow = Array.isArray(allTransactions)
+    ? allTransactions.slice((currentPage - 1) * 25, currentPage * 25)
     : [];
 
   const renderPaginationBreadcrumb = () => {
@@ -110,7 +129,7 @@ const TransactionLookup = () => {
         </button>
       </div>
 
-      {isLoading ? (
+      {isLoading || isTokenPricesLoading ? (
         <LoadingSpinner />
       ) : (
         <>
@@ -134,6 +153,9 @@ const TransactionLookup = () => {
           {renderPaginationBreadcrumb()}
 
           {isFetchingNextPage && <LoadingSpinner />}
+
+          {/* Only render WalletBalance if transactions and token prices are loaded */}
+          {shouldFetchBalance && <WalletBalance walletAddress={walletAddress} />}
         </>
       )}
     </div>
