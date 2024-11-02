@@ -27,19 +27,33 @@ router.get('/wallet/:walletAddress', async (req, res) => {
       },
     });
 
-
     const transactions = response.data.data;
     if (!transactions || transactions.length === 0) {
       return res.status(404).json({ error: 'No relevant transactions found.' });
     }
 
-    // Simply return the transactions without fetching prices
+    // Return the transactions as is (no aggregation for now)
     res.json(transactions);
   } catch (error) {
     console.error('Error fetching wallet transactions from Zerion:', error.response ? error.response.data : error.message);
     return res.status(500).json({ error: 'An error occurred while fetching transactions.' });
   }
 });
+
+module.exports = router;
+
+  
+function aggregateTransactions(transactions) {
+  const transactionMap = {};
+  transactions.forEach(transaction => {
+    const tradeId = transaction.attributes.trade_id || transaction.transactionHash;
+    if (!transactionMap[tradeId]) {
+      transactionMap[tradeId] = { ...transaction, transfers: [] };
+    }
+    transactionMap[tradeId].transfers.push(...transaction.attributes.transfers);
+  });
+  return Object.values(transactionMap);
+  };
 
 // Endpoint to get token prices
 router.post('/token-prices', async (req, res) => {
