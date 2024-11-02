@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import useWalletData from '../hooks/useWalletData';
 
-const WalletBalance = ({ walletAddresses }) => {
+const WalletBalance = ({ walletAddresses, onBalanceFetched, adjustedBalance }) => {
   const { walletBalances, tokens, fetchWalletData, isLoading, error } = useWalletData(process.env.REACT_APP_API_URL);
   const hasFetched = useRef(false);
 
@@ -12,10 +12,18 @@ const WalletBalance = ({ walletAddresses }) => {
     }
   }, [walletAddresses, fetchWalletData]);
 
+  // Calculate total balance
+  const totalBalance = walletBalances.reduce((acc, balance) => acc + balance, 0);
+
+  // Pass the fetched balance to TransactionLookup
+  useEffect(() => {
+    if (onBalanceFetched) {
+      onBalanceFetched(totalBalance);
+    }
+  }, [totalBalance, onBalanceFetched]);
+
   if (isLoading) return <p>Loading wallet data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-
-  const totalBalance = walletBalances.reduce((acc, balance) => acc + balance, 0).toFixed(2);
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
@@ -29,7 +37,8 @@ const WalletBalance = ({ walletAddresses }) => {
         </div>
       ))}
       <p className="text-2xl font-bold">
-        Total Balance: <span className="text-[#4A0E4E]">${totalBalance}</span>
+        Total Balance: <span className="text-[#4A0E4E]">${totalBalance.toFixed(2)}</span> 
+        <span className="text-sm text-gray-700 ml-4">Adjusted Balance: <span className="text-[#4A0E4E]">${adjustedBalance.toFixed(2)}</span></span>
       </p>
 
       <div className="bg-[#FFE4B5] p-4 rounded-lg shadow-md mt-4">
