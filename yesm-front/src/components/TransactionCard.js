@@ -27,6 +27,7 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
 
   const totalSoldQuantity = soldTransfers.reduce((sum, t) => sum + (t.quantity?.float || 0), 0);
   const totalBoughtQuantity = boughtTransfers.reduce((sum, t) => sum + (t.quantity?.float || 0), 0);
+  
 
 
   // Calculate total bought values
@@ -38,24 +39,25 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
     ? getCurrentPrice(boughtImplementation.chain_id, boughtImplementation.address, boughtSymbol)
     : 'N/A';
 
-  // Relative Performance Index (RPI)
-  const calculateRelativePerformanceIndex = (currentPriceBought, boughtPriceAtTrade, currentPriceSold, soldPriceAtTrade) => {
-    if (boughtPriceAtTrade === 0 || soldPriceAtTrade === 0 || currentPriceBought === 'N/A' || currentPriceSold === 'N/A') {
+  const soldPerformance = totalSoldUSD !== 0 && currentSoldPrice !== 'N/A'
+  ? ((totalSoldQuantity * currentSoldPrice - totalSoldUSD) / totalSoldUSD) * 100
+  : 'N/A';
+
+  const boughtPerformance = totalBoughtUSD !== 0 && currentBoughtPrice !== 'N/A'
+  ? ((totalBoughtQuantity * currentBoughtPrice - totalBoughtUSD) / totalBoughtUSD) * 100
+  : 'N/A';
+
+  const calculateRelativePerformanceIndex = (soldPerformance, boughtPerformance) => {
+    if (soldPerformance === 'N/A' || boughtPerformance === 'N/A') {
       return 'N/A';
     }
-    const relativePerformance = (currentPriceBought / boughtPriceAtTrade) / (currentPriceSold / soldPriceAtTrade) - 1;
-    return (relativePerformance * 100).toFixed(2); // Return as a percentage with 2 decimal places
+  
+    const relativePerformance = (parseFloat(boughtPerformance) - parseFloat(soldPerformance)) / 100;
+    return (relativePerformance * 100).toFixed(2); // Return as a percentage
   };
+  
+  const rpi = calculateRelativePerformanceIndex(soldPerformance, boughtPerformance);
 
-  const soldPerformance = totalSoldValue !== 0 && currentSoldPrice !== 'N/A'
-  ? ((currentSoldPrice * totalSoldQuantity - totalSoldValue) / totalSoldValue) * 100
-  : 'N/A';
-
-const boughtPerformance = totalBoughtValue !== 0 && currentBoughtPrice !== 'N/A'
-  ? ((currentBoughtPrice * totalBoughtQuantity - totalBoughtValue) / totalBoughtValue) * 100
-  : 'N/A';
-
-  const rpi = calculateRelativePerformanceIndex(currentBoughtPrice, totalBoughtValue, currentSoldPrice, totalSoldValue);
 
   // Handle Undo Checkbox
   const handleUndoChange = (e) => {
@@ -64,45 +66,54 @@ const boughtPerformance = totalBoughtValue !== 0 && currentBoughtPrice !== 'N/A'
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-4 w-full">
+      {/* Top Section: RPI and USD Gained */}
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">
-          RPI: {rpi !== 'N/A' ? `${rpi}%` : 'N/A'}
-          <span className="relative group ml-2">
-            <span className="text-blue-500 cursor-pointer">ℹ️</span>
-            <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              The Relative Performance Index (RPI) compares the performance of the assets bought and sold in the trade.
-              A positive RPI indicates that the trade outperformed simply holding the sold asset,
-              while a negative RPI suggests underperformance.
-            </div>
-          </span>
-        </h3>
-        <div>
-          <input
-            type="checkbox"
-            className="form-checkbox h-4 w-4 text-[#4A0E4E]"
-            onChange={handleUndoChange}
-          />
-          <label className="ml-2 text-sm text-gray-700">Undo</label>
+        {/* RPI Section */}
+        <div className="flex-1 text-left">
+          <h3 className="text-lg font-semibold">
+            RPI: {rpi !== 'N/A' ? `${rpi}%` : 'N/A'}
+            <span className="relative group ml-2">
+              <span className="text-blue-500 cursor-pointer">ℹ️</span>
+              <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                The Relative Performance Index (RPI) compares the performance of the assets bought and sold in the trade.
+                A positive RPI indicates that the trade outperformed simply holding the sold asset,
+                while a negative RPI suggests underperformance.
+              </div>
+            </span>
+          </h3>
+        </div>
+  
+        {/* USD Gained Section */}
+        <div className="flex-1 text-right">
+          <h3 className="text-lg font-semibold">
+            USD Gained: {boughtPerformance !== 'N/A' ? `$${(totalBoughtValue * currentBoughtPrice - totalBoughtUSD).toFixed(2)}` : 'N/A'}
+          </h3>
         </div>
       </div>
-
-      <h3 className="text-lg font-semibold mb-2">{attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</h3>
-      <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
-
+  
+      {/* Undo Checkbox */}
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          className="form-checkbox h-4 w-4 text-[#4A0E4E]"
+          onChange={handleUndoChange}
+        />
+        <label className="ml-2 text-sm text-gray-700">Undo Trade</label>
+      </div>
+  
       {/* Sold Token Details */}
       <p><strong>Sold:</strong> {totalSoldValue ? `${totalSoldValue} ${soldSymbol}` : 'N/A'}</p>
-      <p><strong>Sold (USD at time of trade):</strong> {totalSoldUSD ? `$${totalSoldUSD.toFixed(2)}` : 'N/A'}</p>
-      <p><strong>Bought:</strong> {totalBoughtValue ? `${totalBoughtValue} ${boughtSymbol}` : 'N/A'}</p>
-      <p><strong>Bought (USD at time of trade):</strong> {totalBoughtUSD ? `$${totalBoughtUSD.toFixed(2)}` : 'N/A'}</p>
-
-      {/* Performance */}
+      <p><strong>Sold at time of trade:</strong> {totalSoldUSD ? `$${totalSoldUSD.toFixed(2)}` : 'N/A'}</p>
       <p><strong>Current Sold Value (USD):</strong> {currentSoldPrice !== 'N/A' ? `$${(totalSoldValue * currentSoldPrice).toFixed(2)}` : 'N/A'}</p>
       <p><strong>Sold Performance:</strong> {soldPerformance !== 'N/A' ? `${soldPerformance.toFixed(2)}%` : 'N/A'}</p>
+      <br />
+      <p><strong>Bought:</strong> {totalBoughtValue ? `${totalBoughtValue} ${boughtSymbol}` : 'N/A'}</p>
+      <p><strong>Bought at time of trade:</strong> {totalBoughtUSD ? `$${totalBoughtUSD.toFixed(2)}` : 'N/A'}</p>
       <p><strong>Current Bought Value (USD):</strong> {currentBoughtPrice !== 'N/A' ? `$${(totalBoughtValue * currentBoughtPrice).toFixed(2)}` : 'N/A'}</p>
       <p><strong>Bought Performance:</strong> {boughtPerformance !== 'N/A' ? `${boughtPerformance.toFixed(2)}%` : 'N/A'}</p>
-
+  
       <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
-
+  
       <button
         className="mt-4 bg-[#4A0E4E] text-white px-4 py-2 rounded hover:bg-[#6A2C6A]"
         onClick={() => navigate(`/transaction-details/${transactionNumber}`, { state: { transaction } })}
@@ -113,4 +124,5 @@ const boughtPerformance = totalBoughtValue !== 0 && currentBoughtPrice !== 'N/A'
   );
 };
 
-export default TransactionCard;
+  export default TransactionCard;
+  
