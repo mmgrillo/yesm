@@ -1,4 +1,5 @@
 import React from 'react';
+import { Info, TrendingUp, TrendingDown } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
 
 const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) => {
@@ -58,6 +59,22 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
   
   const rpi = calculateRelativePerformanceIndex(soldPerformance, boughtPerformance);
 
+   // Helper function to format large numbers
+   const formatNumber = (num, maxDecimals = 4) => {
+    if (typeof num !== 'number') return 'N/A';
+    
+    // For very small numbers (like crypto amounts), show more decimals
+    if (Math.abs(num) < 0.0001) {
+      return num.toExponential(2);
+    }
+    
+    // For regular numbers, limit decimals
+    return num.toLocaleString(undefined, {
+      maximumFractionDigits: maxDecimals,
+      minimumFractionDigits: 2
+    });
+  };
+
 
   // Handle Undo Checkbox
   const handleUndoChange = (e) => {
@@ -65,64 +82,140 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-4 w-full">
-      {/* Top Section: RPI and USD Gained */}
-      <div className="flex justify-between items-center mb-2">
+    <div className="bg-white shadow-lg rounded-xl p-6 mb-4 w-full hover:shadow-xl transition-shadow duration-300">
+      {/* Top Section Divided into RPI and USD Gained */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
         {/* RPI Section */}
-        <div className="flex-1 text-left">
-          <h3 className="text-lg font-semibold">
-            RPI: {rpi !== 'N/A' ? `${rpi}%` : 'N/A'}
-            <span className="relative group ml-2">
-              <span className="text-blue-500 cursor-pointer">ℹ️</span>
-              <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                The Relative Performance Index (RPI) compares the performance of the assets bought and sold in the trade.
-                A positive RPI indicates that the trade outperformed simply holding the sold asset,
-                while a negative RPI suggests underperformance.
+        <div className="bg-gray-50 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm text-gray-600 font-medium">RPI</span>
+            <button className="group relative">
+              <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              <div className="absolute left-1/2 bottom-full mb-2 -translate-x-1/2 w-64 p-3 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                The Relative Performance Index (RPI) compares the performance of bought vs. sold assets. Positive RPI indicates outperformance.
               </div>
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold">
+              {rpi !== 'N/A' ? `${formatNumber(parseFloat(rpi), 2)}%` : 'N/A'}
             </span>
-          </h3>
+            {rpi !== 'N/A' && parseFloat(rpi) !== 0 && (
+              parseFloat(rpi) > 0 
+                ? <TrendingUp className="h-5 w-5 text-green-500" />
+                : <TrendingDown className="h-5 w-5 text-red-500" />
+            )}
+          </div>
         </div>
   
         {/* USD Gained Section */}
-        <div className="flex-1 text-right">
-          <h3 className="text-lg font-semibold">
-            USD Gained: {boughtPerformance !== 'N/A' ? `$${(totalBoughtValue * currentBoughtPrice - totalBoughtUSD).toFixed(2)}` : 'N/A'}
-          </h3>
+        <div className="bg-gray-50 rounded-lg p-4">
+          <div className="text-sm text-gray-600 font-medium mb-1">USD Gained</div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold truncate">
+              {boughtPerformance !== 'N/A' 
+                ? `$${formatNumber(totalBoughtValue * currentBoughtPrice - totalBoughtUSD, 2)}` 
+                : 'N/A'}
+            </span>
+            {boughtPerformance !== 'N/A' && (
+              parseFloat(boughtPerformance) > 0 
+                ? <TrendingUp className="h-5 w-5 text-green-500" />
+                : <TrendingDown className="h-5 w-5 text-red-500" />
+            )}
+          </div>
         </div>
       </div>
   
       {/* Undo Checkbox */}
-      <div className="flex items-center">
+      <div className="mb-4">
         <input
           type="checkbox"
-          className="form-checkbox h-4 w-4 text-[#4A0E4E]"
+          className="form-checkbox h-4 w-4 text-purple-700"
           onChange={handleUndoChange}
         />
         <label className="ml-2 text-sm text-gray-700">Undo Trade</label>
       </div>
   
-      {/* Sold Token Details */}
-      <p><strong>Sold:</strong> {totalSoldValue ? `${totalSoldValue} ${soldSymbol}` : 'N/A'}</p>
-      <p><strong>Sold at time of trade:</strong> {totalSoldUSD ? `$${totalSoldUSD.toFixed(2)}` : 'N/A'}</p>
-      <p><strong>Current Sold Value (USD):</strong> {currentSoldPrice !== 'N/A' ? `$${(totalSoldValue * currentSoldPrice).toFixed(2)}` : 'N/A'}</p>
-      <p><strong>Sold Performance:</strong> {soldPerformance !== 'N/A' ? `${soldPerformance.toFixed(2)}%` : 'N/A'}</p>
-      <br />
-      <p><strong>Bought:</strong> {totalBoughtValue ? `${totalBoughtValue} ${boughtSymbol}` : 'N/A'}</p>
-      <p><strong>Bought at time of trade:</strong> {totalBoughtUSD ? `$${totalBoughtUSD.toFixed(2)}` : 'N/A'}</p>
-      <p><strong>Current Bought Value (USD):</strong> {currentBoughtPrice !== 'N/A' ? `$${(totalBoughtValue * currentBoughtPrice).toFixed(2)}` : 'N/A'}</p>
-      <p><strong>Bought Performance:</strong> {boughtPerformance !== 'N/A' ? `${boughtPerformance.toFixed(2)}%` : 'N/A'}</p>
+      {/* Trade Details Section */}
+      <div className="grid grid-cols-2 gap-6">
+        {/* Sold Details */}
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-800 mb-3">Sold Assets</h3>
+          <div className="space-y-1">
+            <div className="flex justify-between items-baseline">
+              <span className="text-gray-600">Amount:</span>
+              <div className="font-medium truncate ml-2 max-w-[60%] text-right">
+                {totalSoldValue ? `${formatNumber(totalSoldValue)} ${soldSymbol}` : 'N/A'}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Initial Value:</span>
+              <span className="font-medium">${formatNumber(totalSoldUSD)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Current Value:</span>
+              <span className="font-medium">
+                ${formatNumber(totalSoldValue * currentSoldPrice)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Performance:</span>
+              <span className={`font-medium ${
+                soldPerformance !== 'N/A' && parseFloat(soldPerformance) > 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {soldPerformance !== 'N/A' ? `${formatNumber(soldPerformance, 2)}%` : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
   
-      <p><strong>Timestamp:</strong> {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}</p>
+        {/* Bought Details */}
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-800 mb-3">Bought Assets</h3>
+          <div className="space-y-1">
+            <div className="flex justify-between items-baseline">
+              <span className="text-gray-600">Amount:</span>
+              <div className="font-medium truncate ml-2 max-w-[60%] text-right">
+                {totalBoughtValue ? `${formatNumber(totalBoughtValue)} ${boughtSymbol}` : 'N/A'}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Initial Value:</span>
+              <span className="font-medium">${formatNumber(totalBoughtUSD)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Current Value:</span>
+              <span className="font-medium">
+                ${formatNumber(totalBoughtValue * currentBoughtPrice)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Performance:</span>
+              <span className={`font-medium ${
+                boughtPerformance !== 'N/A' && parseFloat(boughtPerformance) > 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {boughtPerformance !== 'N/A' ? `${formatNumber(boughtPerformance, 2)}%` : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
   
-      <button
-        className="mt-4 bg-[#4A0E4E] text-white px-4 py-2 rounded hover:bg-[#6A2C6A]"
-        onClick={() => navigate(`/transaction-details/${transactionNumber}`, { state: { transaction } })}
-      >
-        View Details
-      </button>
+      {/* Footer Section */}
+      <div className="mt-6 flex items-center justify-between">
+        <span className="text-sm text-gray-500">
+          {attributes.mined_at ? new Date(attributes.mined_at).toLocaleString() : 'N/A'}
+        </span>
+        <button
+          className="bg-purple-700 text-white px-6 py-2 rounded-lg hover:bg-purple-800 transition-colors duration-200"
+          onClick={() => navigate(`/transaction-details/${transactionNumber}`, { state: { transaction } })}
+        >
+          View Details
+        </button>
+      </div>
     </div>
   );
 };
 
-  export default TransactionCard;
+export default TransactionCard;
   
