@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Info, TrendingUp, TrendingDown } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
 
 const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) => {
   const { transactionNumber, operation_type: action, attributes } = transaction;
+  const [isUndone, setIsUndone] = useState(false);
 
   if (!attributes) return null; 
 
@@ -78,16 +79,32 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
 
   // Handle Undo Checkbox
   const handleUndoChange = (e) => {
+    setIsUndone(e.target.checked);
     onUndoChange(transaction, e.target.checked);
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 mb-4 w-full hover:shadow-xl transition-shadow duration-300">
-      {/* Top Section Divided into RPI and USD Gained */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+    <div className={`bg-white shadow-lg rounded-xl p-6 mb-4 w-full hover:shadow-xl transition-all duration-300 relative
+      ${isUndone ? 'opacity-60' : 'opacity-100'}`}
+    >
+      {/* Undo Trade Toggle - Moved to top right */}
+      <div className="absolute top-4 right-4">
+        <label className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">
+          <span className="mr-2 text-sm font-medium text-gray-700">Undo Trade</span>
+          <input
+            type="checkbox"
+            checked={isUndone}
+            className="form-checkbox h-4 w-4 text-purple-700 rounded-full"
+            onChange={handleUndoChange}
+          />
+        </label>
+      </div>
+
+      {/* Top Section - RPI and USD Gained */}
+      <div className="grid grid-cols-2 gap-4 mb-6 mt-8">
         {/* RPI Section */}
         <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-sm text-gray-600 font-medium">RPI</span>
             <button className="group relative">
               <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
@@ -96,7 +113,7 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
               </div>
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-2xl font-bold">
               {rpi !== 'N/A' ? `${formatNumber(parseFloat(rpi), 2)}%` : 'N/A'}
             </span>
@@ -110,9 +127,9 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
   
         {/* USD Gained Section */}
         <div className="bg-gray-50 rounded-lg p-4">
-          <div className="text-sm text-gray-600 font-medium mb-1">USD Gained</div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold truncate">
+          <div className="text-sm text-gray-600 font-medium mb-2 text-center">USD Gained</div>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-2xl font-bold">
               {boughtPerformance !== 'N/A' 
                 ? `$${formatNumber(totalBoughtValue * currentBoughtPrice - totalBoughtUSD, 2)}` 
                 : 'N/A'}
@@ -125,77 +142,62 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
           </div>
         </div>
       </div>
-  
-      {/* Undo Checkbox */}
-      <div className="mb-4">
-        <input
-          type="checkbox"
-          className="form-checkbox h-4 w-4 text-purple-700"
-          onChange={handleUndoChange}
-        />
-        <label className="ml-2 text-sm text-gray-700">Undo Trade</label>
-      </div>
-  
-      {/* Trade Details Section */}
+
+      {/* Rest of your card content remains the same... */}
+      {/* Simplified Trade Details Section */}
       <div className="grid grid-cols-2 gap-6">
         {/* Sold Details */}
-        <div className="space-y-2">
-          <h3 className="font-semibold text-gray-800 mb-3">Sold Assets</h3>
-          <div className="space-y-1">
-            <div className="flex justify-between items-baseline">
-              <span className="text-gray-600">Amount:</span>
-              <div className="font-medium truncate ml-2 max-w-[60%] text-right">
-                {totalSoldValue ? `${formatNumber(totalSoldValue)} ${soldSymbol}` : 'N/A'}
+        <div className="text-center">
+          <h3 className="font-semibold text-gray-800 mb-4">Sold Assets</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="text-gray-600 text-sm mb-1">Amount</div>
+              <div className="font-medium text-lg">
+                {formatNumber(totalSoldValue)}
+                <span className="text-gray-600 ml-1">{soldSymbol}</span>
               </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Initial Value:</span>
-              <span className="font-medium">${formatNumber(totalSoldUSD)}</span>
+            <div>
+              <div className="text-gray-600 text-sm mb-1">USD Value</div>
+              <div className="font-medium text-lg">
+                ${formatNumber(totalSoldUSD)}
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Current Value:</span>
-              <span className="font-medium">
-                ${formatNumber(totalSoldValue * currentSoldPrice)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Performance:</span>
-              <span className={`font-medium ${
+            <div>
+              <div className="text-gray-600 text-sm mb-1">Performance</div>
+              <div className={`font-medium text-lg ${
                 soldPerformance !== 'N/A' && parseFloat(soldPerformance) > 0 ? 'text-green-600' : 'text-red-600'
               }`}>
                 {soldPerformance !== 'N/A' ? `${formatNumber(soldPerformance, 2)}%` : 'N/A'}
-              </span>
+              </div>
             </div>
           </div>
         </div>
-  
+
         {/* Bought Details */}
-        <div className="space-y-2">
-          <h3 className="font-semibold text-gray-800 mb-3">Bought Assets</h3>
-          <div className="space-y-1">
-            <div className="flex justify-between items-baseline">
-              <span className="text-gray-600">Amount:</span>
-              <div className="font-medium truncate ml-2 max-w-[60%] text-right">
-                {totalBoughtValue ? `${formatNumber(totalBoughtValue)} ${boughtSymbol}` : 'N/A'}
+        <div className="text-center">
+          <h3 className="font-semibold text-gray-800 mb-4">Bought Assets</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="text-gray-600 text-sm mb-1">Amount</div>
+              <div className="font-medium text-lg">
+                {formatNumber(totalBoughtValue)}
+                <span className="text-gray-600 ml-1">{boughtSymbol}</span>
               </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Initial Value:</span>
-              <span className="font-medium">${formatNumber(totalBoughtUSD)}</span>
+            <div>
+              <div className="text-gray-600 text-sm mb-1">USD Value</div>
+              <div className="font-medium text-lg">
+                ${formatNumber(totalBoughtUSD)}
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Current Value:</span>
-              <span className="font-medium">
-                ${formatNumber(totalBoughtValue * currentBoughtPrice)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Performance:</span>
-              <span className={`font-medium ${
+            <div>
+              <div className="text-gray-600 text-sm mb-1">Performance</div>
+              <div className={`font-medium text-lg ${
                 boughtPerformance !== 'N/A' && parseFloat(boughtPerformance) > 0 ? 'text-green-600' : 'text-red-600'
               }`}>
                 {boughtPerformance !== 'N/A' ? `${formatNumber(boughtPerformance, 2)}%` : 'N/A'}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -210,7 +212,7 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
           className="bg-purple-700 text-white px-6 py-2 rounded-lg hover:bg-purple-800 transition-colors duration-200"
           onClick={() =>
             navigate(`/transaction-details/${transaction.transactionNumber}`, {
-              state: { transaction, tokenPrices }, // Pass the full transaction object
+              state: { transaction, tokenPrices },
             })
           }
         >
@@ -222,4 +224,3 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
 };
 
 export default TransactionCard;
-  
