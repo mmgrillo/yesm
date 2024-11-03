@@ -208,7 +208,11 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
         </span>
         <button
           className="bg-purple-700 text-white px-6 py-2 rounded-lg hover:bg-purple-800 transition-colors duration-200"
-          onClick={() => navigate(`/transaction-details/${transactionNumber}`, { state: { transaction } })}
+          onClick={() =>
+            navigate(`/transaction-details/${transaction.transactionNumber}`, {
+              state: { transaction, tokenPrices }, // Pass the full transaction object
+            })
+          }
         >
           View Details
         </button>
