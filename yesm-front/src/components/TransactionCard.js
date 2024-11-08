@@ -1,10 +1,22 @@
 import React, {useState} from 'react';
 import { Info, TrendingUp, TrendingDown } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
+import useFearGreedIndex from '../hooks/useFearGreedIndex';
+import FearGreedGauge from './FearGreedGauge';
+import useMacroData from '../hooks/useMacroData';
+import MacroContext from './MacroContext';
+import CompactMarketIndicators from './CompactMarketIndicators';
+import useVolatilityIndices from '../hooks/useVolatilityIndices';
+import useMarketData from '../hooks/useMarketData';
+
 
 const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) => {
-  const { transactionNumber, operation_type: action, attributes } = transaction;
+  const { operation_type: action, attributes } = transaction;
   const [isUndone, setIsUndone] = useState(false);
+  const { fearGreedIndex, isLoading: fgiLoading } = useFearGreedIndex(attributes.mined_at);
+  const { macroData, isLoading: macroLoading } = useMacroData(attributes.mined_at);
+  const { volatilityData, isLoading: volatilityLoading } = useVolatilityIndices(attributes.mined_at);
+  const { marketData, isLoading } = useMarketData(attributes.mined_at);
 
   if (!attributes) return null; 
 
@@ -13,6 +25,7 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
     const priceKey = symbol.toLowerCase() === 'eth' ? 'ethereum:eth' : `${chain}:${address || symbol.toLowerCase()}`;
     return tokenPrices[priceKey]?.usd || 'N/A';
   };
+
 
   // Aggregate all sold and bought transfers
   const soldTransfers = attributes.transfers.filter(t => t.direction === 'out');
@@ -143,7 +156,36 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
         </div>
       </div>
 
-      {/* Rest of your card content remains the same... */}
+          {!fgiLoading && fearGreedIndex && (
+      <div className="col-span-2 bg-gray-50 rounded-lg p-4 flex justify-center">
+        <FearGreedGauge
+          value={parseInt(fearGreedIndex.value)}
+          timestamp={fearGreedIndex.timestamp}
+          size="small"
+        />
+      </div>
+    )}
+
+          {!volatilityLoading && (
+            <div className="col-span-2">
+              <CompactMarketIndicators 
+                fearGreedData={marketData.fearGreed}
+                macroData={marketData.macroData}
+                volatilityData={marketData.volatilityData}
+              />
+            </div>
+          )}
+
+        {!macroLoading && macroData && (
+          <div className="col-span-2 bg-gray-50 rounded-lg">
+            <MacroContext 
+              data={macroData}
+              size="small"
+            />
+          </div>
+        )}
+
+    
       {/* Simplified Trade Details Section */}
       <div className="grid grid-cols-2 gap-6">
         {/* Sold Details */}

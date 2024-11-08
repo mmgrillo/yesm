@@ -2,15 +2,29 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Info, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
+import useFearGreedIndex from '../hooks/useFearGreedIndex';
+import FearGreedGauge from './FearGreedGauge';
+import useMacroData from '../hooks/useMacroData';
+import MacroContext from './MacroContext';
+import DetailedMacroContext from './DetailedMacroContext';
+import DetailedMarketIndicators from './DetailedMarketIndicators';
+import useVolatilityIndices from '../hooks/useVolatilityIndices';
 
 const TransactionDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
   
   const transaction = location.state?.transaction;
   const tokenPrices = location.state?.tokenPrices;
   const attributes = transaction?.attributes || {};
   const transfers = attributes.transfers || [];
+  const { fearGreedIndex, isLoading: fgiLoading } = useFearGreedIndex(attributes.mined_at);
+  const { macroData, isLoading: macroLoading } = useMacroData(attributes.mined_at);
+  const { volatilityData, isLoading: volatilityLoading } = useVolatilityIndices(attributes.mined_at);
+  
+
+
 
   const formatNumber = (num, maxDecimals = 4) => {
     if (typeof num !== 'number') return 'N/A';
@@ -72,6 +86,8 @@ const TransactionDetails = () => {
       </div>
     );
   }
+  
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -139,6 +155,16 @@ const TransactionDetails = () => {
               </div>
             </div>
           </div>
+
+          {!macroLoading && !volatilityLoading && (
+            <div className="mt-8">
+              <DetailedMarketIndicators 
+                fearGreedData={fearGreedIndex}
+                macroData={macroData}
+                volatilityData={volatilityData}
+              />
+            </div>
+          )}
 
           {/* Detailed Analysis */}
           <div className="grid grid-cols-2 gap-8">
