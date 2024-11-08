@@ -10,11 +10,15 @@ const cors = require('cors');
 // Load environment variables
 dotenv.config();
 
-const app = express(); // Initialize the app here
+const app = express();
 
 // Enable CORS for your frontend
 app.use(cors({
-  origin: 'http://localhost:3000',  // Your frontend's URL
+  // Update CORS to handle both local and production URLs
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL  // You'll set this in Heroku config vars
+    : 'http://localhost:3000',
+  credentials: true
 }));
 
 // Security middleware
@@ -44,8 +48,11 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    app.listen(config.port, () => {
-      logger.info(`Server is running on port ${config.port}`);
+    // Use Heroku's dynamic port or fallback to config
+    const port = process.env.PORT || config.port || 5001;
+    
+    app.listen(port, '0.0.0.0', () => {  // Added host binding for Heroku
+      logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
     });
   } catch (error) {
     logger.error('Failed to start the server:', error);
@@ -57,7 +64,5 @@ const startServer = async () => {
 if (require.main === module) {
   startServer();
 }
-
-
 
 module.exports = app;
