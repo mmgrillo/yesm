@@ -13,6 +13,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy - Add this line before other middleware
+app.set('trust proxy', 1);
+
 // Enable CORS for your frontend
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
@@ -23,14 +26,14 @@ app.use(cors({
 
 // Security middleware
 app.use(helmet({
-  contentSecurityPolicy: false // Disable CSP for development
+  contentSecurityPolicy: false
 }));
 app.use(compression());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: config.rateLimitWindowMs,
-  max: config.rateLimitMax,
+  windowMs: config.rateLimitWindowMs || 15 * 60 * 1000,
+  max: config.rateLimitMax || 100
 });
 app.use(limiter);
 
@@ -48,7 +51,14 @@ if (process.env.NODE_ENV === 'production') {
 
   // Handle React routing, return all requests to React app
   app.get('*', function(req, res) {
-    res.sendFile(path.join(__dirname, '../../yesm-front/build', 'index.html'));
+    const indexPath = path.join(__dirname, '../../yesm-front/build', 'index.html');
+    console.log('Attempting to serve:', indexPath); // Add this for debugging
+    if (require('fs').existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      console.error('Index file not found at:', indexPath);
+      res.status(404).send('Frontend build not found');
+    }
   });
 }
 

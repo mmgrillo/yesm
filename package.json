@@ -7,10 +7,11 @@
     "node": "18.x"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "cd yesm-back && npm start",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "cd yesm-front && npm install && npm run build"
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd ../yesm-back && npm install",
+     "build": "cd yesm-front && npm run build"
   },
   "keywords": [],
   "author": "",
