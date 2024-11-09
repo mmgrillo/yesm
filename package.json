@@ -10,7 +10,7 @@
     "start": "cd yesm-back && npm start",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "echo 'Starting build process...' && cd yesm-front && echo 'Installing frontend dependencies...' && npm install && echo 'Building frontend...' && npm run build && echo 'Frontend build complete' && cd ../yesm-back && echo 'Installing backend dependencies...' && npm install && echo 'Build process complete'",
+   "heroku-postbuild": "cd yesm-front && npm install && npm run build && cp -r build ../yesm-back/build && cd ../yesm-back && npm install",
      "build": "cd yesm-front && npm run build"
   },
   "keywords": [],

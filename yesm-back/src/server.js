@@ -16,11 +16,15 @@ const app = express();
 // Trust proxy - Add this line before other middleware
 app.set('trust proxy', 1);
 
-// Enable CORS for your frontend
+// CORS configuration based on environment
+const corsOrigin = process.env.NODE_ENV === 'production'
+  ? 'https://yesmother-fdd566b04a1.herokuapp.com'  // Your Heroku app URL
+  : 'http://localhost:3000';
+
+console.log('CORS Origin:', corsOrigin); // Debug log
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:3000',
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -47,12 +51,12 @@ app.use('/api', transactionRoutes);
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React build
-  app.use(express.static(path.join(__dirname, '../../yesm-front/build')));
+  app.use(express.static(path.join(__dirname, '../build')));
 
   // Handle React routing, return all requests to React app
   app.get('*', function(req, res) {
-    const indexPath = path.join(__dirname, '../../yesm-front/build', 'index.html');
-    console.log('Attempting to serve:', indexPath); // Add this for debugging
+    const indexPath = path.join(__dirname, '../build', 'index.html');
+    console.log('Attempting to serve:', indexPath);
     if (require('fs').existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
