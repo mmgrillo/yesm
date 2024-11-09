@@ -4,19 +4,16 @@
   "description": "YESM Application",
   "main": "src/app.js",
   "engines": {
-    "node": "18.x"
+    "node": "18.19.0",
+    "npm": "10.2.3"
   },
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd .. && mkdir -p /app/build && cp -r yesm-front/build/* /app/build/ && ls -la /app/build",
-    "postinstall": "mkdir -p /app/build"
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && mkdir -p ../build && cp -r build/* ../build/",
+    "postinstall": "echo 'Checking build directory structure...'"
   },
-  
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.7.4",
     "compression": "^1.7.4",
