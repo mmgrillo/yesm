@@ -1,1 +1,1 @@
-web: node src/server.js
+web: cd yesm-back && npm start

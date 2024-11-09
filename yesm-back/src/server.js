@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const path = require('path');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -14,15 +15,16 @@ const app = express();
 
 // Enable CORS for your frontend
 app.use(cors({
-  // Update CORS to handle both local and production URLs
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL  // You'll set this in Heroku config vars
+    ? process.env.FRONTEND_URL 
     : 'http://localhost:3000',
   credentials: true
 }));
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false // Disable CSP for development
+}));
 app.use(compression());
 
 // Rate limiting
@@ -39,6 +41,17 @@ app.use(express.json());
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api', transactionRoutes);
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React build
+  app.use(express.static(path.join(__dirname, '../../yesm-front/build')));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', function(req, res) {
+    res.sendFile(path.join(__dirname, '../../yesm-front/build', 'index.html'));
+  });
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
@@ -48,10 +61,9 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    // Use Heroku's dynamic port or fallback to config
     const port = process.env.PORT || config.port || 5001;
     
-    app.listen(port, '0.0.0.0', () => {  // Added host binding for Heroku
+    app.listen(port, '0.0.0.0', () => {
       logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
     });
   } catch (error) {
@@ -60,7 +72,6 @@ const startServer = async () => {
   }
 };
 
-// Only start the server if this file is run directly
 if (require.main === module) {
   startServer();
 }
