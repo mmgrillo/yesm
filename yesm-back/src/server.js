@@ -14,7 +14,7 @@ dotenv.config();
 
 const app = express();
 
-// Trust proxy - Add this line before other middleware
+// Trust proxy
 app.set('trust proxy', 1);
 
 // CORS configuration based on environment
@@ -22,9 +22,11 @@ const corsOrigin = process.env.NODE_ENV === 'production'
   ? process.env.FRONTEND_URL || 'https://yesmother-fdd566b04a1.herokuapp.com'
   : 'http://localhost:3000';
 
+logger.info('Starting server configuration...');
 logger.info('CORS Origin:', corsOrigin);
 logger.info('Environment:', process.env.NODE_ENV);
 logger.info('Current directory:', process.cwd());
+logger.info('Directory contents:', fs.readdirSync(process.cwd()));
 
 app.use(cors({
   origin: corsOrigin,
@@ -55,36 +57,50 @@ app.use('/api', transactionRoutes);
 if (process.env.NODE_ENV === 'production') {
   logger.info('Setting up production static file serving');
   
-  // Define build paths
-  const buildPath = '/app/build';  // Heroku absolute path
-  const indexPath = path.join(buildPath, 'index.html');
-  
-  logger.info('Build path:', buildPath);
-  logger.info('Index path:', indexPath);
+  // Try multiple possible build paths
+  const possibleBuildPaths = [
+    '/app/build',
+    path.join(process.cwd(), 'build'),
+    path.join(process.cwd(), 'yesm-front/build'),
+    path.join(__dirname, '../build'),
+    path.join(__dirname, '../../build')
+  ];
 
-  // Check if build directory exists
-  if (fs.existsSync(buildPath)) {
-    logger.info('Build directory found. Contents:', fs.readdirSync(buildPath));
-  } else {
-    logger.warn('Build directory not found at:', buildPath);
-  }
-
-  // Serve static files from the React build
-  app.use(express.static(buildPath));
-
-  // Handle React routing, return all requests to React app
-  app.get('*', function(req, res) {
-    logger.info('Handling request for:', req.path);
-    logger.info('Attempting to serve index.html from:', indexPath);
-
-    if (fs.existsSync(indexPath)) {
-      logger.info('index.html found, serving file');
-      res.sendFile(indexPath);
-    } else {
-      logger.error('index.html not found. Current directory contents:', fs.readdirSync(process.cwd()));
-      res.status(404).send('Frontend build not found');
+  logger.info('Checking possible build paths:');
+  possibleBuildPaths.forEach(buildPath => {
+    logger.info(`Checking ${buildPath}:`, fs.existsSync(buildPath) ? 'EXISTS' : 'NOT FOUND');
+    if (fs.existsSync(buildPath)) {
+      logger.info(`Contents of ${buildPath}:`, fs.readdirSync(buildPath));
     }
   });
+
+  // Find the first valid build path
+  const buildPath = possibleBuildPaths.find(p => fs.existsSync(p) && fs.existsSync(path.join(p, 'index.html')));
+
+  if (!buildPath) {
+    logger.error('No valid build path found with index.html');
+  } else {
+    logger.info('Using build path:', buildPath);
+    
+    // Serve static files from the React build
+    app.use(express.static(buildPath));
+
+    // Handle React routing, return all requests to React app
+    app.get('*', function(req, res) {
+      const indexPath = path.join(buildPath, 'index.html');
+      logger.info('Request path:', req.path);
+      logger.info('Serving index.html from:', indexPath);
+
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        logger.error('index.html not found in build directory');
+        res.status(404).send('Frontend build not found');
+      }
+    });
+  }
+} else {
+  logger.info('Server running in development mode');
 }
 
 // Error handling middleware
@@ -107,17 +123,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
-// Add process error handlers
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (error) => {
-  logger.error('Unhandled Rejection:', error);
-  process.exit(1);
-});
 
 if (require.main === module) {
   startServer();
