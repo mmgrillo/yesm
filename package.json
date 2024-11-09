@@ -7,10 +7,10 @@
     "node": "18.x"
   },
   "scripts": {
-    "start": "cd yesm-back && npm start",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "echo 'Starting build process...' && pwd && ls -la && echo 'Moving to frontend...' && cd yesm-front && pwd && npm install && echo 'Building frontend...' && npm run build && echo 'Build complete, copying files...' && cd .. && echo 'Creating build directory...' && mkdir -p build && echo 'Copying build files...' && cp -r yesm-front/build/* build/ && echo 'Listing final build directory:' && ls -la build",
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd .. && mkdir -p /app/build && cp -r yesm-front/build/* /app/build/ && echo 'Build files copied to /app/build:' && ls -la /app/build",
     "postinstall": "echo 'Checking build directory structure:' && ls -la yesm-back/build || echo 'Build directory not found'",
     "build": "cd yesm-front && npm run build"
   },
