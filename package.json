@@ -10,10 +10,10 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd .. && mkdir -p /app/build && cp -r yesm-front/build/* /app/build/ && echo 'Build files copied to /app/build:' && ls -la /app/build",
-    "postinstall": "echo 'Checking build directory structure:' && ls -la yesm-back/build || echo 'Build directory not found'",
-    "build": "cd yesm-front && npm run build"
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd .. && mkdir -p /app/build && cp -r yesm-front/build/* /app/build/ && ls -la /app/build",
+    "postinstall": "mkdir -p /app/build"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
