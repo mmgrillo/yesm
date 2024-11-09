@@ -10,7 +10,7 @@
     "start": "cd yesm-back && npm start",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "cd yesm-front && npm install && NODE_ENV=production npm run build && cd .. && mkdir -p build && cp -r yesm-front/build/* build/ && ls -la build",
+    "heroku-postbuild": "echo 'Starting build process...' && pwd && ls -la && echo 'Moving to frontend...' && cd yesm-front && pwd && npm install && echo 'Building frontend...' && npm run build && echo 'Build complete, copying files...' && cd .. && echo 'Creating build directory...' && mkdir -p build && echo 'Copying build files...' && cp -r yesm-front/build/* build/ && echo 'Listing final build directory:' && ls -la build",
     "postinstall": "echo 'Checking build directory structure:' && ls -la yesm-back/build || echo 'Build directory not found'",
     "build": "cd yesm-front && npm run build"
   },
