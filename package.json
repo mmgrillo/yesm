@@ -10,8 +10,9 @@
     "start": "cd yesm-back && npm start",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-   "heroku-postbuild": "cd yesm-front && npm install && npm run build && cp -r build ../yesm-back/build && cd ../yesm-back && npm install",
-     "build": "cd yesm-front && npm run build"
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd .. && mkdir -p yesm-back/build && cp -r yesm-front/build/* yesm-back/build/ && cd yesm-back && npm install",
+    "postinstall": "echo 'Checking build directory structure:' && ls -la yesm-back/build || echo 'Build directory not found'",
+    "build": "cd yesm-front && npm run build"
   },
   "keywords": [],
   "author": "",
