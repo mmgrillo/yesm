@@ -1,1 +1,1 @@
-web: npm start
+echo "web: node yesm-back/src/server.js" > Procfile

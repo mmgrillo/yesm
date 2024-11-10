@@ -6,7 +6,9 @@ import LoadingSpinner from './LoadingSpinner';
 import TransactionCard from './TransactionCard';
 import WalletBalance from './WalletBalance';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://yesmother-e680f705d89a.herokuapp.com/api'
+  : 'http://localhost:5001/api';
 const TRANSACTIONS_PER_PAGE = 20;
 
 const TransactionLookup = () => {
@@ -33,11 +35,22 @@ const TransactionLookup = () => {
   const fetchWalletTransactionsAndBalances = async () => {
     setIsLoading(true);
     setIsFetchingNextPage(true);
+    console.log('Fetching from:', `${API_URL}/wallet/${walletAddresses[0]}`);
   
     try {
       const allFetchedTransactions = [];
       for (const walletAddress of walletAddresses) {
-        const response = await fetch(`${API_URL}/api/wallet/${walletAddress}?limit=${TRANSACTIONS_PER_PAGE}`);
+        const response = await fetch(`${API_URL}/wallet/${walletAddress}?limit=${TRANSACTIONS_PER_PAGE}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         if (Array.isArray(data)) {
           allFetchedTransactions.push(...data);
@@ -48,7 +61,7 @@ const TransactionLookup = () => {
       setHasSearched(true);
     } catch (err) {
       console.error("Failed to fetch transactions", err);
-      setError("Failed to fetch transactions");
+      setError(`Failed to fetch transactions: ${err.message}`);
     } finally {
       setIsLoading(false);
       setIsFetchingNextPage(false);

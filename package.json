@@ -8,7 +8,7 @@
     "npm": "10.2.3"
   },
   "scripts": {
-    "start": "cd yesm-back && npm install && node src/server.js",
+    "start": "node yesm-back/src/server.js",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "heroku-postbuild": "cd yesm-front && npm install && npm run build",
@@ -22,7 +22,6 @@
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.1",
     "helmet": "^7.1.0",
-    "moralis": "^2.27.2",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "web3": "^4.12.0",
