@@ -18,9 +18,12 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS configuration based on environment
-const corsOrigin = process.env.NODE_ENV === 'production'
-  ? process.env.FRONTEND_URL || 'https://yesmother.herokuapp.com'
-  : 'http://localhost:3000';
+const corsOrigins = process.env.NODE_ENV === 'production'
+  ? [
+      'https://yesmother-e680f705d89a.herokuapp.com',
+      'https://yesmother.herokuapp.com'
+    ]
+  : ['http://localhost:3000'];
 
 logger.info('Starting server configuration...');
 logger.info('CORS Origin:', corsOrigin);
@@ -29,8 +32,10 @@ logger.info('Current directory:', process.cwd());
 logger.info('Directory contents:', fs.readdirSync(process.cwd()));
 
 app.use(cors({
-  origin: corsOrigin,
-  credentials: true
+  origin: corsOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Security middleware

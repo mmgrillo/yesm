@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../utils/logger');
 
 const ZERION_API_URL = 'https://api.zerion.io/v1';
 const ZERION_API_KEY = process.env.ZERION_API_KEY;
@@ -23,9 +24,12 @@ class ApiService {
         const response = await request();
         resolve(response);
       } catch (error) {
+        logger.error('Queue processing error:', {
+          error: error.message,
+          response: error.response?.data
+        });
         reject(error);
       }
-      // Wait before processing next request
       await new Promise(resolve => setTimeout(resolve, THROTTLE_DELAY));
     }
     
@@ -39,67 +43,71 @@ class ApiService {
     });
   }
 
-  static async fetchTokenPrices(contractAddresses) {
+  static async makeZerionRequest(url, params = {}) {
+    try {
+      const headers = {
+        Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
+        accept: 'application/json',
+      };
+
+      return await this.throttledRequest(async () => {
+        logger.info('Making Zerion API request:', { url, params });
+        const response = await axios.get(url, { headers, params });
+        return response.data;
+      });
+    } catch (error) {
+      logger.error('Zerion API request failed:', {
+        url,
+        error: error.message,
+        response: error.response?.data
+      });
+      throw error;
+    }
+  }
+
+ static async fetchTokenPrices(contractAddresses) {
     const prices = {};
-
+    
     for (const token of contractAddresses) {
-      const { chain, address, symbol } = token;
+      try {
+        const { chain, address, symbol } = token;
 
-      // Updated handling for Ethereum (ETH)
-      if (symbol?.toUpperCase() === 'ETH' && chain === 'ethereum') {
-        try {
-          const apiUrl = `${ZERION_API_URL}/fungibles/${address}?fields=market_data.price`;
-          const headers = {
-            Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
-            accept: 'application/json',
-          };
-          const response = await axios.get(apiUrl, { headers });
-          const price = response.data.data.attributes.market_data?.price;
+        if (symbol?.toUpperCase() === 'ETH' && chain === 'ethereum') {
+          const data = await this.makeZerionRequest(`${ZERION_API_URL}/fungibles/eth?fields=market_data.price`);
+          const price = data.data.attributes.market_data?.price;
           
-          // Use 'ethereum:eth' as the key to be consistent with the frontend
           prices['ethereum:eth'] = {
             usd: price !== undefined ? price : null,
             symbol: 'ETH',
             name: 'Ethereum',
           };
           
-          console.log(`Fetched price for ETH: $${price}`);
-          continue;
-        } catch (error) {
-          console.error('Error fetching price for ETH:', error.response ? error.response.data : error.message);
-          prices['ethereum:eth'] = { usd: null, symbol: 'ETH', name: 'Ethereum' };
+          logger.info(`Fetched ETH price: $${price}`);
           continue;
         }
-      }
 
-      // Skip processing if non-ETH token is missing chain or address
-      if (!chain || !address) {
-        console.error(`Invalid token data: chain=${chain}, address=${address}`);
-        continue;
-      }
+        if (!chain || !address) {
+          logger.error(`Invalid token data:`, { chain, address });
+          continue;
+        }
 
-      // Fetch price for non-ETH tokens
-      const apiUrl = `${ZERION_API_URL}/fungibles/${address}?fields=market_data.price`;
-      const headers = {
-        Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
-        accept: 'application/json',
-      };
-
-      try {
-        const response = await axios.get(apiUrl, { headers });
-        const price = response.data.data.attributes.market_data?.price;
-        const tokenSymbol = symbol; // Using provided symbol for consistency
+        const data = await this.makeZerionRequest(`${ZERION_API_URL}/fungibles/${address}?fields=market_data.price`);
+        const price = data.data.attributes.market_data?.price;
         const priceKey = `${chain}:${address}`;
 
         prices[priceKey] = {
           usd: price !== undefined ? price : null,
-          symbol: tokenSymbol,
+          symbol: symbol,
         };
 
-        console.log(`Price for token ${address} (symbol: ${tokenSymbol}): $${price}`);
+        logger.info(`Fetched price for ${symbol}:`, { address, price });
       } catch (error) {
-        console.error(`Error fetching price for ${address}:`, error.response ? error.response.data : error.message);
-        prices[`${chain}:${address}`] = { usd: null, symbol: null };
+        logger.error('Error fetching token price:', {
+          token,
+          error: error.message,
+          response: error.response?.data
+        });
+        continue;
       }
     }
 
