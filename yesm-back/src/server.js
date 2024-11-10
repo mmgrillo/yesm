@@ -19,7 +19,7 @@ app.set('trust proxy', 1);
 
 // CORS configuration based on environment
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? process.env.FRONTEND_URL || 'https://yesmother-fdd566b04a1.herokuapp.com'
+  ? process.env.FRONTEND_URL || 'https://yesmother.herokuapp.com'
   : 'http://localhost:3000';
 
 logger.info('Starting server configuration...');
@@ -57,28 +57,42 @@ app.use('/api', transactionRoutes);
 if (process.env.NODE_ENV === 'production') {
   logger.info('Setting up production static file serving');
   
-  // Try multiple possible build paths
+  // Define possible build paths relative to the current directory
   const possibleBuildPaths = [
-    '/app/build',
-    path.join(process.cwd(), 'build'),
-    path.join(process.cwd(), 'yesm-front/build'),
-    path.join(__dirname, '../build'),
-    path.join(__dirname, '../../build')
+    path.join(process.cwd(), '../yesm-front/build'),  // From yesm-back/src to yesm-front/build
+    path.join(process.cwd(), 'yesm-front/build'),     // From root to yesm-front/build
+    path.join(process.cwd(), 'build'),                // Direct build folder
+    path.join(__dirname, '../../yesm-front/build'),   // From src to yesm-front/build
+    path.join(__dirname, '../build'),                 // One level up build
+    '/app/yesm-front/build',                         // Heroku absolute paths
+    '/app/build'                                     // Heroku absolute paths
   ];
 
   logger.info('Checking possible build paths:');
   possibleBuildPaths.forEach(buildPath => {
-    logger.info(`Checking ${buildPath}:`, fs.existsSync(buildPath) ? 'EXISTS' : 'NOT FOUND');
-    if (fs.existsSync(buildPath)) {
-      logger.info(`Contents of ${buildPath}:`, fs.readdirSync(buildPath));
+    try {
+      logger.info(`Checking ${buildPath}:`, fs.existsSync(buildPath) ? 'EXISTS' : 'NOT FOUND');
+      if (fs.existsSync(buildPath)) {
+        logger.info(`Contents of ${buildPath}:`, fs.readdirSync(buildPath));
+      }
+    } catch (error) {
+      logger.error(`Error checking path ${buildPath}:`, error.message);
     }
   });
 
-  // Find the first valid build path
-  const buildPath = possibleBuildPaths.find(p => fs.existsSync(p) && fs.existsSync(path.join(p, 'index.html')));
+  // Find the first valid build path that contains index.html
+  const buildPath = possibleBuildPaths.find(p => {
+    try {
+      return fs.existsSync(p) && fs.existsSync(path.join(p, 'index.html'));
+    } catch (error) {
+      logger.error(`Error validating path ${p}:`, error.message);
+      return false;
+    }
+  });
 
   if (!buildPath) {
     logger.error('No valid build path found with index.html');
+    logger.error('Current directory structure:', JSON.stringify(listDirectoryContents(process.cwd()), null, 2));
   } else {
     logger.info('Using build path:', buildPath);
     
@@ -103,6 +117,26 @@ if (process.env.NODE_ENV === 'production') {
   logger.info('Server running in development mode');
 }
 
+// Helper function to recursively list directory contents
+function listDirectoryContents(dir, depth = 0, maxDepth = 3) {
+  if (depth >= maxDepth) return '[max depth reached]';
+  try {
+    const items = fs.readdirSync(dir);
+    const contents = {};
+    items.forEach(item => {
+      const fullPath = path.join(dir, item);
+      if (fs.statSync(fullPath).isDirectory()) {
+        contents[item] = listDirectoryContents(fullPath, depth + 1, maxDepth);
+      } else {
+        contents[item] = 'file';
+      }
+    });
+    return contents;
+  } catch (error) {
+    return `[error: ${error.message}]`;
+  }
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   logger.error('Error:', err);
@@ -124,6 +158,7 @@ const startServer = async () => {
   }
 };
 
+// Start server only if this file is run directly
 if (require.main === module) {
   startServer();
 }

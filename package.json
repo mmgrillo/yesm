@@ -8,10 +8,10 @@
     "npm": "10.2.3"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "cd yesm-back && npm install && node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "cd yesm-front && npm install && npm run build && mkdir -p ../build && cp -r build/* ../build/",
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build",
     "postinstall": "echo 'Checking build directory structure...'"
   },
   "dependencies": {
@@ -31,5 +31,10 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
-  }
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "yesm-front/node_modules",
+    "yesm-back/node_modules"
+  ]
 }
