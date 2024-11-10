@@ -26,7 +26,7 @@ const corsOrigins = process.env.NODE_ENV === 'production'
   : ['http://localhost:3000'];
 
 logger.info('Starting server configuration...');
-logger.info('CORS Origin:', corsOrigin);
+logger.info('CORS Origin:', corsOrigins);
 logger.info('Environment:', process.env.NODE_ENV);
 logger.info('Current directory:', process.cwd());
 logger.info('Directory contents:', fs.readdirSync(process.cwd()));
