@@ -151,21 +151,44 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    const port = process.env.PORT || config.port || 5001;
+    // Use Heroku's provided port or fallback to default
+    const port = process.env.PORT || 5001;
     
     app.listen(port, '0.0.0.0', () => {
       logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
-      logger.info(`CORS origin set to: ${corsOrigin}`);
+      logger.info('Current directory:', process.cwd());
+      logger.info('Node version:', process.version);
+      logger.info('Memory usage:', process.memoryUsage());
     });
   } catch (error) {
     logger.error('Failed to start the server:', error);
-    process.exit(1);
+    // Don't exit process on error, let Heroku handle restarts
+    throw error;
   }
 };
+// Proper error handling for uncaught exceptions
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception:', err);
+  // Give the logger time to write
+  setTimeout(() => {
+    process.exit(1);
+  }, 1000);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit here, just log
+});
 
 // Start server only if this file is run directly
 if (require.main === module) {
-  startServer();
+  startServer().catch(err => {
+    logger.error('Failed to start application:', err);
+    // Give the logger time to write
+    setTimeout(() => {
+      process.exit(1);
+    }, 1000);
+  });
 }
 
 module.exports = app;
