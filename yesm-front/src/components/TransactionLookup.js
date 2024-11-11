@@ -11,6 +11,8 @@ const API_URL = process.env.NODE_ENV === 'production'
   : 'http://localhost:5001/api';
 const TRANSACTIONS_PER_PAGE = 20;
 
+console.log('API_URL:', API_URL);
+
 const TransactionLookup = () => {
   const [walletAddresses, setWalletAddresses] = useState(['']);
   const [currentPage, setCurrentPage] = useState(1);

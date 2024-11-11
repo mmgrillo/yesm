@@ -12,23 +12,29 @@ const ZERION_API_KEY = process.env.ZERION_API_KEY;
 
 // Configure rate limiters with more lenient settings
 const createLimiter = (windowMs, max) => rateLimit({
-  windowMs,
-  max,
+  windowMs: windowMs,
+  max: max,
   message: { error: 'Too many requests, please try again later.' },
-  keyGenerator: (req) => `${req.ip}_${req.path}`,
+  standardHeaders: true, 
+  legacyHeaders: false, 
+  keyGenerator: (req) => {
+    // Use both IP and path for more granular control
+    return `${req.ip}_${req.path}`;
+  },
   handler: (req, res) => {
-    logger.warn('Rate limit exceeded:', { ip: req.ip, path: req.path });
     res.status(429).json({
       error: 'Too many requests',
-      message: 'Please try again later'
+      message: 'Please wait a moment before trying again',
+      retryAfter: Math.ceil(windowMs / 1000)
     });
   }
 });
 
 // Define rate limiters
-const walletLimiter = createLimiter(60 * 1000, 50);     // 50 requests per minute
-const priceLimiter = createLimiter(60 * 1000, 100);     // 100 requests per minute
-const marketDataLimiter = createLimiter(60 * 1000, 30); // 30 requests per minute
+const walletLimiter = createLimiter(60 * 1000, 100);     // 100 requests per minute
+const priceLimiter = createLimiter(60 * 1000, 200);      // 200 requests per minute
+const marketDataLimiter = createLimiter(60 * 1000, 50);  // 50 requests per minute
+
 
 // Apply rate limiters to routes
 router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
@@ -214,5 +220,11 @@ router.get('/volatility-indices/:timestamp', marketDataLimiter, async (req, res)
     res.status(error.response?.status || 500).json({ error: 'Failed to fetch volatility indices' });
   }
 });
+
+// Apply rate limiters to routes
+router.use('/wallet', walletLimiter);
+router.use('/token-prices', priceLimiter);
+router.use(['/fear-greed-index', '/macro-indicators', '/volatility-indices'], marketDataLimiter);
+
 
 module.exports = router;
