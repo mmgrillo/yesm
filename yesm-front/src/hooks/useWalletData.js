@@ -12,7 +12,7 @@ const useWalletData = (API_URL) => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/api/wallet/${walletAddress}/portfolio?currency=usd`);
+      const response = await axios.get(`${API_URL}/wallet/${walletAddress}/portfolio?currency=usd`);
       const { balance, tokens } = response.data;
 
       setWalletBalances((prevBalances) => [...prevBalances, balance || 0]);

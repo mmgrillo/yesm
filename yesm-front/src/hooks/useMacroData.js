@@ -13,7 +13,7 @@ const useMacroData = (timestamp) => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/macro-indicators/${timestamp}`
+          `${process.env.REACT_APP_API_URL}/macro-indicators/${timestamp}`
         );
         setMacroData(response.data);
         setError(null);

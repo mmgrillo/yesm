@@ -14,7 +14,7 @@ const useFearGreedIndex = (timestamp) => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/fear-greed-index/${timestamp}`
+          `${process.env.REACT_APP_API_URL}/fear-greed-index/${timestamp}`
         );
         setFearGreedIndex(response.data);
         setError(null);

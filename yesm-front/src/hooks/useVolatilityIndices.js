@@ -13,7 +13,7 @@ const useVolatilityIndices = (timestamp) => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/volatility-indices/${timestamp}`
+          `${process.env.REACT_APP_API_URL}/volatility-indices/${timestamp}`
         );
         setVolatilityData(response.data);
         setError(null);

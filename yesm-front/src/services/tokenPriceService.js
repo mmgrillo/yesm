@@ -29,7 +29,7 @@ const fetchTokenPrices = async (API_URL, tokens) => {
   }
 
   try {
-    const response = await axios.post(`${API_URL}/api/token-prices`, { tokens: tokensToFetch });
+    const response = await axios.post(`${API_URL}/token-prices`, { tokens: tokensToFetch });
     
     // Store new prices in cache and add to result
     Object.entries(response.data).forEach(([key, value]) => {
