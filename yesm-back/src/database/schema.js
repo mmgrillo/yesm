@@ -69,6 +69,32 @@ const createTables = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(token_id, timestamp)
       );
+      
+      CREATE TABLE IF NOT EXISTS token_prices_hourly (
+    id SERIAL PRIMARY KEY,
+    token_id INTEGER REFERENCES tokens(id),
+    hour TIMESTAMP NOT NULL,
+    open_price DECIMAL NOT NULL,
+    high_price DECIMAL NOT NULL,
+    low_price DECIMAL NOT NULL,
+    close_price DECIMAL NOT NULL,
+    average_price DECIMAL NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(token_id, hour)
+  );
+
+  CREATE TABLE IF NOT EXISTS token_prices_daily (
+    id SERIAL PRIMARY KEY,
+    token_id INTEGER REFERENCES tokens(id),
+    date DATE NOT NULL,
+    open_price DECIMAL NOT NULL,
+    high_price DECIMAL NOT NULL,
+    low_price DECIMAL NOT NULL,
+    close_price DECIMAL NOT NULL,
+    average_price DECIMAL NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(token_id, date)
+  );
     `);
 
     // Create indexes
@@ -76,6 +102,8 @@ const createTables = async () => {
       CREATE INDEX IF NOT EXISTS idx_fgi_timestamp ON fear_greed_index(timestamp);
       CREATE INDEX IF NOT EXISTS idx_m2_date ON m2_supply(date);
       CREATE INDEX IF NOT EXISTS idx_token_prices_timestamp ON token_prices(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_token_prices_hourly_token_hour ON token_prices_hourly(token_id, hour);
+      CREATE INDEX IF NOT EXISTS idx_token_prices_daily_token_date ON token_prices_daily(token_id, date);
     `);
 
     await client.query('COMMIT');
