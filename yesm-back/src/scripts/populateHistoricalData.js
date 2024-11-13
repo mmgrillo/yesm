@@ -1,4 +1,3 @@
-// src/scripts/populateHistoricalData.js
 const axios = require('axios');
 const { pool } = require('../database/schema');
 const logger = require('../utils/logger');
