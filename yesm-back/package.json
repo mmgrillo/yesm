@@ -12,7 +12,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-db": "node src/scripts/testConnection.js",
     "init-db": "node src/scripts/initDatabase.js",
-    "populate-data": "node src/scripts/populateHistoricalData.js"
+    "populate-data": "node src/scripts/populateHistoricalData.js",
+    "test-script": "node src/scripts/test.js"
   },
   "keywords": [],
   "author": "",
