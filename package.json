@@ -12,7 +12,7 @@
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "heroku-postbuild": "cd yesm-front && npm install && npm run build",
-    "postinstall": "echo 'Checking build directory structure...'"
+    "postinstall": "cd yesm-back && npm install"
   },
   "dependencies": {
     "axios": "^1.7.4",
