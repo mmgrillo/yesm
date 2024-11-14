@@ -1,15 +1,15 @@
+// useMarketData.js
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Cache for frontend
 const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
 
-const useMarketData = (timestamp) => {
+export const useMarketData = (timestamp) => {
   const [marketData, setMarketData] = useState({
     fearGreed: null,
-    macro: null,
-    volatility: null
+    macroData: null,
+    volatilityData: null
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ const useMarketData = (timestamp) => {
       setIsLoading(true);
       setError(null);
 
-      const getCachedOrFetch = async (endpoint) => {
+      const fetchWithRetry = async (endpoint, retries = 3) => {
         const cacheKey = `${endpoint}_${timestamp}`;
         const cachedData = cache.get(cacheKey);
         
@@ -29,35 +29,43 @@ const useMarketData = (timestamp) => {
           return cachedData.data;
         }
 
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/${endpoint}/${timestamp}`,
-            { timeout: 5000 } // 5 second timeout
-          );
-          
-          cache.set(cacheKey, {
-            data: response.data,
-            timestamp: Date.now()
-          });
-          
-          return response.data;
-        } catch (error) {
-          console.error(`Error fetching ${endpoint}:`, error);
-          return null;
+        for (let i = 0; i < retries; i++) {
+          try {
+            const response = await axios.get(
+              `${process.env.REACT_APP_API_URL}/api/${endpoint}/${timestamp}`,
+              { 
+                timeout: 10000,
+                headers: {
+                  'Cache-Control': 'no-cache',
+                  'Pragma': 'no-cache',
+                  'Expires': '0'
+                }
+              }
+            );
+            
+            cache.set(cacheKey, {
+              data: response.data,
+              timestamp: Date.now()
+            });
+            
+            return response.data;
+          } catch (error) {
+            if (i === retries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+          }
         }
       };
 
       try {
-        const [fearGreedData, macroData, volatilityData] = await Promise.allSettled([
-          getCachedOrFetch('fear-greed-index'),
-          getCachedOrFetch('macro-indicators'),
-          getCachedOrFetch('volatility-indices')
+        const [fearGreedData, macroData] = await Promise.all([
+          fetchWithRetry('fear-greed-index').catch(() => null),
+          fetchWithRetry('macro-indicators').catch(() => null)
         ]);
 
         setMarketData({
-          fearGreed: fearGreedData.status === 'fulfilled' ? fearGreedData.value : null,
-          macro: macroData.status === 'fulfilled' ? macroData.value : null,
-          volatility: volatilityData.status === 'fulfilled' ? volatilityData.value : null
+          fearGreed: fearGreedData,
+          macroData: macroData,
+          volatilityData: null // Removed as it's not in database
         });
       } catch (error) {
         console.error('Error fetching market data:', error);
@@ -73,4 +81,55 @@ const useMarketData = (timestamp) => {
   return { marketData, isLoading, error };
 };
 
-export default useMarketData;
+// useTokenPrices.js
+export const useTokenPrices = (API_URL, walletTransactions) => {
+  const [tokenPrices, setTokenPrices] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchPrices = async (tokens) => {
+    try {
+      const response = await axios.post(`${API_URL}/token-prices`, { tokens });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching token prices:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!walletTransactions?.length) return;
+      
+      setIsLoading(true);
+      const uniqueTokens = new Map();
+
+      walletTransactions.forEach(transaction => {
+        if (!transaction.token_address || !transaction.chain) return;
+        
+        const key = `${transaction.chain}:${transaction.token_address}`;
+        if (!uniqueTokens.has(key)) {
+          uniqueTokens.set(key, {
+            chain: transaction.chain,
+            address: transaction.token_address,
+            symbol: transaction.token_symbol
+          });
+        }
+      });
+
+      try {
+        const prices = await fetchPrices(Array.from(uniqueTokens.values()));
+        setTokenPrices(prices);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [API_URL, walletTransactions]);
+
+  return { tokenPrices, isLoading, error };
+};

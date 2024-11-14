@@ -1,42 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const ApiService = require('../services/apiService');
+const { pool } = require('../database/schema');
 const CacheService = require('../services/cacheService');
 const rateLimit = require('express-rate-limit');
 const logger = require('../utils/logger');
 require('dotenv').config();
 
-const ZERION_API_URL = 'https://api.zerion.io/v1';
-const ZERION_API_KEY = process.env.ZERION_API_KEY;
-
-// Configure rate limiters with more lenient settings
+// Rate limiter configuration
 const createLimiter = (windowMs, max) => rateLimit({
-  windowMs: windowMs,
-  max: max,
+  windowMs,
+  max,
   message: { error: 'Too many requests, please try again later.' },
-  standardHeaders: true, 
-  legacyHeaders: false, 
-  keyGenerator: (req) => {
-    // Use both IP and path for more granular control
-    return `${req.ip}_${req.path}`;
-  },
-  handler: (req, res) => {
-    res.status(429).json({
-      error: 'Too many requests',
-      message: 'Please wait a moment before trying again',
-      retryAfter: Math.ceil(windowMs / 1000)
-    });
-  }
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// Define rate limiters
-const walletLimiter = createLimiter(60 * 1000, 100);     // 100 requests per minute
-const priceLimiter = createLimiter(60 * 1000, 200);      // 200 requests per minute
-const marketDataLimiter = createLimiter(60 * 1000, 50);  // 50 requests per minute
+const walletLimiter = createLimiter(60 * 1000, 100);
+const priceLimiter = createLimiter(60 * 1000, 200);
+const marketDataLimiter = createLimiter(60 * 1000, 50);
 
-
-// Apply rate limiters to routes
+// Get wallet transactions with pagination
 router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
   const { walletAddress } = req.params;
   const page = parseInt(req.query.page) || 1;
@@ -47,48 +30,35 @@ router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Wallet address is required.' });
   }
 
-  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions?limit=${limit}&offset=${offset}&filter[operation_types]=trade`;
-  const ZERION_API_KEY = process.env.ZERION_API_KEY;
-
+  const client = await pool.connect();
   try {
-    const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
-    const response = await axios.get(ZERION_API_URL, {
-      headers: {
-        accept: 'application/json',
-        Authorization: `Basic ${encodedApiKey}`,
-      },
-    });
+    // Query transactions from database
+    const result = await client.query(`
+      SELECT t.*, tp.price as token_price
+      FROM transactions t
+      LEFT JOIN token_prices tp ON t.token_id = tp.token_id
+      WHERE t.wallet_address = $1
+      ORDER BY t.timestamp DESC
+      LIMIT $2 OFFSET $3
+    `, [walletAddress, limit, offset]);
 
-    const transactions = response.data.data;
-    if (!transactions || transactions.length === 0) {
-      return res.status(404).json({ error: 'No relevant transactions found.' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No transactions found.' });
     }
 
-    res.json(transactions);
+    res.json(result.rows);
   } catch (error) {
-    logger.error('Error fetching wallet transactions:', error.message);
-    if (error.response?.status === 429) {
-      return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
-    }
-    return res.status(500).json({ error: 'An error occurred while fetching transactions.' });
+    logger.error('Error fetching wallet transactions:', error);
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  } finally {
+    client.release();
   }
 });
 
-function aggregateTransactions(transactions) {
-  const transactionMap = {};
-  transactions.forEach(transaction => {
-    const tradeId = transaction.attributes.trade_id || transaction.transactionHash;
-    if (!transactionMap[tradeId]) {
-      transactionMap[tradeId] = { ...transaction, transfers: [] };
-    }
-    transactionMap[tradeId].transfers.push(...transaction.attributes.transfers);
-  });
-  return Object.values(transactionMap);
-}
-
-// Endpoint to get token prices
+// Get token prices from database
 router.post('/token-prices', priceLimiter, async (req, res) => {
-  const tokens = req.body.tokens;
+  const { tokens } = req.body;
+  const client = await pool.connect();
   
   try {
     const prices = {};
@@ -96,135 +66,101 @@ router.post('/token-prices', priceLimiter, async (req, res) => {
     for (const token of tokens) {
       const key = token.symbol?.toLowerCase() === 'eth' ? 'ethereum:eth' : `${token.chain}:${token.address}`;
       
-      // Try to get from cache first
+      // Try cache first
       const cachedPrice = CacheService.get(key);
       if (cachedPrice) {
         prices[key] = cachedPrice;
         continue;
       }
 
-      // If not in cache, fetch from Zerion
-      const apiUrl = `${ZERION_API_URL}/fungibles/${token.address}?fields=market_data.price`;
-      const response = await axios.get(apiUrl, {
-        headers: {
-          Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
-          accept: 'application/json',
-        },
-      });
+      // Query from database
+      const result = await client.query(`
+        SELECT tp.price, t.symbol
+        FROM token_prices tp
+        JOIN tokens t ON t.id = tp.token_id
+        WHERE t.address = $1 AND t.chain = $2
+        ORDER BY tp.timestamp DESC
+        LIMIT 1
+      `, [token.address, token.chain]);
 
-      const price = response.data.data.attributes.market_data?.price;
-      prices[key] = {
-        usd: price !== undefined ? price : null,
-        symbol: token.symbol,
-      };
-
-      // Cache the result
-      CacheService.set(key, prices[key]);
+      if (result.rows.length > 0) {
+        prices[key] = {
+          usd: result.rows[0].price,
+          symbol: result.rows[0].symbol
+        };
+        CacheService.set(key, prices[key]);
+      }
     }
 
     res.json(prices);
   } catch (error) {
-    logger.error('Error fetching token prices:', error.message);
+    logger.error('Error fetching token prices:', error);
     res.status(500).json({ error: 'Failed to fetch token prices' });
+  } finally {
+    client.release();
   }
 });
 
-// Route fetch wallet portfolio
-router.get('/wallet/:walletAddress/portfolio', walletLimiter, async (req, res) => {
-  const { walletAddress } = req.params;
-
-  if (!walletAddress) {
-    return res.status(400).json({ error: 'Wallet address is required.' });
-  }
-
-  try {
-    const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
-    const ZERION_PORTFOLIO_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/portfolio?currency=usd`;
-
-    const portfolioResponse = await axios.get(ZERION_PORTFOLIO_URL, {
-      headers: {
-        accept: 'application/json',
-        Authorization: `Basic ${encodedApiKey}`,
-      },
-    });
-
-    const portfolioData = portfolioResponse.data.data;
-    const balance = portfolioData.attributes.total?.positions || 0;
-    const chainBalances = portfolioData.attributes.positions_distribution_by_chain || {};
-    const tokens = Object.entries(chainBalances).map(([chain, amount]) => ({
-      chain,
-      amount,
-    }));
-
-    res.json({ balance, tokens });
-  } catch (error) {
-    logger.error('Error fetching wallet portfolio:', error.message);
-    return res.status(500).json({ error: 'An error occurred while fetching wallet portfolio.' });
-  }
-});
-
-// Market data endpoints
+// Market data endpoints using database
 router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) => {
+  const { timestamp } = req.params;
+  const client = await pool.connect();
+  
   try {
-    const { timestamp } = req.params;
-    const cacheKey = CacheService.generateKey('fear-greed', timestamp);
-    const cachedData = CacheService.get(cacheKey);
+    const result = await client.query(`
+      SELECT * FROM fear_greed_index
+      WHERE timestamp <= $1
+      ORDER BY timestamp DESC
+      LIMIT 1
+    `, [timestamp]);
 
-    if (cachedData) {
-      return res.json(cachedData);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No fear & greed data found' });
     }
 
-    const fgiData = await ApiService.fetchFearGreedIndex(timestamp);
-    CacheService.set(cacheKey, fgiData);
-    res.json(fgiData);
+    res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Error fetching Fear & Greed Index:', error.message);
-    res.status(error.response?.status || 500).json({ error: 'Failed to fetch Fear & Greed Index' });
+    logger.error('Error fetching fear & greed index:', error);
+    res.status(500).json({ error: 'Failed to fetch fear & greed index' });
+  } finally {
+    client.release();
   }
 });
 
 router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) => {
+  const { timestamp } = req.params;
+  const client = await pool.connect();
+  
   try {
-    const { timestamp } = req.params;
-    const cacheKey = CacheService.generateKey('macro', timestamp);
-    const cachedData = CacheService.get(cacheKey);
+    const result = await client.query(`
+      SELECT * FROM m2_supply
+      WHERE date <= to_timestamp($1)::date
+      ORDER BY date DESC
+      LIMIT 12
+    `, [timestamp]);
 
-    if (cachedData) {
-      return res.json(cachedData);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No macro data found' });
     }
 
-    const macroData = await ApiService.fetchMacroIndicators(timestamp);
-    CacheService.set(cacheKey, macroData);
+    const currentValue = result.rows[0].value;
+    const threeMonthValue = result.rows[3]?.value;
+    const yearAgoValue = result.rows[11]?.value;
+
+    const macroData = {
+      currentValue,
+      threeMonthChange: threeMonthValue ? ((currentValue - threeMonthValue) / threeMonthValue) * 100 : null,
+      yearChange: yearAgoValue ? ((currentValue - yearAgoValue) / yearAgoValue) * 100 : null,
+      observations: result.rows
+    };
+
     res.json(macroData);
   } catch (error) {
-    logger.error('Error fetching macro indicators:', error.message);
-    res.status(error.response?.status || 500).json({ error: 'Failed to fetch macro indicators' });
+    logger.error('Error fetching macro indicators:', error);
+    res.status(500).json({ error: 'Failed to fetch macro indicators' });
+  } finally {
+    client.release();
   }
 });
-
-router.get('/volatility-indices/:timestamp', marketDataLimiter, async (req, res) => {
-  try {
-    const { timestamp } = req.params;
-    const cacheKey = CacheService.generateKey('volatility', timestamp);
-    const cachedData = CacheService.get(cacheKey);
-
-    if (cachedData) {
-      return res.json(cachedData);
-    }
-
-    const volatilityData = await ApiService.fetchVolatilityIndices(timestamp);
-    CacheService.set(cacheKey, volatilityData);
-    res.json(volatilityData);
-  } catch (error) {
-    logger.error('Error fetching volatility indices:', error.message);
-    res.status(error.response?.status || 500).json({ error: 'Failed to fetch volatility indices' });
-  }
-});
-
-// Apply rate limiters to routes
-router.use('/wallet', walletLimiter);
-router.use('/token-prices', priceLimiter);
-router.use(['/fear-greed-index', '/macro-indicators', '/volatility-indices'], marketDataLimiter);
-
 
 module.exports = router;
