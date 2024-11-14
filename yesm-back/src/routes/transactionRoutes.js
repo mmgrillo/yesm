@@ -184,11 +184,18 @@ router.post('/token-prices', priceLimiter, async (req, res) => {
 });
 
 // Market data endpoints using database
+// Market data endpoints
 router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) => {
   const { timestamp } = req.params;
   const client = await pool.connect();
   
   try {
+    // Check cache first
+    const cacheKey = CacheService.generateKey('fear-greed', timestamp);
+    const cachedData = CacheService.get(cacheKey);
+    if (cachedData) return res.json(cachedData);
+
+    // Try database
     const result = await client.query(`
       SELECT * FROM fear_greed_index
       WHERE timestamp <= $1
@@ -196,14 +203,30 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
       LIMIT 1
     `, [timestamp]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No fear & greed data found' });
+    if (result.rows.length > 0) {
+      const data = result.rows[0];
+      CacheService.set(cacheKey, data);
+      return res.json(data);
     }
 
-    res.json(result.rows[0]);
+    // Fallback to API
+    const fgiData = await ApiService.fetchFearGreedIndex(timestamp);
+    if (fgiData) {
+      // Store in database for future use
+      await client.query(`
+        INSERT INTO fear_greed_index (timestamp, value, classification)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (timestamp) DO NOTHING
+      `, [fgiData.timestamp, fgiData.value, fgiData.classification]);
+      
+      CacheService.set(cacheKey, fgiData);
+      res.json(fgiData);
+    } else {
+      res.status(404).json({ error: 'Data not found' });
+    }
   } catch (error) {
-    logger.error('Error fetching fear & greed index:', error);
-    res.status(500).json({ error: 'Failed to fetch fear & greed index' });
+    logger.error('Error fetching Fear & Greed Index:', error);
+    res.status(500).json({ error: 'Failed to fetch Fear & Greed Index' });
   } finally {
     client.release();
   }
@@ -212,8 +235,14 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
 router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) => {
   const { timestamp } = req.params;
   const client = await pool.connect();
-  
+
   try {
+    // Check cache first
+    const cacheKey = CacheService.generateKey('macro', timestamp);
+    const cachedData = CacheService.get(cacheKey);
+    if (cachedData) return res.json(cachedData);
+
+    // Try database
     const result = await client.query(`
       SELECT * FROM m2_supply
       WHERE date <= to_timestamp($1)::date
@@ -221,22 +250,41 @@ router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) =
       LIMIT 12
     `, [timestamp]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No macro data found' });
+    if (result.rows.length > 0) {
+      const currentValue = result.rows[0].value;
+      const threeMonthValue = result.rows[3]?.value;
+      const yearAgoValue = result.rows[11]?.value;
+
+      const macroData = {
+        currentValue,
+        threeMonthChange: threeMonthValue ? ((currentValue - threeMonthValue) / threeMonthValue) * 100 : null,
+        yearChange: yearAgoValue ? ((currentValue - yearAgoValue) / yearAgoValue) * 100 : null,
+        observations: result.rows
+      };
+
+      CacheService.set(cacheKey, macroData);
+      return res.json(macroData);
     }
 
-    const currentValue = result.rows[0].value;
-    const threeMonthValue = result.rows[3]?.value;
-    const yearAgoValue = result.rows[11]?.value;
+    // Fallback to API
+    const macroData = await ApiService.fetchMacroIndicators(timestamp);
+    if (macroData) {
+      // Store in database
+      try {
+        await client.query(`
+          INSERT INTO m2_supply (date, value)
+          VALUES (to_timestamp($1)::date, $2)
+          ON CONFLICT (date) DO NOTHING
+        `, [timestamp, macroData.currentValue]);
+      } catch (dbError) {
+        logger.error('Error storing macro data:', dbError);
+      }
 
-    const macroData = {
-      currentValue,
-      threeMonthChange: threeMonthValue ? ((currentValue - threeMonthValue) / threeMonthValue) * 100 : null,
-      yearChange: yearAgoValue ? ((currentValue - yearAgoValue) / yearAgoValue) * 100 : null,
-      observations: result.rows
-    };
-
-    res.json(macroData);
+      CacheService.set(cacheKey, macroData);
+      res.json(macroData);
+    } else {
+      res.status(404).json({ error: 'Data not found' });
+    }
   } catch (error) {
     logger.error('Error fetching macro indicators:', error);
     res.status(500).json({ error: 'Failed to fetch macro indicators' });
