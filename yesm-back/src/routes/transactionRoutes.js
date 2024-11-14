@@ -20,7 +20,7 @@ const priceLimiter = createLimiter(60 * 1000, 200);
 const marketDataLimiter = createLimiter(60 * 1000, 50);
 
 // Get wallet transactions with pagination
-router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
+router.get('/wallet/:walletAddress', async (req, res) => {
   const { walletAddress } = req.params;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 25;
@@ -32,31 +32,38 @@ router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
 
   const client = await pool.connect();
   try {
-    // Query transactions from database
-    const result = await client.query(`
-      SELECT t.*, tp.price as token_price
-      FROM transactions t
-      LEFT JOIN token_prices tp ON t.token_id = tp.token_id
-      WHERE t.wallet_address = $1
-      ORDER BY t.timestamp DESC
-      LIMIT $2 OFFSET $3
-    `, [walletAddress, limit, offset]);
+    // First get token information
+    const tokenResult = await client.query(`
+      SELECT t.id, t.symbol, t.chain, t.address
+      FROM tokens t
+      WHERE t.chain = $1
+      ORDER BY t.symbol
+    `, ['ethereum']); // Default to ethereum chain
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No transactions found.' });
-    }
+    // Get token prices
+    const priceResult = await client.query(`
+      SELECT tp.token_id, tp.price, tp.timestamp
+      FROM token_prices tp
+      INNER JOIN tokens t ON t.id = tp.token_id
+      ORDER BY tp.timestamp DESC
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
 
-    res.json(result.rows);
+    const result = {
+      tokens: tokenResult.rows,
+      prices: priceResult.rows
+    };
+
+    res.json(result);
   } catch (error) {
-    logger.error('Error fetching wallet transactions:', error);
-    res.status(500).json({ error: 'Failed to fetch transactions' });
+    logger.error('Error fetching wallet data:', error);
+    res.status(500).json({ error: 'Failed to fetch wallet data' });
   } finally {
     client.release();
   }
 });
 
-// Get token prices from database
-router.post('/token-prices', priceLimiter, async (req, res) => {
+router.post('/token-prices', async (req, res) => {
   const { tokens } = req.body;
   const client = await pool.connect();
   
@@ -64,31 +71,21 @@ router.post('/token-prices', priceLimiter, async (req, res) => {
     const prices = {};
     
     for (const token of tokens) {
-      const key = token.symbol?.toLowerCase() === 'eth' ? 'ethereum:eth' : `${token.chain}:${token.address}`;
-      
-      // Try cache first
-      const cachedPrice = CacheService.get(key);
-      if (cachedPrice) {
-        prices[key] = cachedPrice;
-        continue;
-      }
-
-      // Query from database
       const result = await client.query(`
-        SELECT tp.price, t.symbol
+        SELECT tp.price, t.symbol, t.chain, t.address
         FROM token_prices tp
         JOIN tokens t ON t.id = tp.token_id
-        WHERE t.address = $1 AND t.chain = $2
+        WHERE t.chain = $1 AND t.address = $2
         ORDER BY tp.timestamp DESC
         LIMIT 1
-      `, [token.address, token.chain]);
+      `, [token.chain || 'ethereum', token.address]);
 
-      if (result.rows.length > 0) {
+      if (result.rows[0]) {
+        const key = `${result.rows[0].chain}:${result.rows[0].address}`;
         prices[key] = {
           usd: result.rows[0].price,
           symbol: result.rows[0].symbol
         };
-        CacheService.set(key, prices[key]);
       }
     }
 
