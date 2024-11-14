@@ -133,3 +133,5 @@ export const useTokenPrices = (API_URL, walletTransactions) => {
 
   return { tokenPrices, isLoading, error };
 };
+
+export default useMarketData;
