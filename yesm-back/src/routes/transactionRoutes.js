@@ -1,26 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../database/schema');
+const axios = require('axios');
+const ApiService = require('../services/apiService');
 const CacheService = require('../services/cacheService');
 const rateLimit = require('express-rate-limit');
 const logger = require('../utils/logger');
 require('dotenv').config();
 
-// Rate limiter configuration
+// Rate limiter configuration remains the same
 const createLimiter = (windowMs, max) => rateLimit({
   windowMs,
   max,
-  message: { error: 'Too many requests, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false
+  message: { error: 'Too many requests, please try again later.' }
 });
 
 const walletLimiter = createLimiter(60 * 1000, 100);
 const priceLimiter = createLimiter(60 * 1000, 200);
 const marketDataLimiter = createLimiter(60 * 1000, 50);
 
-// Get wallet transactions with pagination
-router.get('/wallet/:walletAddress', async (req, res) => {
+router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
   const { walletAddress } = req.params;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 25;
@@ -30,62 +28,149 @@ router.get('/wallet/:walletAddress', async (req, res) => {
     return res.status(400).json({ error: 'Wallet address is required.' });
   }
 
-  const client = await pool.connect();
+  const ZERION_API_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/transactions?filter[operation_types]=trade&limit=${limit}&offset=${offset}`;
+  const ZERION_API_KEY = process.env.ZERION_API_KEY;
+
   try {
-    // First get token information
-    const tokenResult = await client.query(`
-      SELECT t.id, t.symbol, t.chain, t.address
-      FROM tokens t
-      WHERE t.chain = $1
-      ORDER BY t.symbol
-    `, ['ethereum']); // Default to ethereum chain
+    const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
+    const response = await axios.get(ZERION_API_URL, {
+      headers: {
+        accept: 'application/json',
+        Authorization: `Basic ${encodedApiKey}`,
+      },
+    });
 
-    // Get token prices
-    const priceResult = await client.query(`
-      SELECT tp.token_id, tp.price, tp.timestamp
-      FROM token_prices tp
-      INNER JOIN tokens t ON t.id = tp.token_id
-      ORDER BY tp.timestamp DESC
-      LIMIT $1 OFFSET $2
-    `, [limit, offset]);
+    const transactions = response.data.data;
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({ error: 'No relevant transactions found.' });
+    }
 
-    const result = {
-      tokens: tokenResult.rows,
-      prices: priceResult.rows
-    };
-
-    res.json(result);
+    res.json(transactions);
   } catch (error) {
-    logger.error('Error fetching wallet data:', error);
-    res.status(500).json({ error: 'Failed to fetch wallet data' });
-  } finally {
-    client.release();
+    logger.error('Error fetching wallet transactions:', error);
+    if (error.response?.status === 429) {
+      return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    }
+    return res.status(500).json({ error: 'Failed to fetch wallet transactions.' });
   }
 });
 
-router.post('/token-prices', async (req, res) => {
-  const { tokens } = req.body;
+// Portfolio endpoint
+router.get('/wallet/:walletAddress/portfolio', walletLimiter, async (req, res) => {
+  const { walletAddress } = req.params;
+  const ZERION_API_KEY = process.env.ZERION_API_KEY;
+
+  if (!walletAddress) {
+    return res.status(400).json({ error: 'Wallet address is required.' });
+  }
+
+  try {
+    const encodedApiKey = Buffer.from(`${ZERION_API_KEY}:`).toString('base64');
+    const ZERION_PORTFOLIO_URL = `https://api.zerion.io/v1/wallets/${walletAddress}/portfolio?currency=usd`;
+
+    const portfolioResponse = await axios.get(ZERION_PORTFOLIO_URL, {
+      headers: {
+        accept: 'application/json',
+        Authorization: `Basic ${encodedApiKey}`,
+      },
+    });
+
+    const portfolioData = portfolioResponse.data.data;
+    const balance = portfolioData.attributes.total?.positions || 0;
+    const chainBalances = portfolioData.attributes.positions_distribution_by_chain || {};
+    const tokens = Object.entries(chainBalances).map(([chain, amount]) => ({
+      chain,
+      amount,
+    }));
+
+    res.json({ balance, tokens });
+  } catch (error) {
+    logger.error('Error fetching wallet portfolio:', error);
+    return res.status(500).json({ error: 'Failed to fetch wallet portfolio.' });
+  }
+});
+
+router.post('/token-prices', priceLimiter, async (req, res) => {
+  const tokens = req.body.tokens;
   const client = await pool.connect();
+  const RETENTION_DAYS = 30; // Keep 30 days of historical prices
   
   try {
     const prices = {};
     
+    // First cleanup old prices
+    await client.query(`
+      DELETE FROM token_prices 
+      WHERE timestamp < extract(epoch from (now() - interval '${RETENTION_DAYS} days'))
+    `);
+    
     for (const token of tokens) {
-      const result = await client.query(`
-        SELECT tp.price, t.symbol, t.chain, t.address
+      const key = token.symbol?.toLowerCase() === 'eth' ? 'ethereum:eth' : `${token.chain}:${token.address}`;
+      
+      // Try cache first
+      const cachedPrice = CacheService.get(key);
+      if (cachedPrice) {
+        prices[key] = cachedPrice;
+        continue;
+      }
+
+      // Try database for recent price (last 24 hours)
+      const dbResult = await client.query(`
+        SELECT tp.price, t.symbol
         FROM token_prices tp
         JOIN tokens t ON t.id = tp.token_id
-        WHERE t.chain = $1 AND t.address = $2
+        WHERE t.chain = $1 
+        AND t.address = $2
+        AND tp.timestamp > extract(epoch from (now() - interval '24 hours'))
         ORDER BY tp.timestamp DESC
         LIMIT 1
       `, [token.chain || 'ethereum', token.address]);
 
-      if (result.rows[0]) {
-        const key = `${result.rows[0].chain}:${result.rows[0].address}`;
+      if (dbResult.rows[0]) {
         prices[key] = {
-          usd: result.rows[0].price,
-          symbol: result.rows[0].symbol
+          usd: dbResult.rows[0].price,
+          symbol: dbResult.rows[0].symbol
         };
+        CacheService.set(key, prices[key]);
+        continue;
+      }
+
+      // Fallback to Zerion API
+      try {
+        const apiUrl = `${ZERION_API_URL}/fungibles/${token.address}?fields=market_data.price`;
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: `Basic ${Buffer.from(ZERION_API_KEY + ':').toString('base64')}`,
+            accept: 'application/json',
+          },
+        });
+
+        const price = response.data.data.attributes.market_data?.price;
+        prices[key] = {
+          usd: price !== undefined ? price : null,
+          symbol: token.symbol,
+        };
+
+        // Store only current price
+        if (price !== undefined) {
+          await client.query(`
+            WITH token_insert AS (
+              INSERT INTO tokens (symbol, chain, address)
+              VALUES ($1, $2, $3)
+              ON CONFLICT (chain, address) DO UPDATE 
+              SET symbol = EXCLUDED.symbol
+              RETURNING id
+            )
+            INSERT INTO token_prices (token_id, price, timestamp)
+            SELECT id, $4, extract(epoch from now())
+            FROM token_insert
+          `, [token.symbol, token.chain || 'ethereum', token.address, price]);
+        }
+
+        CacheService.set(key, prices[key]);
+      } catch (error) {
+        logger.error('Error fetching from Zerion:', error);
+        prices[key] = { usd: null, symbol: token.symbol };
       }
     }
 
