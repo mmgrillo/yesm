@@ -184,9 +184,8 @@ router.post('/token-prices', priceLimiter, async (req, res) => {
 });
 
 // Market data endpoints using database
-// Market data endpoints
 router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) => {
-  const { timestamp } = req.params;
+  const timestamp = parseInt(req.params.timestamp);
   const client = await pool.connect();
   
   try {
@@ -195,13 +194,17 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
     const cachedData = CacheService.get(cacheKey);
     if (cachedData) return res.json(cachedData);
 
-    // Try database
+    // Round timestamp to start of day for database query
+    const startOfDay = Math.floor(timestamp / 86400) * 86400;
+    const endOfDay = startOfDay + 86399;
+
+    // Try database first with day range
     const result = await client.query(`
       SELECT * FROM fear_greed_index
-      WHERE timestamp <= $1
-      ORDER BY timestamp DESC
+      WHERE timestamp BETWEEN $1 AND $2
+      ORDER BY ABS(timestamp - $3)
       LIMIT 1
-    `, [timestamp]);
+    `, [startOfDay, endOfDay, timestamp]);
 
     if (result.rows.length > 0) {
       const data = result.rows[0];
@@ -212,20 +215,28 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
     // Fallback to API
     const fgiData = await ApiService.fetchFearGreedIndex(timestamp);
     if (fgiData) {
-      // Store in database for future use
+      // Store in database at start of day
+      const dayTimestamp = startOfDay;
       await client.query(`
         INSERT INTO fear_greed_index (timestamp, value, classification)
         VALUES ($1, $2, $3)
-        ON CONFLICT (timestamp) DO NOTHING
-      `, [fgiData.timestamp, fgiData.value, fgiData.classification]);
+        ON CONFLICT (timestamp) 
+        DO UPDATE SET 
+          value = EXCLUDED.value,
+          classification = EXCLUDED.classification
+      `, [dayTimestamp, fgiData.value, fgiData.classification]);
       
       CacheService.set(cacheKey, fgiData);
       res.json(fgiData);
     } else {
-      res.status(404).json({ error: 'Data not found' });
+      res.status(404).json({ error: 'Fear & Greed data not found' });
     }
   } catch (error) {
-    logger.error('Error fetching Fear & Greed Index:', error);
+    logger.error('Error fetching Fear & Greed Index:', {
+      error: error.message,
+      timestamp,
+      stack: error.stack
+    });
     res.status(500).json({ error: 'Failed to fetch Fear & Greed Index' });
   } finally {
     client.release();
@@ -233,7 +244,7 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
 });
 
 router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) => {
-  const { timestamp } = req.params;
+  const timestamp = parseInt(req.params.timestamp);
   const client = await pool.connect();
 
   try {
@@ -242,11 +253,17 @@ router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) =
     const cachedData = CacheService.get(cacheKey);
     if (cachedData) return res.json(cachedData);
 
-    // Try database
+    // Convert timestamp to date for database query
     const result = await client.query(`
-      SELECT * FROM m2_supply
-      WHERE date <= to_timestamp($1)::date
-      ORDER BY date DESC
+      WITH date_value AS (
+        SELECT TO_TIMESTAMP($1) AT TIME ZONE 'UTC' AS query_date
+      )
+      SELECT m2.*, 
+             date_value.query_date
+      FROM m2_supply m2
+      CROSS JOIN date_value
+      WHERE m2.date <= (date_value.query_date)::date
+      ORDER BY m2.date DESC
       LIMIT 12
     `, [timestamp]);
 
@@ -259,7 +276,12 @@ router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) =
         currentValue,
         threeMonthChange: threeMonthValue ? ((currentValue - threeMonthValue) / threeMonthValue) * 100 : null,
         yearChange: yearAgoValue ? ((currentValue - yearAgoValue) / yearAgoValue) * 100 : null,
-        observations: result.rows
+        observations: result.rows.map(row => ({
+          date: row.date,
+          value: row.value
+        })),
+        timestamp: timestamp,
+        requestedDate: result.rows[0].query_date
       };
 
       CacheService.set(cacheKey, macroData);
@@ -269,24 +291,44 @@ router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) =
     // Fallback to API
     const macroData = await ApiService.fetchMacroIndicators(timestamp);
     if (macroData) {
-      // Store in database
+      // Store in database with proper date conversion
       try {
         await client.query(`
           INSERT INTO m2_supply (date, value)
-          VALUES (to_timestamp($1)::date, $2)
-          ON CONFLICT (date) DO NOTHING
+          VALUES (TO_TIMESTAMP($1) AT TIME ZONE 'UTC'::date, $2)
+          ON CONFLICT (date) 
+          DO UPDATE SET value = EXCLUDED.value
         `, [timestamp, macroData.currentValue]);
+        
+        // Also store historical observations if available
+        if (macroData.observations?.length > 0) {
+          for (const obs of macroData.observations) {
+            await client.query(`
+              INSERT INTO m2_supply (date, value)
+              VALUES ($1::date, $2)
+              ON CONFLICT (date) DO NOTHING
+            `, [obs.date, obs.value]);
+          }
+        }
       } catch (dbError) {
-        logger.error('Error storing macro data:', dbError);
+        logger.error('Error storing macro data:', {
+          error: dbError.message,
+          timestamp,
+          stack: dbError.stack
+        });
       }
 
       CacheService.set(cacheKey, macroData);
       res.json(macroData);
     } else {
-      res.status(404).json({ error: 'Data not found' });
+      res.status(404).json({ error: 'Macro data not found' });
     }
   } catch (error) {
-    logger.error('Error fetching macro indicators:', error);
+    logger.error('Error fetching macro indicators:', {
+      error: error.message,
+      timestamp,
+      stack: error.stack
+    });
     res.status(500).json({ error: 'Failed to fetch macro indicators' });
   } finally {
     client.release();
