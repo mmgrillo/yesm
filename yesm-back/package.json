@@ -13,7 +13,9 @@
     "test-db": "node src/scripts/testConnection.js",
     "init-db": "node src/scripts/initDatabase.js",
     "populate-data": "node src/scripts/populateHistoricalData.js",
-    "test-script": "node src/scripts/test.js"
+    "test-script": "node src/scripts/test.js",
+    "populate-prices": "node src/scripts/populateTokenPrices.js",
+    "update-prices": "node -e 'require(\"./src/scripts/populateTokenPrices\").updateRecentPrices()'"
   },
   "keywords": [],
   "author": "",

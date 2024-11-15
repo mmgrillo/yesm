@@ -8,9 +8,18 @@ const config = require('./utils/config');
 const logger = require('./utils/logger');
 const cors = require('cors');
 const fs = require('fs');
+const priceUpdateJob = require('./jobs/priceUpdateJob');
 
 // Load environment variables
 dotenv.config();
+
+// Initialize price update job
+if (process.env.NODE_ENV === 'production') {
+  logger.info('Starting price update job...');
+  priceUpdateJob.start().catch(error => {
+    logger.error('Failed to start price update job:', error);
+  });
+}
 
 const app = express();
 
