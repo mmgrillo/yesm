@@ -4,6 +4,29 @@ const axios = require('axios');
 const logger = require('../utils/logger');
 require('dotenv').config();
 
+async function checkDatabaseConnection() {
+  const client = await pool.connect();
+  try {
+    logger.info('Testing database connection...');
+    logger.info('Database URL:', process.env.DATABASE_URL ? 'Present' : 'Missing');
+    
+    const result = await client.query('SELECT NOW()');
+    logger.info('Database connection successful:', result.rows[0]);
+    return true;
+  } catch (error) {
+    logger.error('Database connection failed:', {
+      error: error.message,
+      code: error.code,
+      details: error.details,
+      env: process.env.NODE_ENV,
+      dbUrl: process.env.DATABASE_URL?.substring(0, 20) + '...' // Log just the start for security
+    });
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 class TokenPricePopulationService {
   constructor() {
     this.ZERION_API_URL = 'https://api.zerion.io/v1';
@@ -164,11 +187,18 @@ class TokenPricePopulationService {
 
 // Run if called directly
 if (require.main === module) {
-  const service = new TokenPricePopulationService();
-  service.populateTokenPrices()
+  checkDatabaseConnection()
+    .then(() => {
+      const service = new TokenPricePopulationService();
+      return service.populateTokenPrices();
+    })
     .then(() => process.exit(0))
     .catch(error => {
-      logger.error('Population script failed:', error);
+      logger.error('Population script failed:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
       process.exit(1);
     });
 }
