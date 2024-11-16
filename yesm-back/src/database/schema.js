@@ -63,9 +63,8 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS token_prices (
         id SERIAL PRIMARY KEY,
         token_id INTEGER REFERENCES tokens(id),
-        timestamp TIMESTAMP NOT NULL,
+        timestamp TIMESTAMPTZ NOT NULL,
         price DECIMAL NOT NULL,
-        volume DECIMAL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(token_id, timestamp)
       );
