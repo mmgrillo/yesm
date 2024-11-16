@@ -15,10 +15,6 @@ class TokenPricePopulationService {
     ];
   }
 
-  async delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   async populateTokenPrices() {
     const client = await pool.connect();
     
@@ -29,11 +25,11 @@ class TokenPricePopulationService {
       const retentionDate = new Date();
       retentionDate.setFullYear(retentionDate.getFullYear() - this.RETENTION_YEARS);
 
-      // Cleanup old data using timestamptz
+      // Clean up old data using proper timestamp comparison
       await client.query(`
         DELETE FROM token_prices
         WHERE timestamp < $1::timestamptz
-      `, [retentionDate]);
+      `, [retentionDate.toISOString()]);
 
       for (const token of this.tokens) {
         logger.info(`Processing ${token.symbol}...`);
@@ -67,27 +63,29 @@ class TokenPricePopulationService {
           const priceData = await this.fetchPriceDataZerion(token, fromTimestamp);
           
           // Batch insert prices
-          const BATCH_SIZE = 1000;
-          for (let i = 0; i < priceData.length; i += BATCH_SIZE) {
-            const batch = priceData.slice(i, i + BATCH_SIZE);
-            
-            await client.query('BEGIN');
-            
-            for (const data of batch) {
-              // Convert Unix timestamp to ISO string for PostgreSQL timestamptz
-              const timestamptz = new Date(data.timestamp * 1000).toISOString();
+          if (priceData && priceData.length > 0) {
+            const BATCH_SIZE = 1000;
+            for (let i = 0; i < priceData.length; i += BATCH_SIZE) {
+              const batch = priceData.slice(i, i + BATCH_SIZE);
               
-              await client.query(`
-                INSERT INTO token_prices (token_id, timestamp, price)
-                VALUES ($1, $2::timestamptz, $3)
-                ON CONFLICT (token_id, timestamp) 
-                DO UPDATE SET price = EXCLUDED.price
-              `, [tokenId, timestamptz, data.price]);
-            }
+              await client.query('BEGIN');
+              
+              for (const data of batch) {
+                // Convert Unix timestamp to ISO string for PostgreSQL timestamptz
+                const timestamptz = new Date(data.timestamp * 1000).toISOString();
+                
+                await client.query(`
+                  INSERT INTO token_prices (token_id, timestamp, price)
+                  VALUES ($1, $2::timestamptz, $3)
+                  ON CONFLICT (token_id, timestamp) 
+                  DO UPDATE SET price = EXCLUDED.price
+                `, [tokenId, timestamptz, data.price]);
+              }
 
-            await client.query('COMMIT');
-            
-            logger.info(`Processed ${i + batch.length}/${priceData.length} prices for ${token.symbol}`);
+              await client.query('COMMIT');
+              
+              logger.info(`Processed ${i + batch.length}/${priceData.length} prices for ${token.symbol}`);
+            }
           }
 
           logger.info(`Successfully populated prices for ${token.symbol}`);
@@ -99,7 +97,7 @@ class TokenPricePopulationService {
         }
 
         // Delay between tokens to respect API rate limits
-        await this.delay(2000);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
       logger.info('Token price population completed');
@@ -134,7 +132,6 @@ class TokenPricePopulationService {
         throw new Error('Invalid response from Zerion API');
       }
 
-      // Properly handle the response data structure
       return response.data.data.map(point => ({
         timestamp: Math.floor(new Date(point.attributes.timestamp).getTime() / 1000),
         price: point.attributes.value
