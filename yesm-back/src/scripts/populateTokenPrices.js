@@ -1,31 +1,7 @@
-// src/scripts/populateTokenPrices.js
 const { pool } = require('../database/schema');
 const axios = require('axios');
 const logger = require('../utils/logger');
 require('dotenv').config();
-
-async function checkDatabaseConnection() {
-  const client = await pool.connect();
-  try {
-    logger.info('Testing database connection...');
-    logger.info('Database URL:', process.env.DATABASE_URL ? 'Present' : 'Missing');
-    
-    const result = await client.query('SELECT NOW()');
-    logger.info('Database connection successful:', result.rows[0]);
-    return true;
-  } catch (error) {
-    logger.error('Database connection failed:', {
-      error: error.message,
-      code: error.code,
-      details: error.details,
-      env: process.env.NODE_ENV,
-      dbUrl: process.env.DATABASE_URL?.substring(0, 20) + '...' // Log just the start for security
-    });
-    throw error;
-  } finally {
-    client.release();
-  }
-}
 
 class TokenPricePopulationService {
   constructor() {
@@ -43,77 +19,27 @@ class TokenPricePopulationService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async fetchPriceDataZerion(token, fromTimestamp) {
-    try {
-      const encodedApiKey = Buffer.from(`${this.ZERION_API_KEY}:`).toString('base64');
-      
-      // Due to API limitations, fetch data in chunks of 3 months
-      const CHUNK_SIZE = 90 * 24 * 60 * 60; // 90 days in seconds
-      const endTimestamp = Math.floor(Date.now() / 1000);
-      let currentTimestamp = fromTimestamp;
-      let allPriceData = [];
-
-      while (currentTimestamp < endTimestamp) {
-        const chunkEndTimestamp = Math.min(currentTimestamp + CHUNK_SIZE, endTimestamp);
-        
-        logger.info(`Fetching price data for ${token.symbol} from ${new Date(currentTimestamp * 1000).toISOString()} to ${new Date(chunkEndTimestamp * 1000).toISOString()}`);
-
-        const response = await axios.get(
-          `${this.ZERION_API_URL}/fungibles/${token.address}/charts`, {
-            headers: {
-              accept: 'application/json',
-              Authorization: `Basic ${encodedApiKey}`,
-            },
-            params: {
-              currency: 'usd',
-              resolution: '1min',
-              from: currentTimestamp,
-              to: chunkEndTimestamp
-            }
-          }
-        );
-
-        if (response.data?.points) {
-          const chunkData = response.data.points.map(point => ({
-            timestamp: new Date(point.date),
-            price: point.value
-          }));
-          allPriceData = allPriceData.concat(chunkData);
-        }
-
-        // Move to next chunk
-        currentTimestamp = chunkEndTimestamp;
-        // Respect API rate limits
-        await this.delay(1000);
-      }
-
-      return allPriceData;
-    } catch (error) {
-      logger.error('Error fetching price data from Zerion:', error);
-      throw error;
-    }
-  }
-
   async populateTokenPrices() {
     const client = await pool.connect();
     
     try {
       logger.info('Starting token price population...');
       
-      // Calculate timestamp for 2 years ago
-      const twoYearsAgo = Math.floor((Date.now() - (this.RETENTION_YEARS * 365 * 24 * 60 * 60 * 1000)) / 1000);
+      // Calculate timestamp for retention period
+      const retentionDate = new Date();
+      retentionDate.setFullYear(retentionDate.getFullYear() - this.RETENTION_YEARS);
 
-      // First cleanup any data older than 2 years
+      // First cleanup any data older than retention period
       await client.query(`
         DELETE FROM token_prices
-        WHERE timestamp < NOW() - INTERVAL '${this.RETENTION_YEARS} years'
-      `);
+        WHERE timestamp < $1::timestamp
+      `, [retentionDate]);
 
       for (const token of this.tokens) {
         logger.info(`Processing ${token.symbol}...`);
 
         try {
-          // Get token ID
+          // Get or create token record
           const tokenResult = await client.query(`
             INSERT INTO tokens (symbol, chain, address)
             VALUES ($1, $2, $3)
@@ -131,15 +57,13 @@ class TokenPricePopulationService {
             WHERE token_id = $1
           `, [tokenId]);
 
-          // If we have recent data, only fetch from there, otherwise fetch full 2 years
-          const fetchFromTimestamp = lastPriceResult.rows[0].last_timestamp 
-            ? Math.floor(lastPriceResult.rows[0].last_timestamp.getTime() / 1000)
-            : twoYearsAgo;
+          // If we have recent data, only fetch from there, otherwise fetch from retention date
+          const fetchFromDate = lastPriceResult.rows[0].last_timestamp || retentionDate;
 
           // Fetch price data
-          const priceData = await this.fetchPriceDataZerion(token, fetchFromTimestamp);
+          const priceData = await this.fetchPriceDataZerion(token, fetchFromDate);
           
-          // Batch insert prices in chunks to avoid memory issues
+          // Batch insert prices
           const BATCH_SIZE = 5000;
           for (let i = 0; i < priceData.length; i += BATCH_SIZE) {
             const batch = priceData.slice(i, i + BATCH_SIZE);
@@ -167,6 +91,9 @@ class TokenPricePopulationService {
           logger.error(`Error processing ${token.symbol}:`, error);
           continue;
         }
+
+        // Delay between tokens to respect API rate limits
+        await this.delay(2000);
       }
 
       logger.info('Token price population completed');
@@ -178,27 +105,48 @@ class TokenPricePopulationService {
     }
   }
 
-  // Method to keep prices up to date
-  async updateRecentPrices() {
-    // Similar to populateTokenPrices but only fetches last 24 hours
-    // This can be run more frequently
+  async fetchPriceDataZerion(token, fromDate) {
+    try {
+      const encodedApiKey = Buffer.from(`${this.ZERION_API_KEY}:`).toString('base64');
+      
+      const response = await axios.get(
+        `${this.ZERION_API_URL}/fungibles/${token.address}/charts`, {
+          headers: {
+            accept: 'application/json',
+            Authorization: `Basic ${encodedApiKey}`,
+          },
+          params: {
+            currency: 'usd',
+            resolution: '1min',
+            from: Math.floor(fromDate.getTime() / 1000),
+            to: Math.floor(Date.now() / 1000)
+          }
+        }
+      );
+
+      if (!response.data?.points) {
+        throw new Error('Invalid response from Zerion API');
+      }
+
+      return response.data.points.map(point => ({
+        timestamp: new Date(point.date),
+        price: point.value
+      }));
+
+    } catch (error) {
+      logger.error('Error fetching price data from Zerion:', error);
+      throw error;
+    }
   }
 }
 
 // Run if called directly
 if (require.main === module) {
-  checkDatabaseConnection()
-    .then(() => {
-      const service = new TokenPricePopulationService();
-      return service.populateTokenPrices();
-    })
+  const service = new TokenPricePopulationService();
+  service.populateTokenPrices()
     .then(() => process.exit(0))
     .catch(error => {
-      logger.error('Population script failed:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
+      logger.error('Population script failed:', error);
       process.exit(1);
     });
 }
