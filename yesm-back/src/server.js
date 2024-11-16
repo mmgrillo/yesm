@@ -162,6 +162,11 @@ const startServer = async () => {
   try {
     // Use Heroku's provided port or fallback to default
     const port = process.env.PORT || 5001;
+    logger.info('Port resolution:', {
+      envPort: process.env.PORT,
+      finalPort: port,
+      nodeEnv: process.env.NODE_ENV
+    });
     
     app.listen(port, '0.0.0.0', () => {
       logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
