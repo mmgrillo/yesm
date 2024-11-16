@@ -25,16 +25,15 @@ class TokenPricePopulationService {
     try {
       logger.info('Starting token price population...');
       
-      // Calculate retention date as ISO string
+      // Calculate retention date
       const retentionDate = new Date();
       retentionDate.setFullYear(retentionDate.getFullYear() - this.RETENTION_YEARS);
-      const retentionDateStr = retentionDate.toISOString();
 
-      // First cleanup any data older than retention period using ISO timestamp
+      // Cleanup old data using timestamptz
       await client.query(`
         DELETE FROM token_prices
         WHERE timestamp < $1::timestamptz
-      `, [retentionDateStr]);
+      `, [retentionDate]);
 
       for (const token of this.tokens) {
         logger.info(`Processing ${token.symbol}...`);
@@ -58,27 +57,32 @@ class TokenPricePopulationService {
             WHERE token_id = $1
           `, [tokenId]);
 
-          // Convert the timestamp to Unix timestamp for Zerion API
-          const fetchFromDate = lastPriceResult.rows[0].last_timestamp || retentionDate;
-          const fromTimestamp = Math.floor(new Date(fetchFromDate).getTime() / 1000);
+          // Convert the timestamp for Zerion API
+          const lastTimestamp = lastPriceResult.rows[0].last_timestamp;
+          const fromTimestamp = lastTimestamp 
+            ? Math.floor(new Date(lastTimestamp).getTime() / 1000)
+            : Math.floor(retentionDate.getTime() / 1000);
 
           // Fetch price data
           const priceData = await this.fetchPriceDataZerion(token, fromTimestamp);
           
           // Batch insert prices
-          const BATCH_SIZE = 5000;
+          const BATCH_SIZE = 1000;
           for (let i = 0; i < priceData.length; i += BATCH_SIZE) {
             const batch = priceData.slice(i, i + BATCH_SIZE);
             
             await client.query('BEGIN');
             
             for (const data of batch) {
+              // Convert Unix timestamp to ISO string for PostgreSQL timestamptz
+              const timestamptz = new Date(data.timestamp * 1000).toISOString();
+              
               await client.query(`
                 INSERT INTO token_prices (token_id, timestamp, price)
                 VALUES ($1, $2::timestamptz, $3)
                 ON CONFLICT (token_id, timestamp) 
                 DO UPDATE SET price = EXCLUDED.price
-              `, [tokenId, new Date(data.timestamp * 1000).toISOString(), data.price]);
+              `, [tokenId, timestamptz, data.price]);
             }
 
             await client.query('COMMIT');
@@ -126,13 +130,14 @@ class TokenPricePopulationService {
         }
       );
 
-      if (!response.data?.points) {
+      if (!response.data?.data) {
         throw new Error('Invalid response from Zerion API');
       }
 
-      return response.data.points.map(point => ({
-        timestamp: Math.floor(new Date(point.date).getTime() / 1000),
-        price: point.value
+      // Properly handle the response data structure
+      return response.data.data.map(point => ({
+        timestamp: Math.floor(new Date(point.attributes.timestamp).getTime() / 1000),
+        price: point.attributes.value
       }));
 
     } catch (error) {
