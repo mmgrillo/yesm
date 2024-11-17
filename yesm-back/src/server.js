@@ -16,9 +16,21 @@ dotenv.config();
 // Initialize price update job
 if (process.env.NODE_ENV === 'production') {
   logger.info('Starting price update job...');
-  priceUpdateJob.start().catch(error => {
-    logger.error('Failed to start price update job:', error);
-  });
+  try {
+    // Create a new instance of PriceUpdateJob
+    const priceJob = new PriceUpdateJob();
+    
+    // Start the price update job and handle any errors
+    priceJob.start().catch(error => {
+      logger.error('Price update job error:', error);
+      // Don't crash the server on price update errors
+    });
+    
+    logger.info('Price update job initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize price update job:', error);
+    // Don't crash the server on initialization errors
+  }
 }
 
 const app = express();

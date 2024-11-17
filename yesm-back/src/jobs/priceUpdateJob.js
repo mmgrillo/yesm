@@ -7,9 +7,10 @@ class PriceUpdateJob {
   constructor() {
     this.priceService = new TokenPricePopulationService();
     this.isRunning = false;
+    this.updateInterval = null;
   }
 
-  async updateAndValidatePrices() {
+  async updatePrices() {
     if (this.isRunning) {
       logger.info('Price update already in progress, skipping...');
       return;
@@ -17,45 +18,44 @@ class PriceUpdateJob {
 
     this.isRunning = true;
     try {
-      // First update prices
       await this.priceService.populateTokenPrices();
-
-      // Then validate the new data
-      const validationResults = await PriceValidation.runFullValidation();
-      
-      if (validationResults.hasIssues) {
-        logger.warn('Price validation found issues:', validationResults);
-        
-        // Optional: Check completeness of recent data
-        const lastHour = new Date(Date.now() - 60 * 60 * 1000);
-        const completeness = await PriceValidation.checkDataCompleteness(lastHour, new Date());
-        
-        if (completeness.overallCompleteness < 95) {
-          logger.error('Recent data completeness below threshold:', completeness);
-          // You might want to trigger a re-fetch of data here
-        }
-      }
-
+      logger.info('Price update completed successfully');
     } catch (error) {
-      logger.error('Price update and validation failed:', error);
+      logger.error('Price update failed:', error);
+      // Don't throw the error, just log it
     } finally {
       this.isRunning = false;
     }
   }
 
   start() {
-    // Run every 5 minutes
-    setInterval(() => {
-      this.updateAndValidatePrices().catch(error => {
-        logger.error('Price update job failed:', error);
+    return new Promise((resolve) => {
+      logger.info('Starting price update job');
+      
+      // Initial update
+      this.updatePrices().catch(error => {
+        logger.error('Initial price update failed:', error);
       });
-    }, 5 * 60 * 1000);
 
-    // Run once at startup
-    this.updateAndValidatePrices().catch(error => {
-      logger.error('Initial price update failed:', error);
+      // Set up interval (every 5 minutes)
+      this.updateInterval = setInterval(() => {
+        this.updatePrices().catch(error => {
+          logger.error('Scheduled price update failed:', error);
+        });
+      }, 5 * 60 * 1000);
+
+      logger.info('Price update job started successfully');
+      resolve();
     });
+  }
+
+  stop() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+    logger.info('Price update job stopped');
   }
 }
 
-module.exports = new PriceUpdateJob();
+module.exports = PriceUpdateJob;

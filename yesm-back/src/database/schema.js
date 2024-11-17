@@ -6,7 +6,7 @@ require('dotenv').config();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false  // Required for Heroku Postgres
+    rejectUnauthorized: false 
   }
 });
 
@@ -51,7 +51,7 @@ const createTables = async () => {
         UNIQUE(date)
       );
 
-      CREATE TABLE IF NOT EXISTS tokens (
+       CREATE TABLE IF NOT EXISTS tokens (
         id SERIAL PRIMARY KEY,
         symbol VARCHAR(20) NOT NULL,
         address VARCHAR(42),
@@ -63,7 +63,7 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS token_prices (
         id SERIAL PRIMARY KEY,
         token_id INTEGER REFERENCES tokens(id),
-        timestamp TIMESTAMPTZ NOT NULL,
+        timestamp TIMESTAMPTZ NOT NULL,    -- Changed from bigint to TIMESTAMPTZ
         price DECIMAL NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(token_id, timestamp)
@@ -75,10 +75,11 @@ const createTables = async () => {
       CREATE INDEX IF NOT EXISTS idx_fgi_timestamp ON fear_greed_index(timestamp);
       CREATE INDEX IF NOT EXISTS idx_m2_date ON m2_supply(date);
       CREATE INDEX IF NOT EXISTS idx_token_prices_lookup ON token_prices(token_id, timestamp DESC);
-      CREATE INDEX IF NOT EXISTS idx_token_prices_recent ON token_prices(timestamp DESC);
+       CREATE INDEX IF NOT EXISTS idx_token_prices_recent 
+      ON token_prices(timestamp DESC);
       
-      CREATE INDEX IF NOT EXISTS idx_token_prices_recent_lookup 
-      ON token_prices(token_id, timestamp DESC) 
+      CREATE INDEX IF NOT EXISTS idx_token_prices_lookup 
+      ON token_prices(token_id, timestamp DESC); 
       WHERE timestamp > NOW() - INTERVAL '7 days';
     `);
 
