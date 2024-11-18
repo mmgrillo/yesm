@@ -8,41 +8,7 @@ const FRED_BASE_URL = 'https://api.stlouisfed.org/fred/series/observations';
 const CRYPTOCOMPARE_API_KEY = process.env.CRYPTOCOMPARE_API_KEY;
 require('dotenv').config();
 
-const requestQueue = [];
-let isProcessingQueue = false;
-const THROTTLE_DELAY = 250; 
-
 class ApiService {
-  static async processQueue() {
-    if (isProcessingQueue || requestQueue.length === 0) return;
-    
-    isProcessingQueue = true;
-    
-    while (requestQueue.length > 0) {
-      const { request, resolve, reject } = requestQueue.shift();
-      try {
-        const response = await request();
-        resolve(response);
-      } catch (error) {
-        logger.error('Queue processing error:', {
-          error: error.message,
-          response: error.response?.data
-        });
-        reject(error);
-      }
-      await new Promise(resolve => setTimeout(resolve, THROTTLE_DELAY));
-    }
-    
-    isProcessingQueue = false;
-  }
-
-  static async throttledRequest(requestFn) {
-    return new Promise((resolve, reject) => {
-      requestQueue.push({ request: requestFn, resolve, reject });
-      this.processQueue();
-    });
-  }
-
   static async makeZerionRequest(url, params = {}) {
     try {
       const headers = {
@@ -50,11 +16,9 @@ class ApiService {
         accept: 'application/json',
       };
 
-      return await this.throttledRequest(async () => {
-        logger.info('Making Zerion API request:', { url, params });
-        const response = await axios.get(url, { headers, params });
-        return response.data;
-      });
+      logger.info('Making Zerion API request:', { url, params });
+      const response = await axios.get(url, { headers, params });
+      return response.data;
     } catch (error) {
       logger.error('Zerion API request failed:', {
         url,
@@ -65,7 +29,7 @@ class ApiService {
     }
   }
 
- static async fetchTokenPrices(contractAddresses) {
+  static async fetchTokenPrices(contractAddresses) {
     const prices = {};
     
     for (const token of contractAddresses) {
@@ -116,10 +80,7 @@ class ApiService {
   
   static async fetchFearGreedIndex(timestamp) {
     try {
-      // Convert timestamp to days ago (API accepts 0-365)
       const daysAgo = Math.floor((Date.now() - new Date(timestamp)) / (1000 * 60 * 60 * 24));
-      
-      // Ensure we don't exceed API limits
       const limit = Math.min(daysAgo + 1, 365);
       
       const response = await axios.get(`https://api.alternative.me/fng/?limit=${limit}&format=json`);
@@ -128,7 +89,6 @@ class ApiService {
         throw new Error('Invalid API response');
       }
 
-      // Find the closest date to our timestamp
       const targetDate = new Date(timestamp).setHours(0, 0, 0, 0);
       const closestIndex = response.data.data.find(item => {
         const itemDate = new Date(item.timestamp * 1000).setHours(0, 0, 0, 0);
@@ -146,8 +106,6 @@ class ApiService {
     try {
       const date = new Date(timestamp);
       const endDate = date.toISOString().split('T')[0];
-      
-      // Get date 1 year before
       const yearBefore = new Date(date);
       yearBefore.setFullYear(date.getFullYear() - 1);
       const startDate = yearBefore.toISOString().split('T')[0];
@@ -156,15 +114,14 @@ class ApiService {
         throw new Error('FRED API key is not configured');
       }
 
-      // Fetch M2 data
       const m2Response = await axios.get(FRED_BASE_URL, {
         params: {
-          series_id: 'M2SL', // M2 Money Stock
+          series_id: 'M2SL',
           api_key: FRED_API_KEY,
           file_type: 'json',
           observation_start: startDate,
           observation_end: endDate,
-          frequency: 'm' // Monthly frequency
+          frequency: 'm'
         }
       });
 
@@ -177,19 +134,12 @@ class ApiService {
         throw new Error('No M2 data available');
       }
 
-      // Get the most recent M2 value before or at the trade date
       const currentValue = parseFloat(observations[observations.length - 1].value);
-      
-      // Calculate 3-month change
       const threeMonthIndex = Math.max(observations.length - 4, 0);
       const threeMonthValue = parseFloat(observations[threeMonthIndex].value);
       const threeMonthChange = ((currentValue - threeMonthValue) / threeMonthValue) * 100;
-
-      // Calculate year-over-year change
       const yearAgoValue = parseFloat(observations[0].value);
       const yearChange = ((currentValue - yearAgoValue) / yearAgoValue) * 100;
-
-      // Calculate average growth rate
       const avgMonthlyGrowth = observations.reduce((acc, curr, i, arr) => {
         if (i === 0) return 0;
         const monthlyChange = ((parseFloat(curr.value) - parseFloat(arr[i-1].value)) / parseFloat(arr[i-1].value)) * 100;
@@ -217,29 +167,20 @@ class ApiService {
     try {
       const date = new Date(timestamp);
       const endDate = date.toISOString().split('T')[0];
-      
-      // Get date 30 days before for historical context
       const thirtyDaysBefore = new Date(date);
       thirtyDaysBefore.setDate(date.getDate() - 30);
       const startDate = thirtyDaysBefore.toISOString().split('T')[0];
 
-      // Fetch Crypto Volatility with throttling
-      const cryptoResponse = await this.throttledRequest(async () => {
-        return axios.get('https://min-api.cryptocompare.com/data/v2/histoday', {
-          params: {
-            fsym: 'BTC',
-            tsym: 'USD',
-            limit: 30,
-            toTs: Math.floor(date.getTime() / 1000),
-            api_key: CRYPTOCOMPARE_API_KEY
-          },
-          headers: {
-            'Cache-Control': 'max-age=300' // Cache for 5 minutes
-          }
-        });
+      const cryptoResponse = await axios.get('https://min-api.cryptocompare.com/data/v2/histoday', {
+        params: {
+          fsym: 'BTC',
+          tsym: 'USD',
+          limit: 30,
+          toTs: Math.floor(date.getTime() / 1000),
+          api_key: CRYPTOCOMPARE_API_KEY
+        }
       });
 
-      // Process crypto data
       const cryptoData = cryptoResponse.data.Data.Data;
       const cryptoVolatility = this.calculateVolatility(cryptoData.map(d => d.close));
       const cryptoHistoricalMean = this.calculateMean(cryptoData.map(d => d.close));
@@ -258,7 +199,6 @@ class ApiService {
       };
     } catch (error) {
       console.error('Error fetching volatility indices:', error);
-      // Return null values instead of throwing
       return {
         crypto: {
           current: null,
