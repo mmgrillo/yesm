@@ -202,6 +202,9 @@
   "devDependencies": {
     "concurrently": "^9.1.0"
   },
+  "optionalDependencies": {
+    "fsevents": "*"
+  },
   "scripts": {
     "install-all": "npm install && cd yesm-back && npm install && cd ../yesm-front && npm install",
     "dev": "concurrently \"cd yesm-back && npm run dev\" \"cd yesm-front && npm start\"",
