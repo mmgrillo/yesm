@@ -1,7 +1,7 @@
 {
   "name": "yesm",
   "version": "1.0.0",
-  "description": "",
+  "description": "YESM Application",
   "main": "build-script.js",
   "dependencies": {
     "abitype": "^0.7.1",
@@ -208,8 +208,10 @@
   "scripts": {
     "install-all": "npm install && cd yesm-back && npm install && cd ../yesm-front && npm install",
     "dev": "concurrently \"cd yesm-back && npm run dev\" \"cd yesm-front && npm start\"",
+    "start": "cd yesm-back && npm start",
     "build": "cd yesm-front && npm run build",
     "serve-build": "cd yesm-front && serve -s build",
+    "heroku-postbuild": "cd yesm-front && npm install && npm run build && cd ../yesm-back && npm install",
     "prod": "concurrently \"cd yesm-back && npm start\" \"npm run serve-build\"",
     "db:init": "cd yesm-back && npm run init-db",
     "db:test": "cd yesm-back && npm run test-db",

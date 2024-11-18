@@ -1,1 +1,1 @@
-web: cd yesm-back && npm start
+web: npm start

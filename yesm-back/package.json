@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "src/app.js",
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "10.x"
   },
   "scripts": {
     "dev": "NODE_ENV=development nodemon src/server.js",
@@ -36,7 +37,6 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0",
     "nodemon": "^2.0.22"
   },
 
