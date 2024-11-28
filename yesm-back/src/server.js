@@ -60,7 +60,6 @@ if (process.env.NODE_ENV === 'production') {
 // API routes with versioning
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/v1', transactionRoutes);
-// Maintain legacy route for compatibility
 app.use('/api', transactionRoutes);
 
 // Static file serving in production

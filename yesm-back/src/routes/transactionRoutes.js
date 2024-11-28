@@ -247,4 +247,32 @@ router.get('/volatility-indices/:timestamp', async (req, res) => {
   }
 });
 
+if (process.env.NODE_ENV === 'production') {
+  app.use((err, req, res, next) => {
+    console.error('Production error:', err);
+    
+    // Only send error details in development
+    res.status(err.status || 500).json({
+      error: process.env.NODE_ENV === 'development' 
+        ? err.message 
+        : 'Internal server error',
+      path: req.path
+    });
+  });
+}
+
+// Add Heroku logging
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log({
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      duration: Date.now() - start
+    });
+  });
+  next();
+});
+
 module.exports = router;
