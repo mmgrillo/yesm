@@ -2,13 +2,13 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Info, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
-import useFearGreedIndex from '../hooks/useFearGreedIndex';
-import FearGreedGauge from './FearGreedGauge';
-import useMacroData from '../hooks/useMacroData';
 import MacroContext from './MacroContext';
 import DetailedMacroContext from './DetailedMacroContext';
 import DetailedMarketIndicators from './DetailedMarketIndicators';
+import useFearGreedIndex from '../hooks/useFearGreedIndex';
+import useMacroData from '../hooks/useMacroData';
 import useVolatilityIndices from '../hooks/useVolatilityIndices';
+
 
 const TransactionDetails = () => {
   const location = useLocation();
@@ -22,7 +22,6 @@ const TransactionDetails = () => {
   const { fearGreedIndex, isLoading: fgiLoading } = useFearGreedIndex(attributes.mined_at);
   const { macroData, isLoading: macroLoading } = useMacroData(attributes.mined_at);
   const { volatilityData, isLoading: volatilityLoading } = useVolatilityIndices(attributes.mined_at);
-  
 
 
 

@@ -15,7 +15,11 @@ const MacroContext = ({ data, size = 'normal' }) => {
   } = data;
 
   const formatTrend = (value) => {
-    const formatted = value.toFixed(2);
+    if (value === undefined || value === null) {
+      return <span className="text-gray-500">N/A</span>;
+    }
+    
+    const formatted = Number(value).toFixed(2);
     const isPositive = value > 0;
     const Icon = isPositive ? TrendingUp : TrendingDown;
     const color = isPositive ? 'text-green-500' : 'text-red-500';
@@ -27,6 +31,7 @@ const MacroContext = ({ data, size = 'normal' }) => {
       </div>
     );
   };
+ 
 
   const containerClass = size === 'small' 
     ? 'p-4 space-y-2' 

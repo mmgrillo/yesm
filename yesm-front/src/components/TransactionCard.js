@@ -1,22 +1,41 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Info, TrendingUp, TrendingDown } from 'lucide-react';
 import { getSupportedImplementation } from '../utils/tokenUtils';
-import useFearGreedIndex from '../hooks/useFearGreedIndex';
-import FearGreedGauge from './FearGreedGauge';
-import useMacroData from '../hooks/useMacroData';
 import MacroContext from './MacroContext';
 import CompactMarketIndicators from './CompactMarketIndicators';
-import useVolatilityIndices from '../hooks/useVolatilityIndices';
 import useMarketData from '../hooks/useMarketData';
+import useFearGreedIndex from '../hooks/useFearGreedIndex';
+import useMacroData from '../hooks/useMacroData';
+import useVolatilityIndices from '../hooks/useVolatilityIndices';
+import FearGreedGauge from './FearGreedGauge';
 
 
 const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) => {
-  const { operation_type: action, attributes } = transaction;
   const [isUndone, setIsUndone] = useState(false);
-  const { fearGreedIndex, isLoading: fgiLoading } = useFearGreedIndex(attributes.mined_at);
-  const { macroData, isLoading: macroLoading } = useMacroData(attributes.mined_at);
-  const { volatilityData, isLoading: volatilityLoading } = useVolatilityIndices(attributes.mined_at);
-  const { marketData, isLoading } = useMarketData(attributes.mined_at);
+  const { operation_type: action, attributes } = transaction;
+
+  const { fearGreedIndex, isLoading: fgiLoading } = useFearGreedIndex(
+    attributes?.mined_at ? Math.floor(new Date(attributes.mined_at).getTime() / 1000) : null
+  );
+  const { macroData, isLoading: macroLoading } = useMacroData(
+    attributes?.mined_at ? Math.floor(new Date(attributes.mined_at).getTime() / 1000) : null
+  );
+  const { volatilityData, isLoading: volatilityLoading } = useVolatilityIndices(
+    attributes?.mined_at ? Math.floor(new Date(attributes.mined_at).getTime() / 1000) : null
+  );
+  const { marketData, isLoading } = useMarketData(
+    attributes?.mined_at ? Math.floor(new Date(attributes.mined_at).getTime() / 1000) : null
+  );
+
+  useEffect(() => {
+    if (attributes) {
+      console.log('Transaction attributes:', attributes);
+      console.log('Token prices:', tokenPrices);
+      console.log('Fear & Greed Index:', fearGreedIndex);
+      console.log('Macro Data:', macroData);
+      console.log('Volatility Data:', volatilityData);
+    }
+  }, [attributes, tokenPrices, fearGreedIndex, macroData, volatilityData]);
 
   if (!attributes) return null; 
 
@@ -95,6 +114,7 @@ const TransactionCard = ({ transaction, tokenPrices, navigate, onUndoChange }) =
     setIsUndone(e.target.checked);
     onUndoChange(transaction, e.target.checked);
   };
+
 
   return (
     <div className={`bg-white shadow-lg rounded-xl p-6 mb-4 w-full hover:shadow-xl transition-all duration-300 relative

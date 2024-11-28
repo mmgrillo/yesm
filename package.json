@@ -64,7 +64,6 @@
     "forwarded": "^0.2.0",
     "fresh": "^0.5.2",
     "fs-extra": "^11.2.0",
-    "fsevents": "^2.3.3",
     "function-bind": "^1.1.2",
     "get-intrinsic": "^1.2.4",
     "glob-parent": "^5.1.2",
@@ -207,7 +206,7 @@
   },
   "scripts": {
     "install-all": "npm install && cd yesm-back && npm install && cd ../yesm-front && npm install",
-    "dev": "concurrently \"cd yesm-back && npm run dev\" \"cd yesm-front && npm start\"",
+    "dev": "concurrently \"cd yesm-back && NODE_ENV=development npm run dev\" \"cd yesm-front && NODE_ENV=development npm start\"",
     "start": "cd yesm-back && npm start",
     "build": "cd yesm-front && npm run build",
     "serve-build": "cd yesm-front && serve -s build",

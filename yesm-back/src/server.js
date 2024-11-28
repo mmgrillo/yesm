@@ -1,7 +1,6 @@
 const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
-const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
 const config = require('./utils/config');
@@ -10,210 +9,151 @@ const cors = require('cors');
 const fs = require('fs');
 const priceUpdateJob = require('./jobs/priceUpdateJob');
 
-// Load environment variables
 dotenv.config();
 
-// Initialize price update job
-if (process.env.NODE_ENV === 'production') {
-  logger.info('Starting price update job...');
-  try {
-    // Create a new instance of PriceUpdateJob
-    const priceJob = new PriceUpdateJob();
-    
-    // Start the price update job and handle any errors
-    priceJob.start().catch(error => {
-      logger.error('Price update job error:', error);
-      // Don't crash the server on price update errors
-    });
-    
-    logger.info('Price update job initialized successfully');
-  } catch (error) {
-    logger.error('Failed to initialize price update job:', error);
-    // Don't crash the server on initialization errors
-  }
-}
-
 const app = express();
-
-// Trust proxy
 app.set('trust proxy', 1);
 
-// CORS configuration based on environment
+// Enhanced CORS configuration
 const corsOrigins = process.env.NODE_ENV === 'production'
-  ? [
-      'https://yesmother-e680f705d89a.herokuapp.com',
-      'https://yesmother.herokuapp.com'
-    ]
-  : ['http://localhost:3000'];
+  ? ['https://yesmother-e680f705d89a.herokuapp.com', 'https://yesmother.herokuapp.com']
+  : ['http://localhost:3000', 'http://localhost:5001'];
 
-logger.info('Starting server configuration...');
-logger.info('CORS Origin:', corsOrigins);
-logger.info('Environment:', process.env.NODE_ENV);
-logger.info('Current directory:', process.cwd());
-logger.info('Directory contents:', fs.readdirSync(process.cwd()));
-
-app.use(cors({
-  origin: corsOrigins,
+const corsOptions = {
+  origin: function(origin, callback) {
+    if (!origin || corsOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      logger.warn(`Blocked CORS request from origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 600 // Cache preflight requests for 10 minutes
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Security middleware
 app.use(helmet({
-  contentSecurityPolicy: false
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
+
 app.use(compression());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimitWindowMs || 15 * 60 * 1000,
-  max: config.rateLimitMax || 100
-});
-app.use(limiter);
+app.use(express.json({ limit: '10mb' }));
 
-// Middleware
-app.use(express.json());
+// Initialize price update job in production
+if (process.env.NODE_ENV === 'production') {
+  const priceJob = new priceUpdateJob();
+  priceJob.start().catch(error => {
+    logger.error('Price update job error:', error);
+  });
+}
 
-// API routes
+// API routes with versioning
 const transactionRoutes = require('./routes/transactionRoutes');
+app.use('/api/v1', transactionRoutes);
+// Maintain legacy route for compatibility
 app.use('/api', transactionRoutes);
 
-// Serve static files in production
+// Static file serving in production
 if (process.env.NODE_ENV === 'production') {
-  logger.info('Setting up production static file serving');
-  
-  // Define possible build paths relative to the current directory
   const possibleBuildPaths = [
-    path.join(process.cwd(), '../yesm-front/build'),  // From yesm-back/src to yesm-front/build
-    path.join(process.cwd(), 'yesm-front/build'),     // From root to yesm-front/build
-    path.join(process.cwd(), 'build'),                // Direct build folder
-    path.join(__dirname, '../../yesm-front/build'),   // From src to yesm-front/build
-    path.join(__dirname, '../build'),                 // One level up build
-    '/app/yesm-front/build',                         // Heroku absolute paths
-    '/app/build'                                     // Heroku absolute paths
+    path.join(process.cwd(), '../yesm-front/build'),
+    path.join(process.cwd(), 'yesm-front/build'),
+    path.join(process.cwd(), 'build'),
+    path.join(__dirname, '../../yesm-front/build'),
+    path.join(__dirname, '../build'),
+    '/app/yesm-front/build',
+    '/app/build'
   ];
 
-  logger.info('Checking possible build paths:');
-  possibleBuildPaths.forEach(buildPath => {
-    try {
-      logger.info(`Checking ${buildPath}:`, fs.existsSync(buildPath) ? 'EXISTS' : 'NOT FOUND');
-      if (fs.existsSync(buildPath)) {
-        logger.info(`Contents of ${buildPath}:`, fs.readdirSync(buildPath));
-      }
-    } catch (error) {
-      logger.error(`Error checking path ${buildPath}:`, error.message);
-    }
-  });
-
-  // Find the first valid build path that contains index.html
   const buildPath = possibleBuildPaths.find(p => {
     try {
       return fs.existsSync(p) && fs.existsSync(path.join(p, 'index.html'));
     } catch (error) {
-      logger.error(`Error validating path ${p}:`, error.message);
+      logger.error(`Build path validation error: ${error.message}`);
       return false;
     }
   });
 
-  if (!buildPath) {
-    logger.error('No valid build path found with index.html');
-    logger.error('Current directory structure:', JSON.stringify(listDirectoryContents(process.cwd()), null, 2));
-  } else {
-    logger.info('Using build path:', buildPath);
-    
-    // Serve static files from the React build
-    app.use(express.static(buildPath));
+  if (buildPath) {
+    app.use(express.static(buildPath, {
+      maxAge: '1d',
+      etag: true,
+      lastModified: true
+    }));
 
-    // Handle React routing, return all requests to React app
-    app.get('*', function(req, res) {
+    app.get('*', (req, res) => {
       const indexPath = path.join(buildPath, 'index.html');
-      logger.info('Request path:', req.path);
-      logger.info('Serving index.html from:', indexPath);
-
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
-        logger.error('index.html not found in build directory');
-        res.status(404).send('Frontend build not found');
+        res.status(404).json({ error: 'Frontend build not found' });
       }
     });
   }
-} else {
-  logger.info('Server running in development mode');
 }
 
-// Helper function to recursively list directory contents
-function listDirectoryContents(dir, depth = 0, maxDepth = 3) {
-  if (depth >= maxDepth) return '[max depth reached]';
-  try {
-    const items = fs.readdirSync(dir);
-    const contents = {};
-    items.forEach(item => {
-      const fullPath = path.join(dir, item);
-      if (fs.statSync(fullPath).isDirectory()) {
-        contents[item] = listDirectoryContents(fullPath, depth + 1, maxDepth);
-      } else {
-        contents[item] = 'file';
-      }
-    });
-    return contents;
-  } catch (error) {
-    return `[error: ${error.message}]`;
-  }
-}
-
-// Error handling middleware
+// Enhanced error handling middleware
 app.use((err, req, res, next) => {
-  logger.error('Error:', err);
-  res.status(500).json({ error: 'An error occurred.' });
+  const statusCode = err.status || 500;
+  const errorResponse = {
+    error: err.message || 'An internal server error occurred',
+    status: statusCode,
+    timestamp: new Date().toISOString()
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    errorResponse.stack = err.stack;
+  }
+
+  logger.error('Error:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+
+  res.status(statusCode).json(errorResponse);
 });
 
-// Start server
+// Server startup
 const startServer = async () => {
+  const port = process.env.PORT || 5001;
+  
   try {
-    // Use Heroku's provided port or fallback to default
-    const port = process.env.PORT || 5001;
-    logger.info('Port resolution:', {
-      envPort: process.env.PORT,
-      finalPort: port,
-      nodeEnv: process.env.NODE_ENV
-    });
-    
     app.listen(port, '0.0.0.0', () => {
-      logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
-      logger.info('Current directory:', process.cwd());
-      logger.info('Node version:', process.version);
-      logger.info('Memory usage:', process.memoryUsage());
+      logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+      logger.info(`CORS enabled for origins: ${corsOrigins.join(', ')}`);
     });
   } catch (error) {
-    logger.error('Failed to start the server:', error);
-    // Don't exit process on error, let Heroku handle restarts
+    logger.error('Server startup failed:', error);
     throw error;
   }
 };
-// Proper error handling for uncaught exceptions
+
+// Global error handlers
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught Exception:', err);
-  // Give the logger time to write
-  setTimeout(() => {
-    process.exit(1);
-  }, 1000);
+  setTimeout(() => process.exit(1), 1000);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Don't exit here, just log
+  logger.error('Unhandled Rejection:', { reason, promise });
 });
 
-// Start server only if this file is run directly
 if (require.main === module) {
   startServer().catch(err => {
-    logger.error('Failed to start application:', err);
-    // Give the logger time to write
-    setTimeout(() => {
-      process.exit(1);
-    }, 1000);
+    logger.error('Application startup failed:', err);
+    setTimeout(() => process.exit(1), 1000);
   });
 }
 

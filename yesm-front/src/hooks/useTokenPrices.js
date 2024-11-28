@@ -1,4 +1,3 @@
-// useTokenPrices.js (frontend)
 import { useState, useEffect, useCallback } from 'react';
 import fetchTokenPrices from '../services/tokenPriceService';
 import { getSupportedImplementation } from '../utils/tokenUtils';
@@ -9,25 +8,48 @@ const useTokenPrices = (API_URL, walletTransactions) => {
   const [error, setError] = useState(null);
 
   const fetchAllTokenPrices = useCallback(async () => {
-    if (!walletTransactions?.length) return;
+    console.log('useTokenPrices called with:', {
+      hasAPIURL: !!API_URL,
+      transactions: walletTransactions,
+      transactionsLength: walletTransactions?.length,
+    });
+
+    if (!walletTransactions?.length) {
+      console.log('No transactions available yet');
+      return;
+    }
     
     setIsLoading(true);
-    const uniqueTokens = new Map(); // Using Map instead of Set for better control
+    const uniqueTokens = new Map();
 
-    // Collect unique tokens from transactions
+    console.log('Processing transactions:', walletTransactions.slice(0, 2)); // Log first 2 transactions for debugging
+
     walletTransactions.forEach(transaction => {
+      console.log('Processing transaction:', {
+        hasAttributes: !!transaction.attributes,
+        transfersLength: transaction.attributes?.transfers?.length
+      });
+
       const transfers = transaction.attributes?.transfers || [];
       transfers.forEach(transfer => {
         const tokenInfo = transfer.fungible_info;
+        console.log('Processing transfer:', {
+          hasTokenInfo: !!tokenInfo,
+          symbol: tokenInfo?.symbol,
+          implementations: tokenInfo?.implementations
+        });
+
         if (!tokenInfo) return;
         
         const implementation = getSupportedImplementation(tokenInfo);
-        if (!implementation) return;
+        if (!implementation) {
+          console.log('No supported implementation found for token:', tokenInfo);
+          return;
+        }
 
         const key = tokenInfo.symbol?.toLowerCase() === 'eth' ? 'ethereum:eth' 
           : `${implementation.chain_id}:${implementation.address}`;
         
-        // Only add if not already in map
         if (!uniqueTokens.has(key)) {
           uniqueTokens.set(key, {
             chain: implementation.chain_id,
@@ -38,17 +60,19 @@ const useTokenPrices = (API_URL, walletTransactions) => {
       });
     });
 
+    console.log('Unique tokens found:', Array.from(uniqueTokens.values()));
+
     try {
       const tokensArray = Array.from(uniqueTokens.values());
-      const fetchedPrices = await fetchTokenPrices(API_URL, tokensArray);
+      console.log('Fetching prices for tokens:', tokensArray);
       
-      // Log the fetched prices for debugging
+      const fetchedPrices = await fetchTokenPrices(API_URL, tokensArray);
       console.log('Fetched token prices:', fetchedPrices);
       
       setTokenPrices(fetchedPrices);
       setError(null);
     } catch (err) {
-      console.error("Error fetching token prices:", err);
+      console.error('Error fetching token prices:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);

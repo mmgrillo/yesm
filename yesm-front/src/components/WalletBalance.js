@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import useWalletData from '../hooks/useWalletData';
 
 const WalletBalance = ({ walletAddresses, onBalanceFetched, adjustedBalance }) => {
-  const { walletBalances, tokens, fetchWalletData, isLoading, error } = useWalletData(process.env.REACT_APP_API_URL);
+  const { walletBalances, tokens, fetchWalletData, isLoading, error } = useWalletData();
   const hasFetched = useRef(false);
 
   useEffect(() => {

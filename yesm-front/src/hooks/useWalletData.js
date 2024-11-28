@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const useWalletData = (API_URL) => {
+const useWalletData = () => {
+  const API_URL = process.env.REACT_APP_API_URL;
   const [walletBalances, setWalletBalances] = useState([]);
   const [tokens, setTokens] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

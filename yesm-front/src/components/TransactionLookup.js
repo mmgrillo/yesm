@@ -6,18 +6,18 @@ import LoadingSpinner from './LoadingSpinner';
 import TransactionCard from './TransactionCard';
 import WalletBalance from './WalletBalance';
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://yesmother-e680f705d89a.herokuapp.com/api'
-  : 'http://localhost:5001/api';
+
+
+const API_URL = process.env.REACT_APP_API_URL;
 const TRANSACTIONS_PER_PAGE = 20;
 
-console.log('API_URL:', API_URL);
+
 
 const TransactionLookup = () => {
   const [walletAddresses, setWalletAddresses] = useState(['']);
   const [currentPage, setCurrentPage] = useState(1);
   const [allTransactions, setAllTransactions] = useState([]);
-  const [ isfetchingnextpage, setIsFetchingNextPage] = useState(false);
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [shouldFetchBalance, setShouldFetchBalance] = useState(false);
@@ -28,6 +28,21 @@ const TransactionLookup = () => {
   const [currentBalance, setCurrentBalance] = useState(0);
   const [adjustedBalance, setAdjustedBalance] = useState(0);
 
+  useEffect(() => {
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('API_URL:', API_URL);
+    console.log('Initial render of TransactionLookup');
+  }, []);
+
+  useEffect(() => {
+    console.log('Transactions updated:', {
+      count: allTransactions.length,
+      firstTransaction: allTransactions[0],
+      hasTransfers: allTransactions[0]?.attributes?.transfers,
+      allTransactions: allTransactions // Log full array for debugging
+    });
+  }, [allTransactions]);
+
   const { tokenPrices, isLoading: isTokenPricesLoading } = useTokenPrices(API_URL, allTransactions);
   const navigate = useNavigate();
 
@@ -36,18 +51,20 @@ const TransactionLookup = () => {
 
   const fetchWalletTransactionsAndBalances = async () => {
     setIsLoading(true);
-    setIsFetchingNextPage(true);
     console.log('Fetching from:', `${API_URL}/wallet/${walletAddresses[0]}`);
   
     try {
       const allFetchedTransactions = [];
       for (const walletAddress of walletAddresses) {
-        const response = await fetch(`${API_URL}/wallet/${walletAddress}?limit=${TRANSACTIONS_PER_PAGE}`, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${API_URL}/wallet/${walletAddress}?limit=${TRANSACTIONS_PER_PAGE}&page=${currentPage}`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
           }
-        });
+        );
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -58,7 +75,11 @@ const TransactionLookup = () => {
           allFetchedTransactions.push(...data);
         }
       }
-      setAllTransactions(allFetchedTransactions);
+  
+      setAllTransactions(prevTransactions => {
+        const existingTransactions = currentPage === 1 ? [] : prevTransactions;
+        return [...existingTransactions, ...allFetchedTransactions];
+      });
       setShouldFetchBalance(true);
       setHasSearched(true);
     } catch (err) {
@@ -66,9 +87,17 @@ const TransactionLookup = () => {
       setError(`Failed to fetch transactions: ${err.message}`);
     } finally {
       setIsLoading(false);
-      setIsFetchingNextPage(false);
     }
   };
+
+   // Add effect to monitor token prices loading state
+   useEffect(() => {
+    console.log('Token prices loading state:', {
+      isLoading: isTokenPricesLoading,
+      hasTokenPrices: Object.keys(tokenPrices || {}).length > 0,
+      tokenPrices
+    });
+  }, [isTokenPricesLoading, tokenPrices]);
 
   
   const handleWalletCheck = () => {

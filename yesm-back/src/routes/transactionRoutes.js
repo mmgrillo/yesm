@@ -3,7 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const { pool } = require('../database/schema');
 const ApiService = require('../services/apiService');
-const rateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit'); // Remove duplicate import
 const logger = require('../utils/logger');
 require('dotenv').config();
 
@@ -16,18 +16,7 @@ const isValidTimestamp = (timestamp) => {
          date < new Date('2025-01-01');
 };
 
-// Rate limiter configuration
-const createLimiter = (windowMs, max) => rateLimit({
-  windowMs,
-  max,
-  message: { error: 'Too many requests, please try again later.' }
-});
-
-const walletLimiter = createLimiter(60 * 1000, 100);
-const priceLimiter = createLimiter(60 * 1000, 200);
-const marketDataLimiter = createLimiter(60 * 1000, 50);
-
-router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
+router.get('/wallet/:walletAddress', async (req, res) => {
   const { walletAddress } = req.params;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 25;
@@ -64,7 +53,7 @@ router.get('/wallet/:walletAddress', walletLimiter, async (req, res) => {
   }
 });
 
-router.get('/wallet/:walletAddress/portfolio', walletLimiter, async (req, res) => {
+router.get('/wallet/:walletAddress/portfolio', async (req, res) => {
   const { walletAddress } = req.params;
   const ZERION_API_KEY = process.env.ZERION_API_KEY;
 
@@ -98,7 +87,24 @@ router.get('/wallet/:walletAddress/portfolio', walletLimiter, async (req, res) =
   }
 });
 
-router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) => {
+router.post('/token-prices', async (req, res) => {
+  const { tokens } = req.body;
+  if (!tokens?.length) {
+    return res.status(400).json({ error: 'Tokens array is required.' });
+  }
+
+  try {
+    const prices = await ApiService.fetchTokenPrices(tokens);
+    res.json(prices);
+  } catch (error) {
+    logger.error('Error fetching token prices:', error);
+    res.status(500).json({ error: 'Failed to fetch token prices.' });
+  }
+});
+
+
+
+router.get('/fear-greed-index/:timestamp', async (req, res) => {
   const timestamp = parseInt(req.params.timestamp);
   const client = await pool.connect();
   
@@ -148,7 +154,7 @@ router.get('/fear-greed-index/:timestamp', marketDataLimiter, async (req, res) =
   }
 });
 
-router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) => {
+router.get('/macro-indicators/:timestamp', async (req, res) => {
   const timestamp = parseInt(req.params.timestamp);
   const client = await pool.connect();
 
@@ -215,7 +221,7 @@ router.get('/macro-indicators/:timestamp', marketDataLimiter, async (req, res) =
   }
 });
 
-router.get('/volatility-indices/:timestamp', marketDataLimiter, async (req, res) => {
+router.get('/volatility-indices/:timestamp', async (req, res) => {
   const timestamp = parseInt(req.params.timestamp);
   
   if (!isValidTimestamp(timestamp)) {
