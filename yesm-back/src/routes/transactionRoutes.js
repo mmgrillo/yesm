@@ -16,6 +16,15 @@ const isValidTimestamp = (timestamp) => {
          date < new Date('2025-01-01');
 };
 
+router.use((err, req, res, next) => {
+  console.error('Error details:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path
+  });
+  res.status(500).json({ error: err.message });
+});
+
 router.get('/wallet/:walletAddress', async (req, res) => {
   const { walletAddress } = req.params;
   const page = parseInt(req.query.page) || 1;
