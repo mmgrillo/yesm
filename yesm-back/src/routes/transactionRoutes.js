@@ -257,7 +257,7 @@ router.get('/volatility-indices/:timestamp', async (req, res) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  app.use((err, req, res, next) => {
+  router.use((err, req, res, next) => {
     console.error('Production error:', err);
     
     // Only send error details in development
@@ -271,7 +271,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Add Heroku logging
-app.use((req, res, next) => {
+router.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     console.log({

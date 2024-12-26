@@ -14,6 +14,16 @@ dotenv.config();
 const app = express();
 app.set('trust proxy', 1);
 
+const possibleBuildPaths = [
+  path.join(process.cwd(), '../yesm-front/build'),
+  path.join(process.cwd(), 'yesm-front/build'),
+  path.join(process.cwd(), 'build'),
+  path.join(__dirname, '../../yesm-front/build'),
+  path.join(__dirname, '../build'),
+  '/app/yesm-front/build',
+  '/app/build'
+];
+
 // Enhanced CORS configuration
 const corsOrigins = process.env.NODE_ENV === 'production'
   ? ['https://yesmother-e680f705d89a.herokuapp.com', 'https://yesmother.herokuapp.com']
